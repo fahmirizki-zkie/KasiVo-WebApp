@@ -28,8 +28,12 @@ class BusinessOnboarding extends Component
     {
         $this->validate();
 
-        // TODO (Fahmi): Hubungkan ke database saat tabel businesses selesai
-        // auth()->user()->businesses()->create([...]);
+        // Hubungkan langsung ke model Business (OOP)
+        auth()->user()->businesses()->create([
+            'name' => $this->name,
+            'business_type' => $this->business_type,
+            'description' => $this->description,
+        ]);
 
         session()->flash('message', 'Profil usaha berhasil disimpan!');
 
