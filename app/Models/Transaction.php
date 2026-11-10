@@ -39,9 +39,22 @@ class Transaction extends Model
         return $this->hasMany(TransactionItem::class);
     }
 
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(Attachment::class);
+    }
+
     public function attachment(): HasOne
     {
         return $this->hasOne(Attachment::class);
+    }
+
+    /**
+     * Alias accessor agar bisa diakses via $transaction->description atau $transaction->notes.
+     */
+    public function getDescriptionAttribute(): ?string
+    {
+        return $this->notes;
     }
 }
 
