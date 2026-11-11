@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\BusinessOnboarding;
+use App\Livewire\SelectTransactionType;
 use App\Livewire\TransactionHistory;
 use Illuminate\Support\Facades\Route;
 
@@ -19,8 +20,10 @@ Route::get('onboarding', BusinessOnboarding::class)
     ->middleware(['auth'])
     ->name('onboarding');
 
-// Navigasi Fitur Utama KasiVo (Task KV-008)
+// Navigasi Fitur Utama KasiVo (Task KV-008 & KV-011)
 Route::middleware(['auth'])->group(function () {
+    Route::get('transactions/create', SelectTransactionType::class)->name('transactions.create');
+
     Route::get('transactions/create-pengeluaran', function () {
         return view('placeholder', [
             'title' => 'Catat Pengeluaran',
