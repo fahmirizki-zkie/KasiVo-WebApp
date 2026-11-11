@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\BusinessOnboarding;
+use App\Livewire\CreateIncomeTransaction;
 use App\Livewire\SelectTransactionType;
 use App\Livewire\TransactionHistory;
 use Illuminate\Support\Facades\Route;
@@ -31,12 +32,7 @@ Route::middleware(['auth'])->group(function () {
         ]);
     })->name('transactions.expense');
 
-    Route::get('transactions/create-penjualan', function () {
-        return view('placeholder', [
-            'title' => 'Catat Penjualan',
-            'description' => 'Jalur pencatatan omzet harian atau impor riwayat penjualan digital.'
-        ]);
-    })->name('transactions.income');
+    Route::get('transactions/create-penjualan', CreateIncomeTransaction::class)->name('transactions.income');
 
     Route::get('transactions', TransactionHistory::class)->name('transactions.index');
 
