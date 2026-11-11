@@ -2,9 +2,16 @@
     <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg p-6 sm:p-8">
             <div class="mb-6">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
-                    Kenalkan Usaha Kulinermu 🍜
-                </h2>
+                <div class="flex items-center gap-2.5 mb-2">
+                    <span class="w-8 h-8 rounded-xl bg-[#FCEDEA] text-[#E87559] flex items-center justify-center shrink-0 shadow-xs">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>
+                        </svg>
+                    </span>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                        Kenalkan Usaha Kulinermu
+                    </h2>
+                </div>
                 <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                     Lengkapi profil usaha kulinermu agar KasiVo dapat menyesuaikan analisis keuangan dan rekomendasi restock bahan.
                 </p>

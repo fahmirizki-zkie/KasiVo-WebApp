@@ -19,17 +19,7 @@ new class extends Component
 @php
     $currentRoute = request()->route()?->getName();
     
-    // Page Title & Breadcrumb Resolver
-    $pageCategory = match(true) {
-        request()->routeIs('dashboard') => 'Overview',
-        request()->routeIs('transactions.*') => 'Transaksi',
-        request()->routeIs('restock') => 'Inventaris',
-        request()->routeIs('business-profile') => 'Manajemen Usaha',
-        request()->routeIs('profile') => 'Pengaturan',
-        request()->routeIs('onboarding') => 'Onboarding',
-        default => 'KasiVo POS'
-    };
-
+    // Page Title Resolver
     $pageTitle = match($currentRoute) {
         'dashboard' => 'Dashboard',
         'transactions.index' => 'Riwayat Transaksi',
@@ -40,6 +30,46 @@ new class extends Component
         'profile' => 'Pengaturan Profil Akun',
         'onboarding' => 'Profil Usaha',
         default => 'Dashboard'
+    };
+
+    // Hierarchical Functional Breadcrumbs Definition
+    // Parent crumbs have a valid route url with wire:navigate, current active crumb has null url
+    $breadcrumbs = match($currentRoute) {
+        'dashboard' => [
+            ['label' => 'Dashboard', 'url' => null],
+        ],
+        'transactions.index' => [
+            ['label' => 'Dashboard', 'url' => route('dashboard')],
+            ['label' => 'Riwayat Transaksi', 'url' => null],
+        ],
+        'transactions.income' => [
+            ['label' => 'Transaksi', 'url' => route('transactions.index')],
+            ['label' => 'Catat Penjualan', 'url' => null],
+        ],
+        'transactions.expense' => [
+            ['label' => 'Transaksi', 'url' => route('transactions.index')],
+            ['label' => 'Catat Pengeluaran', 'url' => null],
+        ],
+        'restock' => [
+            ['label' => 'Dashboard', 'url' => route('dashboard')],
+            ['label' => 'Saran Restock Bahan', 'url' => null],
+        ],
+        'business-profile' => [
+            ['label' => 'Dashboard', 'url' => route('dashboard')],
+            ['label' => 'Profil Usaha & Ekspor', 'url' => null],
+        ],
+        'profile' => [
+            ['label' => 'Dashboard', 'url' => route('dashboard')],
+            ['label' => 'Pengaturan Akun', 'url' => null],
+        ],
+        'onboarding' => [
+            ['label' => 'Dashboard', 'url' => route('dashboard')],
+            ['label' => 'Profil Usaha', 'url' => null],
+        ],
+        default => [
+            ['label' => 'Dashboard', 'url' => route('dashboard')],
+            ['label' => $pageTitle, 'url' => null],
+        ]
     };
 
     $userName = auth()->user()->name ?? 'Pengguna KasiVo';
@@ -258,13 +288,65 @@ new class extends Component
                     </a>
                 </div>
 
+                <!-- Mobile & Tablet Compact Breadcrumb (Visible on < lg) -->
+                <div class="flex items-center gap-2 lg:hidden min-w-0">
+                    <div class="h-4 w-px bg-[#EEEEEE] shrink-0" aria-hidden="true"></div>
+                    <nav aria-label="Breadcrumb Mobile" class="flex items-center text-xs font-medium min-w-0">
+                        <ol class="flex items-center gap-1 min-w-0">
+                            @foreach ($breadcrumbs as $crumb)
+                                @if (!$loop->first)
+                                    <li class="shrink-0 text-[#999999]" aria-hidden="true">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                                        </svg>
+                                    </li>
+                                @endif
+                                <li class="min-w-0 {{ $loop->last ? 'text-[#E87559] font-semibold truncate max-w-[120px] sm:max-w-[200px]' : 'shrink-0 text-[#777777]' }}">
+                                    @if ($crumb['url'] && !$loop->last)
+                                        <a href="{{ $crumb['url'] }}" 
+                                           wire:navigate 
+                                           class="text-[#777777] hover:text-[#E87559] hover:underline transition-colors focus:outline-none">
+                                            {{ $crumb['label'] }}
+                                        </a>
+                                    @else
+                                        <span class="truncate" aria-current="{{ $loop->last ? 'page' : 'false' }}">
+                                            {{ $crumb['label'] }}
+                                        </span>
+                                    @endif
+                                </li>
+                            @endforeach
+                        </ol>
+                    </nav>
+                </div>
+
                 <!-- Desktop Breadcrumb & Dynamic Title (Visible on lg+) -->
                 <div class="hidden lg:flex flex-col">
-                    <div class="flex items-center gap-1.5 text-xs text-[#777777] font-medium">
-                        <span>{{ $pageCategory }}</span>
-                        <span>/</span>
-                        <span class="text-[#E87559] font-semibold">{{ $pageTitle }}</span>
-                    </div>
+                    <nav aria-label="Breadcrumb" class="flex items-center text-xs font-medium text-[#777777]">
+                        <ol class="flex items-center gap-1.5">
+                            @foreach ($breadcrumbs as $crumb)
+                                @if (!$loop->first)
+                                    <li class="shrink-0 text-[#999999]" aria-hidden="true">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                                        </svg>
+                                    </li>
+                                @endif
+                                <li class="min-w-0">
+                                    @if ($crumb['url'] && !$loop->last)
+                                        <a href="{{ $crumb['url'] }}" 
+                                           wire:navigate 
+                                           class="text-[#777777] hover:text-[#E87559] hover:underline transition-colors focus:outline-none focus:text-[#E87559]">
+                                            {{ $crumb['label'] }}
+                                        </a>
+                                    @else
+                                        <span class="text-[#E87559] font-semibold truncate" aria-current="page">
+                                            {{ $crumb['label'] }}
+                                        </span>
+                                    @endif
+                                </li>
+                            @endforeach
+                        </ol>
+                    </nav>
                     <h1 class="text-base font-extrabold text-[#252525] tracking-tight">
                         {{ $pageTitle }}
                     </h1>

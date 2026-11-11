@@ -4,8 +4,13 @@
         <!-- 1. Header & Quick Actions -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                    <span>📋</span> Riwayat Transaksi
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-[#FCEDEA] text-[#E87559] flex items-center justify-center shrink-0 shadow-xs">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z"/>
+                        </svg>
+                    </span>
+                    <span>Riwayat Transaksi</span>
                 </h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                     Catatan seluruh arus kas masuk (penjualan) dan kas keluar (pengeluaran) usahamu.
@@ -16,13 +21,13 @@
                     <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
-                    + Catat Penjualan
+                    Catat Penjualan
                 </a>
                 <a href="{{ route('transactions.expense') }}" class="inline-flex items-center px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-medium rounded-lg shadow-sm transition">
                     <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
                     </svg>
-                    - Catat Pengeluaran
+                    Catat Pengeluaran
                 </a>
             </div>
         </div>
@@ -252,20 +257,33 @@
                                         <!-- Sumber Input (Multimodal) -->
                                         <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
                                             @if ($t->source_type === 'photo')
-                                                <span class="inline-flex items-center gap-1 text-gray-600 dark:text-gray-400" title="Dari Foto Nota">
-                                                    📸 Foto
+                                                <span class="inline-flex items-center gap-1.5 text-gray-600 dark:text-gray-400 font-medium" title="Dari Foto Nota">
+                                                    <svg class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                    </svg>
+                                                    <span>Foto</span>
                                                 </span>
                                             @elseif ($t->source_type === 'voice')
-                                                <span class="inline-flex items-center gap-1 text-gray-600 dark:text-gray-400" title="Dari Suara">
-                                                    🎙️ Suara
+                                                <span class="inline-flex items-center gap-1.5 text-gray-600 dark:text-gray-400 font-medium" title="Dari Suara">
+                                                    <svg class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                                                    </svg>
+                                                    <span>Suara</span>
                                                 </span>
                                             @elseif ($t->source_type === 'digital_import')
-                                                <span class="inline-flex items-center gap-1 text-gray-600 dark:text-gray-400" title="Impor Digital">
-                                                    📥 Impor
+                                                <span class="inline-flex items-center gap-1.5 text-gray-600 dark:text-gray-400 font-medium" title="Impor Digital">
+                                                    <svg class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                                    </svg>
+                                                    <span>Impor</span>
                                                 </span>
                                             @else
-                                                <span class="inline-flex items-center gap-1 text-gray-600 dark:text-gray-400" title="Ketik Teks">
-                                                    ✍️ Teks
+                                                <span class="inline-flex items-center gap-1.5 text-gray-600 dark:text-gray-400 font-medium" title="Ketik Teks">
+                                                    <svg class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                    </svg>
+                                                    <span>Teks</span>
                                                 </span>
                                             @endif
                                         </td>

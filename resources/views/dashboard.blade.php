@@ -9,7 +9,7 @@
                     <span>Sistem POS & Kasir Online</span>
                 </div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-[#252525] tracking-tight">
-                    Selamat datang kembali, {{ auth()->user()->name }} 👋
+                    Selamat datang kembali, {{ auth()->user()->name }}
                 </h1>
                 <p class="text-sm text-[#777777] mt-1 max-w-xl">
                     Pantau kinerja penjualan, stok bahan baku, dan riwayat pesanan usaha Anda hari ini dalam satu platform terpadu.
