@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\BusinessOnboarding;
+use App\Livewire\TransactionHistory;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome');
@@ -34,12 +35,7 @@ Route::middleware(['auth'])->group(function () {
         ]);
     })->name('transactions.income');
 
-    Route::get('transactions', function () {
-        return view('placeholder', [
-            'title' => 'Riwayat Transaksi',
-            'description' => 'Daftar riwayat transaksi kas masuk dan kas keluar usaha.'
-        ]);
-    })->name('transactions.index');
+    Route::get('transactions', TransactionHistory::class)->name('transactions.index');
 
     Route::get('restock', function () {
         return view('placeholder', [
