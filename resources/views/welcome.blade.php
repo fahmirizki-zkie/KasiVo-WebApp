@@ -46,7 +46,7 @@
                 </a>
 
                 <!-- Desktop Navigation Links -->
-                <nav class="hidden md:flex items-center gap-1 lg:gap-2">
+                <nav class="hidden lg:flex items-center gap-1 lg:gap-2">
                     <a href="#hero" class="px-3.5 py-2 text-sm font-medium text-[#252525] hover:text-[#E87559] rounded-xl hover:bg-[#FCEDEA]/50 transition-colors">
                         Home
                     </a>
@@ -90,8 +90,8 @@
                     @endauth
                 </div>
 
-                <!-- Mobile Hamburger Button -->
-                <div class="flex sm:hidden">
+                <!-- Mobile & Tablet Hamburger Button -->
+                <div class="flex lg:hidden">
                     <button type="button" 
                             id="mobile-menu-btn"
                             aria-label="Toggle Navigation Menu"
@@ -106,8 +106,8 @@
                 </div>
             </div>
 
-            <!-- Mobile Navigation Drawer -->
-            <div id="mobile-menu" class="hidden sm:hidden py-4 border-t border-[#EEEEEE] space-y-2">
+            <!-- Mobile & Tablet Navigation Drawer -->
+            <div id="mobile-menu" class="hidden lg:hidden py-4 border-t border-[#EEEEEE] space-y-2">
                 <a href="#hero" class="mobile-nav-link block px-3 py-2 text-base font-medium text-[#252525] rounded-lg hover:bg-[#FCEDEA]">Home</a>
                 <a href="#features" class="mobile-nav-link block px-3 py-2 text-base font-medium text-[#777777] hover:text-[#252525] rounded-lg hover:bg-[#FCEDEA]">Features</a>
                 <a href="#why-us" class="mobile-nav-link block px-3 py-2 text-base font-medium text-[#777777] hover:text-[#252525] rounded-lg hover:bg-[#FCEDEA]">Why KasiVo</a>
@@ -145,23 +145,13 @@
             <!-- REFINED SUBTLE ABSTRACT BACKGROUND & CORAL ACCENTS       -->
             <!-- ======================================================== -->
             <!-- A. Top Right Hero: Soft Coral / Orange Radial Glow Blob -->
-            <div class="absolute -top-12 sm:-top-20 -right-12 sm:-right-20 lg:right-[-2%] w-[440px] sm:w-[580px] lg:w-[700px] h-[440px] sm:h-[580px] lg:h-[700px] rounded-full bg-coral-glow filter blur-[60px] lg:blur-[85px] pointer-events-none z-0 animate-coral-glow-1 select-none"></div>
+            <div class="absolute -top-12 sm:-top-20 -right-12 sm:-right-20 lg:-right-10 w-[320px] sm:w-[460px] lg:w-[580px] h-[320px] sm:h-[460px] lg:h-[580px] rounded-full bg-coral-glow filter blur-[60px] lg:blur-[85px] pointer-events-none z-0 select-none"></div>
 
-            <!-- A2. Top Right Organic Floating Graphic -->
-            <div class="absolute -top-16 sm:-top-24 -right-16 sm:-right-24 lg:right-[-6%] w-[480px] sm:w-[640px] lg:w-[780px] pointer-events-none z-0 animate-subtle-float-1 select-none opacity-20 sm:opacity-25 mix-blend-multiply mask-organic-soft filter blur-[6px]">
-                <img src="{{ asset('images/abstract-coral-shape.jpg') }}" alt="" class="w-full h-auto object-contain transform rotate-12">
-            </div>
+            <!-- B1. Left Diagonal Hero: Directional Coral / Orange Gradient Flow (Contained & Non-intrusive) -->
+            <div class="absolute -top-16 sm:-top-24 -left-16 sm:-left-24 lg:-left-12 w-[300px] sm:w-[420px] lg:w-[500px] h-[360px] sm:h-[480px] lg:h-[560px] rounded-[60px] bg-left-diagonal-coral filter blur-[50px] sm:blur-[75px] pointer-events-none z-0 select-none"></div>
 
-            <!-- B1. Left Diagonal Hero: Directional Coral / Orange Gradient Flow -->
-            <div class="absolute -top-16 sm:-top-24 -left-16 sm:-left-28 lg:left-[-4%] w-[460px] sm:w-[620px] lg:w-[760px] h-[520px] sm:h-[680px] lg:h-[820px] rounded-[80px] bg-left-diagonal-coral filter blur-[55px] sm:blur-[75px] pointer-events-none z-0 animate-subtle-float-2 select-none"></div>
-
-            <!-- B2. Left Diagonal Organic Shape Accent (Mirroring right side) -->
-            <div class="absolute -top-14 sm:-top-20 -left-16 sm:-left-24 lg:left-[-6%] w-[480px] sm:w-[640px] lg:w-[780px] pointer-events-none z-0 animate-subtle-float-2 select-none opacity-20 sm:opacity-25 mix-blend-multiply mask-organic-soft filter blur-[6px]">
-                <img src="{{ asset('images/abstract-coral-shape.jpg') }}" alt="" class="w-full h-auto object-contain transform -scale-x-100 rotate-12">
-            </div>
-
-            <!-- B3. Mid/Lower Left Soft Peach Anchor Glow -->
-            <div class="absolute top-[48%] sm:top-[52%] -left-12 sm:-left-20 lg:-left-6 w-[340px] sm:w-[460px] lg:w-[520px] h-[340px] sm:h-[460px] lg:h-[520px] rounded-full bg-coral-warm-glow filter blur-[60px] lg:blur-[80px] pointer-events-none z-0 animate-coral-glow-2 select-none"></div>
+            <!-- B2. Mid/Lower Left Soft Peach Anchor Glow -->
+            <div class="absolute top-[48%] sm:top-[52%] -left-12 sm:-left-20 lg:-left-6 w-[260px] sm:w-[360px] lg:w-[420px] h-[260px] sm:h-[360px] lg:h-[420px] rounded-full bg-coral-warm-glow filter blur-[55px] lg:blur-[75px] pointer-events-none z-0 select-none"></div>
 
             <!-- C. Soft Ambient Background Glow (Central whitespace preserved) -->
             <div class="absolute top-4 left-1/2 -translate-x-1/2 w-[700px] h-[360px] bg-gradient-to-b from-[#FCEDEA]/50 via-[#FCEDEA]/20 to-transparent rounded-full blur-3xl -z-10 pointer-events-none"></div>
@@ -263,60 +253,60 @@
                         <div class="p-4 sm:p-6 lg:p-8 space-y-6 bg-gradient-to-b from-white to-[#FCEDEA]/20">
                             
                             <!-- 1. Top Metrics Summary Row -->
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                                 <!-- Card 1: Total Sales -->
-                                <div class="bg-white p-5 rounded-2xl border border-[#EEEEEE] shadow-sm hover:border-[#E87559]/30 transition">
-                                    <div class="flex items-center justify-between text-[#777777] text-xs font-medium">
+                                <div class="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#EEEEEE] shadow-sm hover:border-[#E87559]/30 transition">
+                                    <div class="flex items-center justify-between text-[#777777] text-[11px] sm:text-xs font-medium">
                                         <span>Total Penjualan Hari Ini</span>
-                                        <span class="px-2 py-0.5 rounded-full bg-[#DDF1EC] text-[#43A58A] font-semibold text-[11px]">+18.4%</span>
+                                        <span class="px-2 py-0.5 rounded-full bg-[#DDF1EC] text-[#43A58A] font-semibold text-[10px] sm:text-[11px]">+18.4%</span>
                                     </div>
-                                    <div class="mt-2 text-2xl font-extrabold text-[#252525]">
+                                    <div class="mt-2 text-xl sm:text-2xl font-extrabold text-[#252525]">
                                         Rp 14.850.000
                                     </div>
-                                    <div class="mt-1 text-xs text-[#777777] flex items-center gap-1">
+                                    <div class="mt-1 text-[11px] sm:text-xs text-[#777777] flex items-center gap-1">
                                         <span class="text-[#43A58A] font-semibold">↑ Rp 2.3jt</span> vs hari kemarin
                                     </div>
                                 </div>
 
                                 <!-- Card 2: Total Transactions -->
-                                <div class="bg-white p-5 rounded-2xl border border-[#EEEEEE] shadow-sm hover:border-[#E87559]/30 transition">
-                                    <div class="flex items-center justify-between text-[#777777] text-xs font-medium">
+                                <div class="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#EEEEEE] shadow-sm hover:border-[#E87559]/30 transition">
+                                    <div class="flex items-center justify-between text-[#777777] text-[11px] sm:text-xs font-medium">
                                         <span>Total Transaksi</span>
-                                        <span class="px-2 py-0.5 rounded-full bg-[#E1F0F7] text-[#252525] font-semibold text-[11px]">184 Order</span>
+                                        <span class="px-2 py-0.5 rounded-full bg-[#E1F0F7] text-[#252525] font-semibold text-[10px] sm:text-[11px]">184 Order</span>
                                     </div>
-                                    <div class="mt-2 text-2xl font-extrabold text-[#252525]">
+                                    <div class="mt-2 text-xl sm:text-2xl font-extrabold text-[#252525]">
                                         184 Tiket
                                     </div>
-                                    <div class="mt-1 text-xs text-[#777777]">
+                                    <div class="mt-1 text-[11px] sm:text-xs text-[#777777]">
                                         Rata-rata: <span class="font-semibold text-[#252525]">Rp 80.700</span> / order
                                     </div>
                                 </div>
 
                                 <!-- Card 3: Inventory Status -->
-                                <div class="bg-white p-5 rounded-2xl border border-[#EEEEEE] shadow-sm hover:border-[#E87559]/30 transition">
-                                    <div class="flex items-center justify-between text-[#777777] text-xs font-medium">
+                                <div class="bg-white p-3.5 sm:p-5 rounded-2xl border border-[#EEEEEE] shadow-sm hover:border-[#E87559]/30 transition">
+                                    <div class="flex items-center justify-between text-[#777777] text-[11px] sm:text-xs font-medium">
                                         <span>Status Persediaan</span>
-                                        <span class="px-2 py-0.5 rounded-full bg-[#FCEDEA] text-[#E87559] font-semibold text-[11px]">2 Perlu Restock</span>
+                                        <span class="px-2 py-0.5 rounded-full bg-[#FCEDEA] text-[#E87559] font-semibold text-[10px] sm:text-[11px]">2 Perlu Restock</span>
                                     </div>
-                                    <div class="mt-2 text-2xl font-extrabold text-[#252525]">
+                                    <div class="mt-2 text-xl sm:text-2xl font-extrabold text-[#252525]">
                                         94% Aman
                                     </div>
-                                    <div class="mt-1 text-xs text-[#E87559] font-medium flex items-center gap-1.5">
+                                    <div class="mt-1 text-[11px] sm:text-xs text-[#E87559] font-medium flex items-center gap-1.5">
                                         <svg class="w-3.5 h-3.5 shrink-0 text-[#E87559]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
-                                        <span>Arabika Beans sisa 1.2kg</span>
+                                        <span class="truncate">Arabika Beans sisa 1.2kg</span>
                                     </div>
                                 </div>
 
                                 <!-- Card 4: AI Business Health -->
-                                <div class="bg-gradient-to-br from-[#FCEDEA] to-[#E1F0F7] p-5 rounded-2xl border border-[#E87559]/20 shadow-sm">
-                                    <div class="flex items-center justify-between text-[#252525] text-xs font-semibold">
+                                <div class="bg-gradient-to-br from-[#FCEDEA] to-[#E1F0F7] p-3.5 sm:p-5 rounded-2xl border border-[#E87559]/20 shadow-sm">
+                                    <div class="flex items-center justify-between text-[#252525] text-[11px] sm:text-xs font-semibold">
                                         <span>AI Business Score</span>
-                                        <span class="px-2 py-0.5 rounded-full bg-white text-[#E87559] font-bold text-[11px]">EXCELLENT</span>
+                                        <span class="px-2 py-0.5 rounded-full bg-white text-[#E87559] font-bold text-[10px] sm:text-[11px]">EXCELLENT</span>
                                     </div>
-                                    <div class="mt-2 text-2xl font-extrabold text-[#E87559] flex items-center gap-1.5">
-                                        <span>96</span><span class="text-sm font-semibold text-[#777777]">/100</span>
+                                    <div class="mt-2 text-xl sm:text-2xl font-extrabold text-[#E87559] flex items-center gap-1.5">
+                                        <span>96</span><span class="text-xs sm:text-sm font-semibold text-[#777777]">/100</span>
                                     </div>
-                                    <div class="mt-1 text-xs text-[#252525] font-medium">
+                                    <div class="mt-1 text-[11px] sm:text-xs text-[#252525] font-medium">
                                         Efisiensi Dapur: <span class="text-[#43A58A] font-bold">+24%</span>
                                     </div>
                                 </div>
