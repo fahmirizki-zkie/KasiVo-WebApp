@@ -23,6 +23,7 @@ new class extends Component
     $pageTitle = match($currentRoute) {
         'dashboard' => 'Dashboard',
         'transactions.index' => 'Riwayat Transaksi',
+        'transactions.create' => 'Pilih Jenis Pencatatan',
         'transactions.expense' => 'Catat Pengeluaran',
         'transactions.income' => 'Catat Penjualan',
         'restock' => 'Saran Restock Bahan',
@@ -33,7 +34,7 @@ new class extends Component
     };
 
     // Hierarchical Functional Breadcrumbs Definition
-    // Parent crumbs have a valid route url with wire:navigate, current active crumb has null url
+    // Parent crumbs have a valid route url (native navigation for reliable 1-click response), current active crumb has null url
     $breadcrumbs = match($currentRoute) {
         'dashboard' => [
             ['label' => 'Dashboard', 'url' => null],
@@ -41,6 +42,10 @@ new class extends Component
         'transactions.index' => [
             ['label' => 'Dashboard', 'url' => route('dashboard')],
             ['label' => 'Riwayat Transaksi', 'url' => null],
+        ],
+        'transactions.create' => [
+            ['label' => 'Transaksi', 'url' => route('transactions.index')],
+            ['label' => 'Pilih Jenis Pencatatan', 'url' => null],
         ],
         'transactions.income' => [
             ['label' => 'Transaksi', 'url' => route('transactions.index')],
@@ -304,8 +309,7 @@ new class extends Component
                                 <li class="min-w-0 {{ $loop->last ? 'text-[#E87559] font-semibold truncate max-w-[120px] sm:max-w-[200px]' : 'shrink-0 text-[#777777]' }}">
                                     @if ($crumb['url'] && !$loop->last)
                                         <a href="{{ $crumb['url'] }}" 
-                                           wire:navigate 
-                                           class="text-[#777777] hover:text-[#E87559] hover:underline transition-colors focus:outline-none">
+                                           class="inline-block py-0.5 text-[#777777] hover:text-[#E87559] hover:underline transition-colors focus:outline-none">
                                             {{ $crumb['label'] }}
                                         </a>
                                     @else
@@ -334,8 +338,7 @@ new class extends Component
                                 <li class="min-w-0">
                                     @if ($crumb['url'] && !$loop->last)
                                         <a href="{{ $crumb['url'] }}" 
-                                           wire:navigate 
-                                           class="text-[#777777] hover:text-[#E87559] hover:underline transition-colors focus:outline-none focus:text-[#E87559]">
+                                           class="inline-block py-0.5 text-[#777777] hover:text-[#E87559] hover:underline transition-colors focus:outline-none focus:text-[#E87559]">
                                             {{ $crumb['label'] }}
                                         </a>
                                     @else
@@ -357,7 +360,7 @@ new class extends Component
             <div class="flex items-center gap-3">
                 
                 <!-- Quick "+ Transaksi" Action Button (Desktop & Tablet) -->
-                <a href="{{ route('transactions.expense') }}" 
+                <a href="{{ route('transactions.create') }}" 
                    wire:navigate
                    class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#E87559] hover:bg-[#D66448] text-white text-xs font-semibold shadow-sm shadow-[#E87559]/20 hover:shadow-md transition-all transform active:scale-95">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
