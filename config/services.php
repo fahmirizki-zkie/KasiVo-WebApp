@@ -35,4 +35,21 @@ return [
         ],
     ],
 
+    'groq' => [
+        'api_key' => env('GROQ_API_KEY'),
+        'base_url' => env('GROQ_BASE_URL', 'https://api.groq.com/openai/v1'),
+        'vision_model' => env('GROQ_VISION_MODEL', 'llama-3.2-11b-vision-preview'),
+        'whisper_model' => env('GROQ_WHISPER_MODEL', 'whisper-large-v3-turbo'),
+        'text_model' => env('GROQ_TEXT_MODEL', 'qwen/qwen3.8-27b'),
+        'timeout' => (int) env('GROQ_TIMEOUT', 30),
+        'retry_attempts' => (int) env('GROQ_RETRY_ATTEMPTS', 2),
+    ],
+
+    'gemini' => [
+        'api_key' => env('GEMINI_API_KEY'),
+        'base_url' => env('GEMINI_BASE_URL', 'https://generativelanguage.googleapis.com/v1beta'),
+        'model' => env('GEMINI_MODEL', 'gemini-1.5-flash'),
+        'timeout' => (int) env('GEMINI_TIMEOUT', 30),
+    ],
+
 ];
