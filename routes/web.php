@@ -1,6 +1,8 @@
 <?php
 
 use App\Livewire\BusinessOnboarding;
+use App\Livewire\CreateIncomeTransaction;
+use App\Livewire\SelectTransactionType;
 use App\Livewire\TransactionHistory;
 use Illuminate\Support\Facades\Route;
 
@@ -19,8 +21,10 @@ Route::get('onboarding', BusinessOnboarding::class)
     ->middleware(['auth'])
     ->name('onboarding');
 
-// Navigasi Fitur Utama KasiVo (Task KV-008)
+// Navigasi Fitur Utama KasiVo (Task KV-008 & KV-011)
 Route::middleware(['auth'])->group(function () {
+    Route::get('transactions/create', SelectTransactionType::class)->name('transactions.create');
+
     Route::get('transactions/create-pengeluaran', function () {
         return view('placeholder', [
             'title' => 'Catat Pengeluaran',
@@ -28,12 +32,7 @@ Route::middleware(['auth'])->group(function () {
         ]);
     })->name('transactions.expense');
 
-    Route::get('transactions/create-penjualan', function () {
-        return view('placeholder', [
-            'title' => 'Catat Penjualan',
-            'description' => 'Jalur pencatatan omzet harian atau impor riwayat penjualan digital.'
-        ]);
-    })->name('transactions.income');
+    Route::get('transactions/create-penjualan', CreateIncomeTransaction::class)->name('transactions.income');
 
     Route::get('transactions', TransactionHistory::class)->name('transactions.index');
 

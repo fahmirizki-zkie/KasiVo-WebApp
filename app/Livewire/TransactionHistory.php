@@ -20,6 +20,14 @@ class TransactionHistory extends Component
     public string $category = 'all';
     public ?int $confirmingDeletionId = null;
 
+    // State untuk Detail & Koreksi Transaksi (KV-017)
+    public ?int $selectedTransactionId = null;
+    public bool $isEditing = false;
+    public $edit_amount = '';
+    public string $edit_category = '';
+    public string $edit_transaction_date = '';
+    public string $edit_notes = '';
+
     /**
      * Reset pagination saat filter berubah.
      */
@@ -41,6 +49,87 @@ class TransactionHistory extends Component
     public function updatedCategory(): void
     {
         $this->resetPage();
+    }
+
+    /**
+     * Tampilkan detail transaksi.
+     */
+    public function showDetail(int $id): void
+    {
+        $business = $this->getActiveBusiness();
+        if (!$business) {
+            return;
+        }
+
+        $transaction = $business->transactions()->with(['items', 'attachments'])->findOrFail($id);
+
+        $this->selectedTransactionId = $transaction->id;
+        $this->isEditing = false;
+
+        $this->edit_amount = (float) $transaction->amount;
+        $this->edit_category = $transaction->category;
+        $this->edit_transaction_date = Carbon::parse($transaction->transaction_date)->format('Y-m-d');
+        $this->edit_notes = $transaction->notes ?? '';
+    }
+
+    /**
+     * Buka mode koreksi data.
+     */
+    public function startEditing(): void
+    {
+        $this->isEditing = true;
+    }
+
+    /**
+     * Batalkan mode edit / tutup modal detail.
+     */
+    public function cancelDetail(): void
+    {
+        $this->selectedTransactionId = null;
+        $this->isEditing = false;
+        $this->resetValidation();
+    }
+
+    /**
+     * Simpan koreksi data transaksi (Audit Timestamp).
+     */
+    public function updateTransaction(): void
+    {
+        if (!$this->selectedTransactionId) {
+            return;
+        }
+
+        $this->validate([
+            'edit_amount' => 'required|numeric|min:1000|max:100000000',
+            'edit_category' => 'required|string',
+            'edit_transaction_date' => 'required|date|before_or_equal:today',
+            'edit_notes' => 'nullable|string|max:500',
+        ], [
+            'edit_amount.required' => 'Nominal transaksi wajib diisi.',
+            'edit_amount.min' => 'Nominal transaksi minimal Rp 1.000.',
+            'edit_amount.numeric' => 'Nominal harus berupa angka.',
+            'edit_transaction_date.required' => 'Tanggal transaksi wajib diisi.',
+            'edit_transaction_date.before_or_equal' => 'Tanggal tidak boleh melebihi hari ini.',
+            'edit_category.required' => 'Kategori transaksi wajib dipilih.',
+            'edit_notes.max' => 'Catatan maksimal 500 karakter.',
+        ]);
+
+        $business = $this->getActiveBusiness();
+        if (!$business) {
+            abort(403, 'Bisnis tidak ditemukan.');
+        }
+
+        $transaction = $business->transactions()->findOrFail($this->selectedTransactionId);
+
+        $transaction->update([
+            'amount' => $this->edit_amount,
+            'category' => $this->edit_category,
+            'transaction_date' => $this->edit_transaction_date,
+            'notes' => trim($this->edit_notes) ?: null,
+        ]);
+
+        $this->isEditing = false;
+        session()->flash('message', 'Transaksi berhasil dikoreksi dan tercatat di riwayat.');
     }
 
     /**
@@ -73,11 +162,13 @@ class TransactionHistory extends Component
             abort(403, 'Bisnis tidak ditemukan.');
         }
 
-        // Pastikan transaksi yang dihapus hanya milik bisnis pengguna yang aktif
         $transaction = $business->transactions()->findOrFail($this->confirmingDeletionId);
         $transaction->delete();
 
         $this->confirmingDeletionId = null;
+        if ($this->selectedTransactionId === $transaction->id) {
+            $this->selectedTransactionId = null;
+        }
         session()->flash('message', 'Transaksi berhasil dihapus dari pembukuan.');
     }
 
@@ -101,6 +192,7 @@ class TransactionHistory extends Component
                 'netCashFlow' => 0,
                 'hasBusiness' => false,
                 'transactionToDelete' => null,
+                'selectedTransaction' => null,
             ]);
         }
 
@@ -154,6 +246,11 @@ class TransactionHistory extends Component
             ? $business->transactions()->find($this->confirmingDeletionId)
             : null;
 
+        // Ambil objek transaksi yang sedang dilihat detailnya
+        $selectedTransaction = $this->selectedTransactionId
+            ? $business->transactions()->with(['items', 'attachments'])->find($this->selectedTransactionId)
+            : null;
+
         return view('livewire.transaction-history', [
             'transactions' => $transactions,
             'totalCashIn' => (float) $totalCashIn,
@@ -161,6 +258,7 @@ class TransactionHistory extends Component
             'netCashFlow' => (float) $netCashFlow,
             'hasBusiness' => true,
             'transactionToDelete' => $transactionToDelete,
+            'selectedTransaction' => $selectedTransaction,
         ]);
     }
 }
