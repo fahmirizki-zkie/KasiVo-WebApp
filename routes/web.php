@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\BusinessOnboarding;
+use App\Livewire\CreateExpenseVoiceTransaction;
 use App\Livewire\CreateIncomeTransaction;
 use App\Livewire\SelectTransactionType;
 use App\Livewire\TransactionHistory;
@@ -25,12 +26,7 @@ Route::get('onboarding', BusinessOnboarding::class)
 Route::middleware(['auth'])->group(function () {
     Route::get('transactions/create', SelectTransactionType::class)->name('transactions.create');
 
-    Route::get('transactions/create-pengeluaran', function () {
-        return view('placeholder', [
-            'title' => 'Catat Pengeluaran',
-            'description' => 'Jalur pencatatan belanja bahan baku dan operasional via foto nota, suara, atau teks bebas.'
-        ]);
-    })->name('transactions.expense');
+    Route::get('transactions/create-pengeluaran', CreateExpenseVoiceTransaction::class)->name('transactions.expense');
 
     Route::get('transactions/create-penjualan', CreateIncomeTransaction::class)->name('transactions.income');
 
