@@ -17,17 +17,17 @@
                 </p>
             </div>
             <div class="flex items-center gap-2">
-                <a href="{{ route('transactions.income') }}" class="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg shadow-sm transition">
-                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                <a href="{{ route('transactions.income') }}" wire:navigate class="inline-flex items-center px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-xs transition active:scale-95">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
                     </svg>
-                    Catat Penjualan
+                    <span>Catat Penjualan</span>
                 </a>
-                <a href="{{ route('transactions.expense') }}" class="inline-flex items-center px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-medium rounded-lg shadow-sm transition">
-                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                <a href="{{ route('transactions.expense') }}" wire:navigate class="inline-flex items-center px-3.5 py-2 bg-[#E87559] hover:bg-[#D66448] text-white text-xs sm:text-sm font-semibold rounded-xl shadow-xs transition active:scale-95">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"></path>
                     </svg>
-                    Catat Pengeluaran
+                    <span>Catat Pengeluaran</span>
                 </a>
             </div>
         </div>
@@ -346,42 +346,42 @@
 
     <!-- 5. Modal Konfirmasi Hapus Transaksi (KV-018) -->
     @if ($confirmingDeletionId && $transactionToDelete)
-        <div class="fixed inset-0 z-50 overflow-y-auto bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-xl border border-gray-100 dark:border-gray-700 space-y-4">
+        <div class="fixed inset-0 z-50 overflow-y-auto bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-[#EEEEEE] space-y-4">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-rose-100 dark:bg-rose-900/40 text-rose-600 flex items-center justify-center flex-shrink-0">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    <div class="w-10 h-10 rounded-xl bg-[#FCEDEA] text-[#E87559] border border-[#E87559]/20 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Hapus Transaksi?</h3>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Tindakan ini akan mempengaruhi perhitungan kas bersih.</p>
+                        <h3 class="text-base sm:text-lg font-bold text-[#252525]">Hapus Transaksi?</h3>
+                        <p class="text-xs text-[#777777]">Tindakan ini akan mempengaruhi perhitungan kas bersih.</p>
                     </div>
                 </div>
 
-                <div class="bg-gray-50 dark:bg-gray-900/50 p-3 rounded-lg text-xs space-y-1">
-                    <p class="text-gray-500">Keterangan: <span class="font-semibold text-gray-900 dark:text-white">{{ $transactionToDelete->description }}</span></p>
-                    <p class="text-gray-500">Nominal: <span class="font-semibold {{ $transactionToDelete->type === 'cash_in' ? 'text-emerald-600' : 'text-rose-600' }}">Rp {{ number_format($transactionToDelete->amount, 0, ',', '.') }}</span></p>
-                    <p class="text-gray-500">Tanggal: <span class="font-medium text-gray-700 dark:text-gray-300">{{ \Carbon\Carbon::parse($transactionToDelete->transaction_date)->translatedFormat('d M Y') }}</span></p>
+                <div class="bg-[#FBFBFC] p-3.5 rounded-xl border border-[#EEEEEE] text-xs space-y-1.5">
+                    <p class="text-[#777777]">Keterangan: <span class="font-semibold text-[#252525]">{{ $transactionToDelete->description }}</span></p>
+                    <p class="text-[#777777]">Nominal: <span class="font-bold {{ $transactionToDelete->type === 'cash_in' ? 'text-emerald-600' : 'text-[#E87559]' }}">Rp {{ number_format($transactionToDelete->amount, 0, ',', '.') }}</span></p>
+                    <p class="text-[#777777]">Tanggal: <span class="font-medium text-[#252525]">{{ \Carbon\Carbon::parse($transactionToDelete->transaction_date)->translatedFormat('d M Y') }}</span></p>
                 </div>
 
-                <p class="text-xs text-gray-500">
+                <p class="text-xs text-[#777777] leading-relaxed">
                     Apakah kamu yakin ingin menghapus transaksi ini dari pembukuan? Data yang sudah dihapus tidak dapat dipulihkan.
                 </p>
 
-                <div class="flex items-center justify-end gap-3 pt-2">
+                <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-[#EEEEEE]">
                     <button
                         type="button"
                         wire:click="cancelDelete"
-                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition"
+                        class="px-4 py-2 text-xs font-semibold text-[#777777] hover:text-[#252525] bg-gray-100 hover:bg-gray-200 rounded-xl transition"
                     >
                         Batal
                     </button>
                     <button
                         type="button"
                         wire:click="deleteTransaction"
-                        class="px-4 py-2 text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-sm transition"
+                        class="px-4 py-2 text-xs font-bold text-white bg-[#E87559] hover:bg-[#D66448] rounded-xl shadow-xs transition active:scale-95"
                     >
                         Ya, Hapus Transaksi
                     </button>
@@ -392,32 +392,38 @@
 
     <!-- 6. Modal Detail & Koreksi Transaksi (KV-017) -->
     @if ($selectedTransactionId && $selectedTransaction)
-        <div class="fixed inset-0 z-50 overflow-y-auto bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-gray-100 dark:border-gray-700 space-y-5">
+        <div class="fixed inset-0 z-50 overflow-y-auto bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-xl border border-[#EEEEEE] space-y-5">
 
                 <!-- Modal Header -->
-                <div class="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-700">
+                <div class="flex items-center justify-between pb-3.5 border-b border-[#EEEEEE]">
                     <div class="flex items-center gap-2">
                         @if ($selectedTransaction->type === 'cash_in')
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300">
-                                + Kas Masuk
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#DDF1EC] text-emerald-700 border border-emerald-200/50">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+                                </svg>
+                                <span>Kas Masuk</span>
                             </span>
                         @else
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-100 dark:bg-rose-900/40 text-rose-800 dark:text-rose-300">
-                                - Kas Keluar
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#FCEDEA] text-[#E87559] border border-[#E87559]/20">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                                </svg>
+                                <span>Kas Keluar</span>
                             </span>
                         @endif
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">
+                        <h3 class="text-base sm:text-lg font-bold text-[#252525]">
                             {{ $isEditing ? 'Koreksi Data Transaksi' : 'Rincian Transaksi' }}
                         </h3>
                     </div>
                     <button
                         type="button"
                         wire:click="cancelDetail"
-                        class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition"
+                        class="w-8 h-8 rounded-lg flex items-center justify-center text-[#777777] hover:text-[#252525] hover:bg-gray-100 transition-colors"
                     >
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                     </button>
                 </div>
@@ -426,16 +432,16 @@
                     <!-- MODE PREVIEW RINCIAN TRANSAKSI -->
                     <div class="space-y-4">
                         <!-- Nominal & Tanggal -->
-                        <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl flex items-center justify-between">
+                        <div class="bg-[#FBFBFC] p-4 rounded-xl border border-[#EEEEEE] flex items-center justify-between">
                             <div>
-                                <span class="text-xs text-gray-400 font-medium uppercase tracking-wider">Total Nominal</span>
-                                <div class="text-2xl font-extrabold {{ $selectedTransaction->type === 'cash_in' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">
+                                <span class="text-[11px] text-[#777777] font-semibold uppercase tracking-wider">Total Nominal</span>
+                                <div class="text-2xl font-extrabold {{ $selectedTransaction->type === 'cash_in' ? 'text-emerald-600' : 'text-[#E87559]' }}">
                                     {{ $selectedTransaction->type === 'cash_in' ? '+' : '-' }}Rp {{ number_format($selectedTransaction->amount, 0, ',', '.') }}
                                 </div>
                             </div>
                             <div class="text-right">
-                                <span class="text-xs text-gray-400 font-medium uppercase tracking-wider">Tanggal</span>
-                                <div class="text-sm font-semibold text-gray-900 dark:text-white">
+                                <span class="text-[11px] text-[#777777] font-semibold uppercase tracking-wider">Tanggal</span>
+                                <div class="text-xs sm:text-sm font-bold text-[#252525]">
                                     {{ \Carbon\Carbon::parse($selectedTransaction->transaction_date)->translatedFormat('d F Y') }}
                                 </div>
                             </div>
@@ -443,23 +449,36 @@
 
                         <!-- Info Kategori & Sumber Input -->
                         <div class="grid grid-cols-2 gap-3 text-xs">
-                            <div class="p-3 rounded-lg border border-gray-100 dark:border-gray-700">
-                                <span class="text-gray-400">Kategori:</span>
-                                <p class="font-semibold text-gray-900 dark:text-white mt-0.5">
+                            <div class="p-3 rounded-xl border border-[#EEEEEE] bg-[#FBFBFC]">
+                                <span class="text-[#777777] font-medium">Kategori:</span>
+                                <p class="font-bold text-[#252525] mt-0.5">
                                     {{ ucfirst(str_replace('_', ' ', $selectedTransaction->category)) }}
                                 </p>
                             </div>
-                            <div class="p-3 rounded-lg border border-gray-100 dark:border-gray-700">
-                                <span class="text-gray-400">Metode Input:</span>
-                                <p class="font-semibold text-gray-900 dark:text-white mt-0.5">
+                            <div class="p-3 rounded-xl border border-[#EEEEEE] bg-[#FBFBFC]">
+                                <span class="text-[#777777] font-medium">Metode Input:</span>
+                                <p class="font-bold text-[#252525] mt-0.5 flex items-center gap-1.5">
                                     @if ($selectedTransaction->source_type === 'photo')
-                                        📸 Foto Nota / Struk
+                                        <svg class="w-3.5 h-3.5 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
+                                        <span>Foto Nota / Struk</span>
                                     @elseif ($selectedTransaction->source_type === 'voice')
-                                        🎙️ Pesan Suara
+                                        <svg class="w-3.5 h-3.5 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                                        </svg>
+                                        <span>Pesan Suara</span>
                                     @elseif ($selectedTransaction->source_type === 'digital_import')
-                                        📥 Impor Digital
+                                        <svg class="w-3.5 h-3.5 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                        </svg>
+                                        <span>Impor Digital</span>
                                     @else
-                                        ✍️ Ketik Teks
+                                        <svg class="w-3.5 h-3.5 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                        </svg>
+                                        <span>Ketik Teks</span>
                                     @endif
                                 </p>
                             </div>
@@ -467,8 +486,8 @@
 
                         <!-- Catatan Transaksi -->
                         <div>
-                            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Keterangan / Catatan:</span>
-                            <p class="text-sm text-gray-800 dark:text-gray-200 mt-1 bg-gray-50 dark:bg-gray-900/30 p-3 rounded-lg border border-gray-100 dark:border-gray-700">
+                            <span class="text-[11px] font-semibold text-[#777777] uppercase tracking-wider">Keterangan / Catatan:</span>
+                            <p class="text-xs sm:text-sm text-[#252525] mt-1 bg-[#FBFBFC] p-3 rounded-xl border border-[#EEEEEE] leading-relaxed">
                                 {{ $selectedTransaction->notes ?: 'Tidak ada catatan tambahan.' }}
                             </p>
                         </div>
@@ -476,22 +495,22 @@
                         <!-- Rincian Item Belanja (jika ada) -->
                         @if ($selectedTransaction->items->isNotEmpty())
                             <div>
-                                <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Rincian Barang Dapur:</span>
-                                <div class="mt-1 border border-gray-100 dark:border-gray-700 rounded-lg overflow-hidden">
-                                    <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-700 text-xs">
-                                        <thead class="bg-gray-50 dark:bg-gray-900 text-gray-500">
+                                <span class="text-[11px] font-semibold text-[#777777] uppercase tracking-wider">Rincian Barang Dapur:</span>
+                                <div class="mt-1 border border-[#EEEEEE] rounded-xl overflow-hidden shadow-xs">
+                                    <table class="min-w-full divide-y divide-[#EEEEEE] text-xs">
+                                        <thead class="bg-[#FBFBFC] text-[#777777]">
                                             <tr>
-                                                <th class="px-3 py-2 text-left">Barang</th>
-                                                <th class="px-3 py-2 text-center">Jumlah</th>
-                                                <th class="px-3 py-2 text-right">Subtotal</th>
+                                                <th class="px-3 py-2 text-left font-semibold">Barang</th>
+                                                <th class="px-3 py-2 text-center font-semibold">Jumlah</th>
+                                                <th class="px-3 py-2 text-right font-semibold">Subtotal</th>
                                             </tr>
                                         </thead>
-                                        <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                                        <tbody class="divide-y divide-[#EEEEEE]">
                                             @foreach ($selectedTransaction->items as $item)
-                                                <tr>
-                                                    <td class="px-3 py-2 font-medium text-gray-900 dark:text-white">{{ $item->item_name }}</td>
-                                                    <td class="px-3 py-2 text-center text-gray-500">{{ (float) $item->quantity }} {{ $item->unit }}</td>
-                                                    <td class="px-3 py-2 text-right font-medium text-gray-900 dark:text-white">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td>
+                                                <tr class="hover:bg-[#FBFBFC]/50 transition-colors">
+                                                    <td class="px-3 py-2 font-medium text-[#252525]">{{ $item->item_name }}</td>
+                                                    <td class="px-3 py-2 text-center text-[#777777]">{{ (float) $item->quantity }} {{ $item->unit }}</td>
+                                                    <td class="px-3 py-2 text-right font-semibold text-[#252525]">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -503,13 +522,18 @@
                         <!-- Bukti Foto Nota (jika ada) -->
                         @if ($selectedTransaction->attachments->isNotEmpty())
                             <div>
-                                <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Bukti Foto Struk / Nota:</span>
+                                <span class="text-[11px] font-semibold text-[#777777] uppercase tracking-wider">Bukti Foto Struk / Nota:</span>
                                 <div class="mt-2 flex gap-3">
                                     @foreach ($selectedTransaction->attachments as $att)
-                                        <a href="{{ $att->url }}" target="_blank" class="group relative block w-24 h-24 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm" title="Klik untuk perbesar">
+                                        <a href="{{ $att->url }}" target="_blank" class="group relative block w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border border-[#EEEEEE] shadow-xs" title="Klik untuk perbesar">
                                             <img src="{{ $att->url }}" alt="{{ $att->file_name }}" class="w-full h-full object-cover group-hover:scale-105 transition" />
-                                            <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
-                                                <span class="text-white text-xs font-medium">Buka ↗</span>
+                                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+                                                <span class="text-white text-[10px] font-semibold flex items-center gap-1">
+                                                    <span>Buka</span>
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                                    </svg>
+                                                </span>
                                             </div>
                                         </a>
                                     @endforeach
@@ -518,30 +542,42 @@
                         @endif
 
                         <!-- Jejak Audit Waktu (Audit Timestamp) -->
-                        <div class="pt-3 border-t border-gray-100 dark:border-gray-700 text-[11px] text-gray-400 space-y-0.5">
-                            <p>🕒 Dicatat pada: {{ $selectedTransaction->created_at->format('d M Y, H:i') }} WIB</p>
+                        <div class="pt-3 border-t border-[#EEEEEE] text-[11px] text-[#777777] space-y-1">
+                            <p class="flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                                <span>Dicatat pada: {{ $selectedTransaction->created_at->format('d M Y, H:i') }} WIB</span>
+                            </p>
                             @if ($selectedTransaction->updated_at->gt($selectedTransaction->created_at))
-                                <p class="text-amber-600 dark:text-amber-400 font-medium">
-                                    ✏️ Terakhir dikoreksi: {{ $selectedTransaction->updated_at->format('d M Y, H:i') }} WIB
+                                <p class="flex items-center gap-1.5 text-amber-700 font-medium">
+                                    <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                    <span>Terakhir dikoreksi: {{ $selectedTransaction->updated_at->format('d M Y, H:i') }} WIB</span>
                                 </p>
                             @endif
                         </div>
 
                         <!-- Footer Preview -->
-                        <div class="pt-3 border-t border-gray-100 dark:border-gray-700 flex items-center justify-end gap-2.5">
+                        <div class="pt-3.5 border-t border-[#EEEEEE] flex items-center justify-end gap-2.5">
                             <button
                                 type="button"
                                 wire:click="cancelDetail"
-                                class="px-4 py-2 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 rounded-lg transition"
+                                class="px-4 py-2 text-xs font-semibold text-[#777777] hover:text-[#252525] bg-gray-100 hover:bg-gray-200 rounded-xl transition"
                             >
                                 Tutup
                             </button>
                             <button
                                 type="button"
                                 wire:click="startEditing"
-                                class="inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition"
+                                class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-[#E87559] hover:bg-[#D66448] rounded-xl shadow-xs transition active:scale-95"
                             >
-                                ✏️ Koreksi Transaksi Ini
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                </svg>
+                                <span>Koreksi Transaksi Ini</span>
                             </button>
                         </div>
                     </div>
@@ -551,28 +587,28 @@
                     <form wire:submit="updateTransaction" class="space-y-4">
                         <!-- Nominal Koreksi -->
                         <div>
-                            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                                Nominal Transaksi (Rp) <span class="text-rose-500">*</span>
+                            <label class="block text-xs font-semibold text-[#252525] mb-1">
+                                Nominal Transaksi (Rp) <span class="text-[#E87559]">*</span>
                             </label>
                             <input
                                 type="number"
                                 wire:model="edit_amount"
                                 step="1000"
-                                class="block w-full py-2 px-3 text-sm rounded-lg border {{ $errors->has('edit_amount') ? 'border-rose-500' : 'border-gray-300 dark:border-gray-600' }} bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                                class="block w-full py-2 px-3 text-xs sm:text-sm rounded-xl border {{ $errors->has('edit_amount') ? 'border-[#E87559] text-[#E87559] focus:ring-[#E87559]/20' : 'border-[#EEEEEE] text-[#252525] focus:border-[#E87559] focus:ring-[#E87559]/20' }} bg-[#FBFBFC]"
                             />
                             @error('edit_amount')
-                                <p class="text-[11px] text-rose-500 mt-1">{{ $message }}</p>
+                                <p class="text-[11px] text-[#E87559] mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <!-- Kategori Koreksi -->
                         <div>
-                            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                                Kategori <span class="text-rose-500">*</span>
+                            <label class="block text-xs font-semibold text-[#252525] mb-1">
+                                Kategori <span class="text-[#E87559]">*</span>
                             </label>
                             <select
                                 wire:model="edit_category"
-                                class="block w-full py-2 px-3 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                                class="block w-full py-2 px-3 text-xs sm:text-sm rounded-xl border border-[#EEEEEE] bg-[#FBFBFC] text-[#252525] focus:border-[#E87559] focus:ring-[#E87559]/20"
                             >
                                 @if ($selectedTransaction->type === 'cash_in')
                                     <option value="penjualan_tunai">Penjualan Tunai</option>
@@ -587,55 +623,58 @@
                                 <option value="lainnya">Lainnya</option>
                             </select>
                             @error('edit_category')
-                                <p class="text-[11px] text-rose-500 mt-1">{{ $message }}</p>
+                                <p class="text-[11px] text-[#E87559] mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <!-- Tanggal Koreksi -->
                         <div>
-                            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                                Tanggal Transaksi <span class="text-rose-500">*</span>
+                            <label class="block text-xs font-semibold text-[#252525] mb-1">
+                                Tanggal Transaksi <span class="text-[#E87559]">*</span>
                             </label>
                             <input
                                 type="date"
                                 wire:model="edit_transaction_date"
                                 max="{{ date('Y-m-d') }}"
-                                class="block w-full py-2 px-3 text-sm rounded-lg border {{ $errors->has('edit_transaction_date') ? 'border-rose-500' : 'border-gray-300 dark:border-gray-600' }} bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                                class="block w-full py-2 px-3 text-xs sm:text-sm rounded-xl border {{ $errors->has('edit_transaction_date') ? 'border-[#E87559] text-[#E87559] focus:ring-[#E87559]/20' : 'border-[#EEEEEE] text-[#252525] focus:border-[#E87559] focus:ring-[#E87559]/20' }} bg-[#FBFBFC]"
                             />
                             @error('edit_transaction_date')
-                                <p class="text-[11px] text-rose-500 mt-1">{{ $message }}</p>
+                                <p class="text-[11px] text-[#E87559] mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <!-- Catatan Koreksi -->
                         <div>
-                            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                            <label class="block text-xs font-semibold text-[#252525] mb-1">
                                 Catatan / Keterangan
                             </label>
                             <textarea
                                 wire:model="edit_notes"
                                 rows="2"
-                                class="block w-full py-2 px-3 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                                class="block w-full py-2 px-3 text-xs sm:text-sm rounded-xl border border-[#EEEEEE] bg-[#FBFBFC] text-[#252525] focus:border-[#E87559] focus:ring-[#E87559]/20"
                             ></textarea>
                             @error('edit_notes')
-                                <p class="text-[11px] text-rose-500 mt-1">{{ $message }}</p>
+                                <p class="text-[11px] text-[#E87559] mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <!-- Tombol Submit Koreksi -->
-                        <div class="pt-3 border-t border-gray-100 dark:border-gray-700 flex items-center justify-end gap-2.5">
+                        <div class="pt-3.5 border-t border-[#EEEEEE] flex items-center justify-end gap-2.5">
                             <button
                                 type="button"
                                 wire:click="$set('isEditing', false)"
-                                class="px-4 py-2 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 rounded-lg transition"
+                                class="px-4 py-2 text-xs font-semibold text-[#777777] hover:text-[#252525] bg-gray-100 hover:bg-gray-200 rounded-xl transition"
                             >
                                 Batal
                             </button>
                             <button
                                 type="submit"
-                                class="px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm transition"
+                                class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition active:scale-95"
                             >
-                                Simpan Perubahan ➔
+                                <span>Simpan Perubahan</span>
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                </svg>
                             </button>
                         </div>
                     </form>
