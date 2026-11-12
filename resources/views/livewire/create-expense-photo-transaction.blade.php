@@ -35,18 +35,58 @@
 
             <!-- Pesan Error Backend / Livewire -->
             @if($errorMessage)
-                <div class="mb-6 p-4 rounded-2xl bg-[#FCEDEA] border border-[#E87559]/20 text-[#252525] text-xs sm:text-sm flex items-start gap-3">
-                    <div class="w-8 h-8 rounded-xl bg-white text-[#DC6464] flex items-center justify-center shrink-0 shadow-xs">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                        </svg>
+                @if($errorType === 'quota_exceeded')
+                    <div class="mb-6 p-4 rounded-2xl bg-red-50 border-2 border-red-200 text-[#252525] text-xs sm:text-sm flex flex-col sm:flex-row items-start justify-between gap-4 shadow-sm">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+                                <span class="text-base">⚠️</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-extrabold text-red-700 text-sm">Kuota AI Anda Sudah Penuh / Token AI Anda Sudah Habis</p>
+                                <p class="mt-1 text-red-900 leading-relaxed text-xs">
+                                    Layanan AI mencapai batas panggilan saat ini. Jangan khawatir, foto nota Anda tidak hilang! Klik tombol di samping untuk mencatat transaksi ini secara langsung.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 w-full sm:w-auto shrink-0 pt-2 sm:pt-0">
+                            <button type="button" 
+                                    wire:click="proceedToEmergencyReview"
+                                    class="flex-1 sm:flex-none px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold rounded-xl text-xs transition shadow-xs flex items-center justify-center gap-1.5">
+                                <span>✍️</span>
+                                <span>Koreksi Nominal Langsung</span>
+                            </button>
+                            <button type="button" 
+                                    wire:click="retryProcess"
+                                    class="px-3 py-2.5 bg-white hover:bg-gray-50 border border-red-300 text-red-700 font-semibold rounded-xl text-xs transition">
+                                🔄 Coba Ulang
+                            </button>
+                        </div>
                     </div>
-                    <div class="flex-1">
-                        <p class="font-bold text-[#DC6464]">Perhatian</p>
-                        <p class="mt-0.5 text-[#555555] leading-relaxed">{{ $errorMessage }}</p>
-                        <button type="button" wire:click="$set('errorMessage', null)" class="mt-2 text-xs text-[#E87559] hover:underline font-semibold">Tutup</button>
+                @else
+                    <div class="mb-6 p-4 rounded-2xl bg-[#FCEDEA] border border-[#E87559]/20 text-[#252525] text-xs sm:text-sm flex flex-col sm:flex-row items-start justify-between gap-4">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-white text-[#DC6464] flex items-center justify-center shrink-0 shadow-xs">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-bold text-[#DC6464]">Perhatian</p>
+                                <p class="mt-0.5 text-[#555555] leading-relaxed">{{ $errorMessage }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
+                            <button type="button" 
+                                    wire:click="proceedToEmergencyReview"
+                                    class="flex-1 sm:flex-none px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition">
+                                ✍️ Koreksi Nominal Langsung
+                            </button>
+                            <button type="button" 
+                                    wire:click="$set('errorMessage', null)" 
+                                    class="px-3 py-2 text-xs text-[#777777] hover:underline font-semibold">Tutup</button>
+                        </div>
                     </div>
-                </div>
+                @endif
             @endif
 
             <!-- ======================================================== -->
