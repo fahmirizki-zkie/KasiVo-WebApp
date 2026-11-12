@@ -67,12 +67,12 @@
                                 </svg>
                                 <span>Pesan Suara</span>
                             </span>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FBFBFC] border border-[#EEEEEE] text-[#252525] font-medium">
+                            <a href="{{ route('transactions.text') }}" wire:navigate class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FBFBFC] hover:bg-[#FCEDEA] border border-[#EEEEEE] hover:border-[#E87559]/30 text-[#252525] hover:text-[#E87559] font-medium transition-colors">
                                 <svg class="w-3.5 h-3.5 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
                                 </svg>
                                 <span>Ketik Teks</span>
-                            </span>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -132,12 +132,12 @@
                                 </svg>
                                 <span>Pesan Suara</span>
                             </span>
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FBFBFC] border border-[#EEEEEE] text-[#252525] font-medium">
+                            <a href="{{ route('transactions.text') }}" wire:navigate class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FBFBFC] hover:bg-[#FCEDEA] border border-[#EEEEEE] hover:border-[#E87559]/30 text-[#252525] hover:text-[#E87559] font-medium transition-colors">
                                 <svg class="w-3.5 h-3.5 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
                                 </svg>
                                 <span>Ketik Teks</span>
-                            </span>
+                            </a>
                         </div>
                     </div>
                 </div>
