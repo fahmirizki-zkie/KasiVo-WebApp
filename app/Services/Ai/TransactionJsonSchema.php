@@ -51,7 +51,7 @@ SKEMA JSON RESMI:
     {
       "item_name": "Nama Item",
       "quantity": 1.0,
-      "unit": "kg" | "liter" | "pcs" | "ikat" | "porsi" | "pack" | "dus",
+      "unit": "kg" | "liter" | "pcs" | "ikat" | "porsi" | "pack" | "dus" | "tabung" | "bungkus" | "botol" | "cup",
       "price_per_unit": 0,
       "subtotal": 0
     }
@@ -67,12 +67,13 @@ ATURAN KLASIFIKASI & PARSING:
    - "operasional": tabung gas LPG, token listrik PLN, air galon, es balok/kristal, sabun cuci, sapu/lap, bensin/transportasi, sewa tempat, perbaikan kompor.
    - "penjualan": pendapatan jualan harian/omzet.
 3. "total_amount":
-   - Wajib bernilai numerik murni (misal: "50rb" -> 50000, "15.000" -> 15000, "2jt" -> 2000000). Jangan sertakan simbol "Rp" atau titik koma.
+   - Wajib bernilai numerik murni (misal: "50rb" -> 50000, "25k" -> 25000, "15.000" -> 15000, "1.5jt" -> 1500000, "3 rebu" -> 3000). Jangan sertakan simbol "Rp" atau titik koma.
 4. "transaction_date":
    - Format wajib "YYYY-MM-DD".
    - Jika teks menyebut "kemarin", hitung H-1 dari referensi {$today}. Jika "hari ini" / "tadi sore" / tanggal tidak tertera di struk, gunakan {$today}.
 5. "items":
    - Pisahkan setiap barang ke dalam array `items`.
+   - Konversi kuantitas pecahan bahasa pasar: "setengah kilo" -> quantity: 0.5, unit: "kg"; "seperempat" -> quantity: 0.25.
    - Pastikan subtotal = quantity * price_per_unit.
    - Jika rincian item tidak ada di nota (misal hanya total bayar), buat 1 item umum dengan nama transaksi tersebut.
 6. "confidence_score" & "needs_review":
@@ -267,9 +268,9 @@ PROMPT;
         if (str_contains($str, 'jt') || str_contains($str, 'juta')) {
             $multiplier = 1000000.0;
             $str = str_replace(['juta', 'jt'], '', $str);
-        } elseif (str_contains($str, 'rb') || str_contains($str, 'k') || str_contains($str, 'ribu')) {
+        } elseif (str_contains($str, 'rb') || str_contains($str, 'k') || str_contains($str, 'ribu') || str_contains($str, 'rebu')) {
             $multiplier = 1000.0;
-            $str = str_replace(['ribu', 'rb', 'k'], '', $str);
+            $str = str_replace(['ribu', 'rebu', 'rb', 'k'], '', $str);
         }
 
         // Remove currency prefixes and non-numeric chars except separators
