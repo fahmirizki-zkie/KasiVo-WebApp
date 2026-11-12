@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\BusinessOnboarding;
+use App\Livewire\CreateExpensePhotoTransaction;
 use App\Livewire\CreateExpenseTextTransaction;
 use App\Livewire\CreateExpenseVoiceTransaction;
 use App\Livewire\CreateIncomeTransaction;
@@ -30,6 +31,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('transactions/create-pengeluaran', CreateExpenseVoiceTransaction::class)->name('transactions.expense');
 
     Route::get('transactions/create-teks', CreateExpenseTextTransaction::class)->name('transactions.text');
+
+    Route::get('transactions/create-foto', CreateExpensePhotoTransaction::class)->name('transactions.photo');
 
     Route::get('transactions/create-penjualan', CreateIncomeTransaction::class)->name('transactions.income');
 

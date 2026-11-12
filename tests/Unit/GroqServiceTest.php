@@ -23,8 +23,8 @@ class GroqServiceTest extends TestCase
         $this->service = new GroqService(
             apiKey: 'gsk_test_mock_groq_api_key_1234567890',
             baseUrl: 'https://api.groq.com/openai/v1',
-            textModel: 'llama-3.3-70b-versatile',
-            visionModel: 'llama-3.2-11b-vision-preview',
+            textModel: 'qwen/qwen3.8-27b',
+            visionModel: 'qwen/qwen3.8-27b',
             whisperModel: 'whisper-large-v3-turbo',
             timeout: 5,
             retryAttempts: 1
@@ -116,7 +116,7 @@ class GroqServiceTest extends TestCase
             'https://api.groq.com/openai/v1/chat/completions' => function (\Illuminate\Http\Client\Request $request) {
                 $payload = $request->data();
 
-                $this->assertEquals('llama-3.2-11b-vision-preview', $payload['model']);
+                $this->assertEquals('qwen/qwen3.8-27b', $payload['model']);
                 $content = $payload['messages'][1]['content'];
                 $this->assertIsArray($content);
                 $this->assertEquals('image_url', $content[1]['type']);
@@ -224,7 +224,7 @@ class GroqServiceTest extends TestCase
             'business_id' => $business->id,
             'user_id' => $user->id,
             'raw_input_type' => 'text',
-            'model_used' => 'llama-3.3-70b-versatile',
+            'model_used' => 'qwen/qwen3.8-27b',
             'status' => 'success',
         ]);
     }

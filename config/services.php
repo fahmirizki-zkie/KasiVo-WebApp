@@ -38,7 +38,7 @@ return [
     'groq' => [
         'api_key' => env('GROQ_API_KEY'),
         'base_url' => env('GROQ_BASE_URL', 'https://api.groq.com/openai/v1'),
-        'vision_model' => env('GROQ_VISION_MODEL', 'llama-3.2-11b-vision-preview'),
+        'vision_model' => env('GROQ_VISION_MODEL', 'qwen/qwen3.8-27b'),
         'whisper_model' => env('GROQ_WHISPER_MODEL', 'whisper-large-v3-turbo'),
         'text_model' => env('GROQ_TEXT_MODEL', 'qwen/qwen3.8-27b'),
         'timeout' => (int) env('GROQ_TIMEOUT', 30),

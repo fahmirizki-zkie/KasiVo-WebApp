@@ -54,13 +54,13 @@
                     <div class="mt-5 pt-4 border-t border-[#EEEEEE] space-y-2">
                         <p class="text-[11px] font-semibold text-[#777777] uppercase tracking-wider">Mendukung Jalur:</p>
                         <div class="flex flex-wrap gap-2 text-xs">
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FBFBFC] border border-[#EEEEEE] text-[#252525] font-medium">
+                            <a href="{{ route('transactions.photo') }}" wire:navigate class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FBFBFC] hover:bg-[#FCEDEA] border border-[#EEEEEE] hover:border-[#E87559]/30 text-[#252525] hover:text-[#E87559] font-medium transition-colors">
                                 <svg class="w-3.5 h-3.5 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 </svg>
                                 <span>Foto Nota / Struk</span>
-                            </span>
+                            </a>
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FBFBFC] border border-[#EEEEEE] text-[#252525] font-medium">
                                 <svg class="w-3.5 h-3.5 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>

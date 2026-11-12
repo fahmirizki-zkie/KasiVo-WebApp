@@ -32,7 +32,7 @@ class GroqService
         $this->apiKey = $apiKey ?? (string) config('services.groq.api_key', '');
         $this->baseUrl = rtrim($baseUrl ?? (string) config('services.groq.base_url', 'https://api.groq.com/openai/v1'), '/');
         $this->textModel = $textModel ?? (string) config('services.groq.text_model', 'qwen/qwen3.8-27b');
-        $this->visionModel = $visionModel ?? (string) config('services.groq.vision_model', 'llama-3.2-11b-vision-preview');
+        $this->visionModel = $visionModel ?? (string) config('services.groq.vision_model', 'qwen/qwen3.8-27b');
         $this->whisperModel = $whisperModel ?? (string) config('services.groq.whisper_model', 'whisper-large-v3-turbo');
         $this->timeout = $timeout ?? (int) config('services.groq.timeout', 30);
         $this->retryAttempts = $retryAttempts ?? (int) config('services.groq.retry_attempts', 2);
