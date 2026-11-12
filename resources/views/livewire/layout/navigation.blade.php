@@ -25,6 +25,8 @@ new class extends Component
         'transactions.index' => 'Riwayat Transaksi',
         'transactions.create' => 'Pilih Jenis Pencatatan',
         'transactions.expense' => 'Catat Pengeluaran',
+        'transactions.photo' => 'Catat Pengeluaran',
+        'transactions.text' => 'Catat Pengeluaran',
         'transactions.income' => 'Catat Penjualan',
         'restock' => 'Saran Restock Bahan',
         'business-profile' => 'Profil Usaha & Ekspor',
@@ -54,6 +56,16 @@ new class extends Component
         'transactions.expense' => [
             ['label' => 'Transaksi', 'url' => route('transactions.index')],
             ['label' => 'Catat Pengeluaran', 'url' => null],
+        ],
+        'transactions.photo' => [
+            ['label' => 'Transaksi', 'url' => route('transactions.index')],
+            ['label' => 'Pilih Jenis', 'url' => route('transactions.create')],
+            ['label' => 'Foto Nota', 'url' => null],
+        ],
+        'transactions.text' => [
+            ['label' => 'Transaksi', 'url' => route('transactions.index')],
+            ['label' => 'Pilih Jenis', 'url' => route('transactions.create')],
+            ['label' => 'Teks Bebas', 'url' => null],
         ],
         'restock' => [
             ['label' => 'Dashboard', 'url' => route('dashboard')],
@@ -177,12 +189,40 @@ new class extends Component
                        class="block px-3 py-1.5 rounded-lg text-xs transition-colors {{ request()->routeIs('transactions.index') ? 'text-[#E87559] font-bold bg-[#FCEDEA]/50' : 'text-[#777777] hover:text-[#252525] hover:bg-gray-50' }}">
                         Riwayat Transaksi
                     </a>
-                    <a href="{{ route('transactions.expense') }}" 
-                       wire:navigate
-                       class="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs transition-colors {{ request()->routeIs('transactions.expense') ? 'text-[#E87559] font-bold bg-[#FCEDEA]/50' : 'text-[#777777] hover:text-[#252525] hover:bg-gray-50' }}">
-                        <span>Catat Pengeluaran</span>
-                        <span class="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-amber-100 text-amber-700">Nota/AI</span>
-                    </a>
+                    <!-- Catat Pengeluaran (Multi-Moda AI) -->
+                    <div class="space-y-0.5 pt-1">
+                        <div class="flex items-center justify-between px-3 py-1 text-xs font-bold text-[#252525]">
+                            <span>Catat Pengeluaran</span>
+                            <span class="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-amber-100 text-amber-700">AI</span>
+                        </div>
+                        <div class="pl-2 space-y-0.5 border-l-2 border-[#EEEEEE] ml-3">
+                            <a href="{{ route('transactions.photo') }}" 
+                               wire:navigate
+                               class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-colors {{ request()->routeIs('transactions.photo') ? 'text-[#E87559] font-bold bg-[#FCEDEA]/60' : 'text-[#777777] hover:text-[#252525] hover:bg-gray-50' }}">
+                                <svg class="w-3.5 h-3.5 {{ request()->routeIs('transactions.photo') ? 'text-[#E87559]' : 'text-[#777777]' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                <span>Foto Nota</span>
+                            </a>
+                            <a href="{{ route('transactions.expense') }}" 
+                               wire:navigate
+                               class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-colors {{ request()->routeIs('transactions.expense') ? 'text-[#E87559] font-bold bg-[#FCEDEA]/60' : 'text-[#777777] hover:text-[#252525] hover:bg-gray-50' }}">
+                                <svg class="w-3.5 h-3.5 {{ request()->routeIs('transactions.expense') ? 'text-[#E87559]' : 'text-[#777777]' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                                </svg>
+                                <span>Suara</span>
+                            </a>
+                            <a href="{{ route('transactions.text') }}" 
+                               wire:navigate
+                               class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-colors {{ request()->routeIs('transactions.text') ? 'text-[#E87559] font-bold bg-[#FCEDEA]/60' : 'text-[#777777] hover:text-[#252525] hover:bg-gray-50' }}">
+                                <svg class="w-3.5 h-3.5 {{ request()->routeIs('transactions.text') ? 'text-[#E87559]' : 'text-[#777777]' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <span>Teks Bebas</span>
+                            </a>
+                        </div>
+                    </div>
                     <a href="{{ route('transactions.income') }}" 
                        wire:navigate
                        class="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs transition-colors {{ request()->routeIs('transactions.income') ? 'text-[#E87559] font-bold bg-[#FCEDEA]/50' : 'text-[#777777] hover:text-[#252525] hover:bg-gray-50' }}">
@@ -517,14 +557,43 @@ new class extends Component
                         <span>Riwayat Transaksi</span>
                     </a>
 
-                    <!-- Catat Pengeluaran -->
-                    <a href="{{ route('transactions.expense') }}" 
-                       wire:navigate
-                       @click="mobileDrawerOpen = false"
-                       class="flex items-center justify-between pl-11 pr-3.5 py-2 rounded-xl text-xs font-medium transition-colors {{ request()->routeIs('transactions.expense') ? 'text-[#E87559] font-bold bg-[#FCEDEA]/50' : 'text-[#777777] hover:text-[#252525] hover:bg-gray-50' }}">
-                        <span>Catat Pengeluaran</span>
-                        <span class="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-amber-100 text-amber-700">Nota/AI</span>
-                    </a>
+                    <!-- Catat Pengeluaran (Multi-Moda AI Mobile) -->
+                    <div class="space-y-0.5 pt-1">
+                        <div class="flex items-center justify-between pl-8 pr-3.5 py-1 text-xs font-bold text-[#252525]">
+                            <span>Catat Pengeluaran</span>
+                            <span class="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-amber-100 text-amber-700">AI</span>
+                        </div>
+                        <div class="pl-2 space-y-0.5 border-l-2 border-[#EEEEEE] ml-8">
+                            <a href="{{ route('transactions.photo') }}" 
+                               wire:navigate
+                               @click="mobileDrawerOpen = false"
+                               class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-colors {{ request()->routeIs('transactions.photo') ? 'text-[#E87559] font-bold bg-[#FCEDEA]/60' : 'text-[#777777] hover:text-[#252525] hover:bg-gray-50' }}">
+                                <svg class="w-3.5 h-3.5 {{ request()->routeIs('transactions.photo') ? 'text-[#E87559]' : 'text-[#777777]' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                <span>Foto Nota</span>
+                            </a>
+                            <a href="{{ route('transactions.expense') }}" 
+                               wire:navigate
+                               @click="mobileDrawerOpen = false"
+                               class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-colors {{ request()->routeIs('transactions.expense') ? 'text-[#E87559] font-bold bg-[#FCEDEA]/60' : 'text-[#777777] hover:text-[#252525] hover:bg-gray-50' }}">
+                                <svg class="w-3.5 h-3.5 {{ request()->routeIs('transactions.expense') ? 'text-[#E87559]' : 'text-[#777777]' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                                </svg>
+                                <span>Suara</span>
+                            </a>
+                            <a href="{{ route('transactions.text') }}" 
+                               wire:navigate
+                               @click="mobileDrawerOpen = false"
+                               class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-colors {{ request()->routeIs('transactions.text') ? 'text-[#E87559] font-bold bg-[#FCEDEA]/60' : 'text-[#777777] hover:text-[#252525] hover:bg-gray-50' }}">
+                                <svg class="w-3.5 h-3.5 {{ request()->routeIs('transactions.text') ? 'text-[#E87559]' : 'text-[#777777]' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <span>Teks Bebas</span>
+                            </a>
+                        </div>
+                    </div>
 
                     <!-- Catat Penjualan -->
                     <a href="{{ route('transactions.income') }}" 
