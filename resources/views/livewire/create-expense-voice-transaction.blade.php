@@ -32,369 +32,609 @@
                 </p>
             </div>
 
-            <!-- 2. Tab Switcher: Rekam Mikrofon vs Unggah Berkas -->
-            <div class="flex p-1 bg-[#FBFBFC] rounded-2xl border border-[#EEEEEE] mb-6">
-                <button
-                    type="button"
-                    @click="switchTab('record')"
-                    :class="activeTab === 'record' ? 'bg-white text-[#252525] shadow-xs font-bold' : 'text-[#777777] hover:text-[#252525] font-medium'"
-                    class="flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 transition-all"
-                >
-                    <svg class="w-4 h-4 text-[#E87559]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
-                    </svg>
-                    <span>Rekam Suara Langsung</span>
-                </button>
-
-                <button
-                    type="button"
-                    @click="switchTab('upload')"
-                    :class="activeTab === 'upload' ? 'bg-white text-[#252525] shadow-xs font-bold' : 'text-[#777777] hover:text-[#252525] font-medium'"
-                    class="flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 transition-all"
-                >
-                    <svg class="w-4 h-4 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                    </svg>
-                    <span>Unggah File Audio</span>
-                </button>
-            </div>
-
-            <!-- 3. Alert Pesan Error (Jika Ada) -->
-            <template x-if="state === 'error' && errorMessage">
+            <!-- Pesan Error Backend / Livewire -->
+            @if($errorMessage)
                 <div class="mb-6 p-4 rounded-2xl bg-[#FCEDEA] border border-[#E87559]/20 text-[#252525] text-xs sm:text-sm flex items-start gap-3">
-                    <div class="w-8 h-8 rounded-xl bg-white text-[#E87559] flex items-center justify-center shrink-0 shadow-xs">
+                    <div class="w-8 h-8 rounded-xl bg-white text-[#DC6464] flex items-center justify-center shrink-0 shadow-xs">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                         </svg>
                     </div>
                     <div class="flex-1">
-                        <p class="font-bold text-[#E87559]">Perhatian Akses</p>
-                        <p class="mt-0.5 text-[#555555] leading-relaxed" x-text="errorMessage"></p>
-                        <div class="mt-3 flex items-center gap-2">
-                            <button
-                                type="button"
-                                @click="state = 'idle'; errorMessage = ''"
-                                class="px-3 py-1.5 rounded-lg bg-white border border-[#EEEEEE] text-xs font-semibold text-[#252525] hover:bg-gray-50 transition"
-                            >
-                                Coba Lagi
-                            </button>
-                            <button
-                                type="button"
-                                @click="switchTab('upload')"
-                                class="px-3 py-1.5 rounded-lg bg-[#FCEDEA] text-xs font-semibold text-[#E87559] hover:bg-[#E87559]/10 transition"
-                            >
-                                Gunakan Unggah File
-                            </button>
-                        </div>
+                        <p class="font-bold text-[#DC6464]">Perhatian</p>
+                        <p class="mt-0.5 text-[#555555] leading-relaxed">{{ $errorMessage }}</p>
+                        <button type="button" wire:click="$set('errorMessage', null)" class="mt-2 text-xs text-[#E87559] hover:underline font-semibold">Tutup</button>
                     </div>
                 </div>
-            </template>
+            @endif
 
             <!-- ======================================================== -->
-            <!-- TAB 1: REKAM MIKROFON                                    -->
+            <!-- TAMPILAN 1: PROSES AI SEDANG BERJALAN                    -->
             <!-- ======================================================== -->
-            <div x-show="activeTab === 'record'" x-cloak class="space-y-6">
-
-                <!-- STATE A: IDLE (Siap Merekam) -->
-                <div x-show="state === 'idle'" class="text-center py-6 sm:py-8 space-y-5">
+            @if($isProcessing)
+                <div class="py-12 text-center space-y-6">
                     <div class="relative inline-flex items-center justify-center">
-                        <div class="absolute -inset-3 rounded-full bg-[#FCEDEA]/60 blur-md"></div>
-                        <button
-                            type="button"
-                            @click="startRecording()"
-                            class="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-br from-[#E87559] to-[#D66448] text-white shadow-lg shadow-[#E87559]/30 hover:scale-105 active:scale-95 transition-all flex flex-col items-center justify-center group focus:outline-hidden"
-                            title="Klik untuk mulai merekam suara"
-                        >
-                            <svg class="w-10 h-10 sm:w-12 sm:h-12 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <div class="w-20 h-20 rounded-full bg-[#FCEDEA] animate-ping absolute opacity-40"></div>
+                        <div class="w-16 h-16 rounded-full bg-[#E87559] text-white flex items-center justify-center shadow-md relative z-10">
+                            <svg class="w-8 h-8 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
                             </svg>
-                        </button>
-                    </div>
-
-                    <div>
-                        <h2 class="text-base sm:text-lg font-bold text-[#252525]">
-                            Tekan untuk Mulai Merekam
-                        </h2>
-                        <p class="text-xs text-[#777777] mt-1 max-w-sm mx-auto">
-                            Izin mikrofon browser hanya akan diminta saat tombol ini ditekan.
-                        </p>
-                    </div>
-
-                    <!-- Voice Prompt Guideline Box -->
-                    <div class="bg-[#FBFBFC] rounded-2xl p-4 border border-[#EEEEEE] max-w-md mx-auto text-left space-y-2">
-                        <div class="flex items-center gap-1.5 text-xs font-bold text-[#E87559]">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            <span>Tips Menyebutkan Belanjaan:</span>
-                        </div>
-                        <p class="text-xs text-[#555555] leading-relaxed italic">
-                            "Beli cabai rawit merah dua kilo tujuh puluh ribu dan minyak goreng sawit dua liter tiga puluh empat ribu."
-                        </p>
-                        <div class="pt-2 border-t border-[#EEEEEE] flex items-center justify-between text-[11px] text-[#777777]">
-                            <span>Batas durasi: <strong class="text-[#252525]" x-text="formattedMaxDuration">02:00</strong></span>
-                            <span>Noise Suppression: Aktif</span>
                         </div>
                     </div>
-                </div>
-
-                <!-- STATE B: REQUESTING PERMISSION (Menunggu Izin Browser) -->
-                <div x-show="state === 'requesting_permission'" class="text-center py-10 space-y-4">
-                    <div class="w-20 h-20 rounded-full bg-[#FCEDEA] text-[#E87559] border border-[#E87559]/30 flex items-center justify-center mx-auto animate-pulse">
-                        <svg class="w-10 h-10 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <div class="space-y-1.5">
+                        <h3 class="text-lg font-bold text-[#252525]">AI KasiVo Sedang Mendengarkan...</h3>
+                        <p class="text-xs sm:text-sm text-[#777777] max-w-md mx-auto leading-relaxed">
+                            Mentranskripsi suara dengan Groq Whisper STT dan menyusun rincian pengeluaran ke dalam format terstruktur.
+                        </p>
+                    </div>
+                    <div class="flex items-center justify-center gap-1.5 text-xs text-[#E87559] font-medium">
+                        <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                         </svg>
+                        <span>Estimasi proses < 2 detik</span>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold text-[#252525]">Menghubungkan ke Mikrofon...</h3>
-                        <p class="text-xs text-[#777777] mt-1 max-w-sm mx-auto">
-                            Silakan pilih <strong>"Izinkan" (Allow)</strong> pada kotak konfirmasi browser Anda untuk melanjutkan perekaman.
-                        </p>
+                </div>
+
+            <!-- ======================================================== -->
+            <!-- TAMPILAN 2: KONFIRMASI DRAFT HASIL AI (REVIEW SCREEN)     -->
+            <!-- ======================================================== -->
+            @elseif($step === 'review')
+                <div class="space-y-6">
+
+                    <!-- Audio Transcription Bubble -->
+                    @if($transcriptionText)
+                        <div class="p-4 rounded-2xl bg-[#FCEDEA]/50 border border-[#E87559]/20 flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-[#E87559] text-white flex items-center justify-center shrink-0 shadow-xs">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-xs font-bold text-[#E87559]">Transkripsi Suara (Whisper AI):</p>
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold">Terekstrak</span>
+                                </div>
+                                <p class="text-xs sm:text-sm font-medium text-[#252525] mt-1 italic leading-relaxed">
+                                    "{{ $transcriptionText }}"
+                                </p>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Warning jika needs_review aktif -->
+                    @if(!empty($draft['needs_review']))
+                        <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5">
+                            <svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            <p class="leading-relaxed">
+                                <strong>Perlu Ditinjau:</strong> {{ $draft['review_reason'] ?: 'Pastikan nominal dan rincian belanja sudah sesuai dengan rekaman Anda.' }}
+                            </p>
+                        </div>
+                    @endif
+
+                    <!-- Form Konfirmasi Transaksi -->
+                    <div class="space-y-5 pt-2">
+
+                        <!-- Total Pengeluaran -->
+                        <div>
+                            <label class="block text-xs font-bold text-[#777777] uppercase tracking-wider mb-1.5">
+                                Total Pengeluaran (Rp) <span class="text-[#DC6464]">*</span>
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-bold text-[#777777]">Rp</span>
+                                <input
+                                    type="number"
+                                    wire:model.live="draft.amount"
+                                    value="{{ $draft['amount'] }}"
+                                    class="w-full pl-12 pr-4 py-3 rounded-2xl border border-[#EEEEEE] focus:border-[#E87559] focus:ring-1 focus:ring-[#E87559] text-2xl font-extrabold text-[#252525]"
+                                    placeholder="0"
+                                    min="0"
+                                />
+                            </div>
+                            @error('draft.amount') <p class="text-xs text-[#DC6464] mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <!-- Kategori Pengeluaran -->
+                        <div>
+                            <label class="block text-xs font-bold text-[#777777] uppercase tracking-wider mb-1.5">
+                                Kategori <span class="text-[#DC6464]">*</span>
+                            </label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button
+                                    type="button"
+                                    wire:click="$set('draft.category', 'bahan_baku')"
+                                    class="p-3 rounded-xl border text-left flex items-center gap-3 transition {{ ($draft['category'] ?? '') === 'bahan_baku' ? 'border-[#E87559] bg-[#FCEDEA] text-[#E87559] font-bold shadow-2xs' : 'border-[#EEEEEE] bg-white text-[#555555] hover:bg-gray-50' }}"
+                                >
+                                    <span class="w-3 h-3 rounded-full {{ ($draft['category'] ?? '') === 'bahan_baku' ? 'bg-[#E87559]' : 'bg-gray-300' }}"></span>
+                                    <div>
+                                        <p class="text-xs font-bold">Bahan Baku</p>
+                                        <p class="text-[10px] text-[#777777]">Sembako, sayur, daging, bumbu, cup</p>
+                                    </div>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    wire:click="$set('draft.category', 'operasional')"
+                                    class="p-3 rounded-xl border text-left flex items-center gap-3 transition {{ ($draft['category'] ?? '') === 'operasional' ? 'border-[#E87559] bg-[#FCEDEA] text-[#E87559] font-bold shadow-2xs' : 'border-[#EEEEEE] bg-white text-[#555555] hover:bg-gray-50' }}"
+                                >
+                                    <span class="w-3 h-3 rounded-full {{ ($draft['category'] ?? '') === 'operasional' ? 'bg-[#E87559]' : 'bg-gray-300' }}"></span>
+                                    <div>
+                                        <p class="text-xs font-bold">Operasional</p>
+                                        <p class="text-[10px] text-[#777777]">Gas LPG, listrik, es batu, galon</p>
+                                    </div>
+                                </button>
+                            </div>
+                            @error('draft.category') <p class="text-xs text-[#DC6464] mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <!-- Tanggal & Catatan -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-[#777777] uppercase tracking-wider mb-1.5">
+                                    Tanggal Transaksi <span class="text-[#DC6464]">*</span>
+                                </label>
+                                <input
+                                    type="date"
+                                    wire:model="draft.transaction_date"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-[#EEEEEE] focus:border-[#E87559] text-xs font-medium text-[#252525]"
+                                />
+                                @error('draft.transaction_date') <p class="text-xs text-[#DC6464] mt-1">{{ $message }}</p> @enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-[#777777] uppercase tracking-wider mb-1.5">
+                                    Keterangan / Tempat Belanja
+                                </label>
+                                <input
+                                    type="text"
+                                    wire:model="draft.notes"
+                                    placeholder="Contoh: Belanja di Toko Berkah"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-[#EEEEEE] focus:border-[#E87559] text-xs font-medium text-[#252525]"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- Rincian Barang Belanjaan -->
+                        <div class="space-y-3 pt-3 border-t border-[#EEEEEE]">
+                            <div class="flex items-center justify-between">
+                                <label class="text-xs font-bold text-[#252525] uppercase tracking-wider flex items-center gap-1.5">
+                                    <span>Rincian Barang</span>
+                                    <span class="px-2 py-0.5 rounded-full bg-gray-100 text-[10px] font-semibold text-[#777777]">
+                                        {{ count($draft['items'] ?? []) }} item
+                                    </span>
+                                </label>
+                                <button
+                                    type="button"
+                                    wire:click="addItem"
+                                    class="text-xs text-[#E87559] hover:underline font-bold flex items-center gap-1"
+                                >
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                                    </svg>
+                                    <span>Tambah Barang</span>
+                                </button>
+                            </div>
+
+                            <div class="space-y-2">
+                                @forelse($draft['items'] ?? [] as $index => $item)
+                                    <div class="p-3 rounded-xl bg-[#FBFBFC] border border-[#EEEEEE] flex flex-wrap items-center gap-2 text-xs">
+                                        <div class="flex-1 min-w-[130px]">
+                                            <input
+                                                type="text"
+                                                wire:model="draft.items.{{ $index }}.item_name"
+                                                value="{{ $item['item_name'] }}"
+                                                placeholder="Nama barang"
+                                                class="w-full px-2.5 py-1.5 rounded-lg border border-[#EEEEEE] text-xs font-medium focus:border-[#E87559]"
+                                            />
+                                        </div>
+                                        <div class="w-16">
+                                            <input
+                                                type="number"
+                                                step="0.1"
+                                                wire:model.lazy="draft.items.{{ $index }}.quantity"
+                                                wire:change="updateItemSubtotal({{ $index }})"
+                                                value="{{ $item['quantity'] }}"
+                                                placeholder="Qty"
+                                                class="w-full px-2 py-1.5 rounded-lg border border-[#EEEEEE] text-xs text-center focus:border-[#E87559]"
+                                            />
+                                        </div>
+                                        <div class="w-16">
+                                            <input
+                                                type="text"
+                                                wire:model="draft.items.{{ $index }}.unit"
+                                                value="{{ $item['unit'] }}"
+                                                placeholder="Satuan"
+                                                class="w-full px-2 py-1.5 rounded-lg border border-[#EEEEEE] text-xs text-center focus:border-[#E87559]"
+                                            />
+                                        </div>
+                                        <div class="w-24">
+                                            <input
+                                                type="number"
+                                                wire:model.lazy="draft.items.{{ $index }}.unit_price"
+                                                wire:change="updateItemSubtotal({{ $index }})"
+                                                value="{{ $item['unit_price'] }}"
+                                                placeholder="Harga"
+                                                class="w-full px-2 py-1.5 rounded-lg border border-[#EEEEEE] text-xs text-right focus:border-[#E87559]"
+                                            />
+                                        </div>
+                                        <div class="w-24 text-right font-bold text-[#252525]">
+                                            Rp {{ number_format((float) ($item['subtotal'] ?? 0), 0, ',', '.') }}
+                                        </div>
+                                        <button
+                                            type="button"
+                                            wire:click="removeItem({{ $index }})"
+                                            class="p-1.5 text-gray-400 hover:text-[#DC6464] hover:bg-red-50 rounded-lg transition"
+                                            title="Hapus baris ini"
+                                        >
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                @empty
+                                    <p class="text-xs text-[#777777] italic py-2">
+                                        Tidak ada rincian per barang (biaya dicatat sebagai pengeluaran umum).
+                                    </p>
+                                @endforelse
+                            </div>
+                        </div>
+
                     </div>
+
+                    <!-- Tombol Aksi Konfirmasi Final -->
+                    <div class="flex items-center justify-between gap-3 pt-6 border-t border-[#EEEEEE]">
+                        <button
+                            type="button"
+                            wire:click="resetToRecord"
+                            class="px-4 py-2.5 rounded-xl border border-[#EEEEEE] text-xs font-semibold text-[#555555] hover:bg-gray-50 flex items-center gap-1.5 transition"
+                        >
+                            <svg class="w-4 h-4 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                            </svg>
+                            <span>Rekam Ulang</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            wire:click="saveTransaction"
+                            wire:loading.attr="disabled"
+                            class="px-6 py-2.5 rounded-xl bg-[#E87559] hover:bg-[#D66448] text-xs sm:text-sm font-bold text-white shadow-xs flex items-center gap-2 transition active:scale-95 disabled:opacity-50"
+                        >
+                            <span wire:loading.remove wire:target="saveTransaction">Simpan Pengeluaran</span>
+                            <span wire:loading wire:target="saveTransaction" class="flex items-center gap-1.5">
+                                <svg class="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                                </svg>
+                                <span>Menyimpan...</span>
+                            </span>
+                            <svg wire:loading.remove wire:target="saveTransaction" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                </div>
+
+            <!-- ======================================================== -->
+            <!-- TAMPILAN 3: INTERFACE PEREKAMAN SUARA & UNGGAH BERKAS    -->
+            <!-- ======================================================== -->
+            @else
+
+                <!-- 2. Tab Switcher: Rekam Mikrofon vs Unggah Berkas -->
+                <div class="flex p-1 bg-[#FBFBFC] rounded-2xl border border-[#EEEEEE] mb-6">
                     <button
                         type="button"
-                        @click="cancelRecording()"
-                        class="text-xs font-semibold text-[#777777] hover:text-[#252525] underline pt-2"
+                        @click="switchTab('record')"
+                        :class="activeTab === 'record' ? 'bg-white text-[#252525] shadow-xs font-bold' : 'text-[#777777] hover:text-[#252525] font-medium'"
+                        class="flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 transition-all"
                     >
-                        Batalkan Permintaan
+                        <svg class="w-4 h-4 text-[#E87559]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                        </svg>
+                        <span>Rekam Suara Langsung</span>
+                    </button>
+
+                    <button
+                        type="button"
+                        @click="switchTab('upload')"
+                        :class="activeTab === 'upload' ? 'bg-white text-[#252525] shadow-xs font-bold' : 'text-[#777777] hover:text-[#252525] font-medium'"
+                        class="flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 transition-all"
+                    >
+                        <svg class="w-4 h-4 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                        </svg>
+                        <span>Unggah File Audio</span>
                     </button>
                 </div>
 
-                <!-- STATE C: RECORDING (Sedang Merekam Suara) -->
-                <div x-show="state === 'recording'" class="py-6 sm:py-8 space-y-6 text-center">
-                    
-                    <!-- Pulsing Microphone Indicator -->
-                    <div class="relative inline-flex items-center justify-center">
-                        <div class="absolute -inset-4 rounded-full bg-[#E87559]/20 animate-ping"></div>
-                        <div class="relative w-24 h-24 rounded-full bg-[#E87559] text-white flex items-center justify-center shadow-lg shadow-[#E87559]/30">
-                            <svg class="w-10 h-10 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                <!-- Alert Pesan Error Audio Recorder (Jika Ada) -->
+                <template x-if="state === 'error' && errorMessage">
+                    <div class="mb-6 p-4 rounded-2xl bg-[#FCEDEA] border border-[#E87559]/20 text-[#252525] text-xs sm:text-sm flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-white text-[#E87559] flex items-center justify-center shrink-0 shadow-xs">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                             </svg>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-bold text-[#E87559]">Perhatian Akses</p>
+                            <p class="mt-0.5 text-[#555555] leading-relaxed" x-text="errorMessage"></p>
+                            <div class="mt-3 flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    @click="state = 'idle'; errorMessage = ''"
+                                    class="px-3 py-1.5 rounded-lg bg-white border border-[#EEEEEE] text-xs font-semibold text-[#252525] hover:bg-gray-50 transition"
+                                >
+                                    Coba Lagi
+                                </button>
+                                <button
+                                    type="button"
+                                    @click="switchTab('upload')"
+                                    class="px-3 py-1.5 rounded-lg bg-[#FCEDEA] text-xs font-semibold text-[#E87559] hover:bg-[#E87559]/10 transition"
+                                >
+                                    Gunakan Unggah File
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- TAB 1: REKAM MIKROFON -->
+                <div x-show="activeTab === 'record'" x-cloak class="space-y-6">
+
+                    <!-- STATE A: IDLE (Siap Merekam) -->
+                    <div x-show="state === 'idle'" class="text-center py-6 sm:py-8 space-y-5">
+                        <div class="relative inline-flex items-center justify-center">
+                            <button
+                                type="button"
+                                @click="startRecording()"
+                                class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#E87559] hover:bg-[#D66448] text-white flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 active:scale-95 group focus:outline-hidden"
+                            >
+                                <svg class="w-10 h-10 sm:w-12 sm:h-12 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.5V22"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 22h8"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div>
+                            <p class="text-base sm:text-lg font-bold text-[#252525]">Tekan untuk Mulai Merekam</p>
+                            <p class="text-xs text-[#777777] mt-1 max-w-sm mx-auto">
+                                Contoh: "Beli telur ayam dua kilo lima puluh enam ribu sama minyak goreng dua liter tiga puluh lima ribu."
+                            </p>
                         </div>
                     </div>
 
-                    <!-- Digital Timer Display -->
-                    <div class="space-y-1">
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FCEDEA] text-[#E87559] text-xs font-bold">
-                            <span class="w-2 h-2 rounded-full bg-[#E87559] animate-ping"></span>
-                            <span>Merekam Audio</span>
+                    <!-- STATE B: REQUESTING PERMISSION -->
+                    <div x-show="state === 'requesting_permission'" class="text-center py-8 space-y-3">
+                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#FCEDEA] text-[#E87559] animate-pulse">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
                         </div>
-                        <div class="text-3xl sm:text-4xl font-extrabold text-[#252525] font-mono tracking-tight" x-text="formattedDuration">
-                            00:00
-                        </div>
-                        <p class="text-[11px] text-[#777777]">
-                            Maksimal rekaman: <span x-text="formattedMaxDuration">02:00</span>
+                        <p class="text-sm font-bold text-[#252525]">Meminta Izin Akses Mikrofon...</p>
+                        <p class="text-xs text-[#777777] max-w-xs mx-auto">
+                            Klik "Izinkan" atau "Allow" pada jendela pop-up peramban Anda untuk mengaktifkan rekaman.
                         </p>
                     </div>
 
-                    <!-- Real-Time Web Audio API Visualizer Bars -->
-                    <div class="flex items-center justify-center gap-1.5 h-10 max-w-xs mx-auto py-1">
-                        <template x-for="(barHeight, index) in visualizerBars" :key="index">
-                            <div
-                                class="w-2.5 rounded-full bg-gradient-to-t from-[#E87559] to-[#F7B09E] transition-all duration-75"
-                                :style="`height: ${barHeight}%`"
-                            ></div>
-                        </template>
-                    </div>
+                    <!-- STATE C: RECORDING (Sedang Merekam Suara) -->
+                    <div x-show="state === 'recording'" class="py-6 sm:py-8 space-y-6">
+                        <div class="text-center space-y-2">
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-red-600 border border-red-200/60 text-xs font-semibold">
+                                <span class="w-2 h-2 rounded-full bg-red-600 animate-ping"></span>
+                                <span>Merekam Suara Pengguna...</span>
+                            </div>
 
-                    <!-- Control Action Buttons -->
-                    <div class="flex items-center justify-center gap-3 pt-4 border-t border-[#EEEEEE]">
-                        <button
-                            type="button"
-                            @click="cancelRecording()"
-                            class="px-4 py-2.5 rounded-xl text-xs font-semibold text-[#777777] hover:text-[#252525] bg-gray-100 hover:bg-gray-200 transition flex items-center gap-1.5"
-                        >
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
-                            <span>Batal</span>
-                        </button>
-
-                        <button
-                            type="button"
-                            @click="stopRecording()"
-                            class="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#E87559] hover:bg-[#D66448] shadow-sm transition active:scale-95 flex items-center gap-2"
-                        >
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/>
-                            </svg>
-                            <span>Selesai Merekam</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- STATE D: STOPPED (Preview Rekaman Selesai) -->
-                <div x-show="state === 'stopped'" class="py-4 space-y-5">
-                    
-                    <!-- Success Header -->
-                    <div class="flex items-center gap-2.5 p-3 rounded-xl bg-[#DDF1EC] border border-emerald-200/60 text-emerald-800 text-xs font-semibold">
-                        <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                        </svg>
-                        <span>Rekaman suara berhasil disimpan. Dengarkan kembali sebelum diproses AI.</span>
-                    </div>
-
-                    <!-- Audio Player Box -->
-                    <div class="p-4 sm:p-5 rounded-2xl bg-[#FBFBFC] border border-[#EEEEEE] space-y-3">
-                        <div class="flex items-center justify-between text-xs text-[#777777]">
-                            <span class="font-medium flex items-center gap-1.5">
-                                <svg class="w-4 h-4 text-[#E87559]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
-                                </svg>
-                                <span>Pemutar Hasil Rekaman</span>
-                            </span>
-                            <span class="font-semibold text-[#252525]" x-text="`Durasi: ${formattedDuration}`"></span>
+                            <div class="text-4xl sm:text-5xl font-mono font-extrabold text-[#252525] tracking-wider pt-2" x-text="formattedDuration">
+                                00:00
+                            </div>
+                            <p class="text-[11px] text-[#777777]" x-text="`Batas maksimum durasi: ${formattedMaxDuration}`"></p>
                         </div>
 
-                        <!-- Native HTML5 Audio Controls -->
-                        <div class="w-full">
-                            <audio :src="audioUrl" controls class="w-full rounded-lg focus:outline-hidden"></audio>
+                        <!-- Audio Visualizer Real-Time Waveform -->
+                        <div class="flex items-center justify-center gap-1.5 h-16 px-4 bg-[#FBFBFC] rounded-2xl border border-[#EEEEEE]">
+                            <template x-for="(height, idx) in visualizerBars" :key="idx">
+                                <div
+                                    class="w-1.5 bg-[#E87559] rounded-full transition-all duration-75"
+                                    :style="`height: ${Math.max(8, height)}%; opacity: ${0.4 + (height / 100) * 0.6};`"
+                                ></div>
+                            </template>
                         </div>
 
-                        <!-- Metadata Info -->
-                        <div class="flex flex-wrap items-center justify-between gap-2 pt-2 text-[11px] text-[#777777] border-t border-[#EEEEEE]">
-                            <span class="truncate max-w-xs" x-text="fileName"></span>
-                            <span class="px-2 py-0.5 rounded-md bg-white border border-[#EEEEEE] font-mono font-medium text-[#252525]" x-text="fileSizeFormatted"></span>
-                        </div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="flex flex-wrap items-center justify-between gap-3 pt-3">
-                        <div class="flex items-center gap-2">
+                        <!-- Action Buttons saat Merekam -->
+                        <div class="flex items-center justify-center gap-3 pt-4 border-t border-[#EEEEEE]">
                             <button
                                 type="button"
-                                @click="resetRecording()"
-                                class="px-3.5 py-2 text-xs font-semibold rounded-xl text-[#252525] bg-gray-100 hover:bg-gray-200 transition flex items-center gap-1.5"
+                                @click="cancelRecording()"
+                                class="px-4 py-2.5 rounded-xl text-xs font-semibold text-[#777777] hover:text-[#252525] bg-gray-100 hover:bg-gray-200 transition flex items-center gap-1.5"
                             >
-                                <svg class="w-3.5 h-3.5 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                                 </svg>
-                                <span>Ulangi Rekaman</span>
+                                <span>Batal</span>
                             </button>
 
                             <button
                                 type="button"
+                                @click="stopRecording()"
+                                class="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#E87559] hover:bg-[#D66448] shadow-sm transition active:scale-95 flex items-center gap-2"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/>
+                                </svg>
+                                <span>Selesai Merekam</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STATE D: STOPPED (Preview Rekaman Selesai) -->
+                    <div x-show="state === 'stopped'" class="py-4 space-y-5">
+                        <div class="flex items-center gap-2.5 p-3 rounded-xl bg-[#DDF1EC] border border-emerald-200/60 text-emerald-800 text-xs font-semibold">
+                            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>Rekaman suara berhasil disimpan. Dengarkan kembali sebelum diproses AI.</span>
+                        </div>
+
+                        <!-- Audio Player Box -->
+                        <div class="p-4 sm:p-5 rounded-2xl bg-[#FBFBFC] border border-[#EEEEEE] space-y-3">
+                            <div class="flex items-center justify-between text-xs text-[#777777]">
+                                <span class="font-medium flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-[#E87559]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+                                    </svg>
+                                    <span>Pemutar Hasil Rekaman</span>
+                                </span>
+                                <span class="font-semibold text-[#252525]" x-text="`Durasi: ${formattedDuration}`"></span>
+                            </div>
+
+                            <div class="w-full">
+                                <audio :src="audioUrl" controls class="w-full rounded-lg focus:outline-hidden"></audio>
+                            </div>
+
+                            <div class="flex flex-wrap items-center justify-between gap-2 pt-2 text-[11px] text-[#777777] border-t border-[#EEEEEE]">
+                                <span class="truncate max-w-xs" x-text="fileName"></span>
+                                <span class="px-2 py-0.5 rounded-md bg-white border border-[#EEEEEE] font-mono font-medium text-[#252525]" x-text="fileSizeFormatted"></span>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex flex-wrap items-center justify-between gap-3 pt-3">
+                            <div class="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    @click="resetRecording()"
+                                    class="px-3.5 py-2 text-xs font-semibold rounded-xl text-[#252525] bg-gray-100 hover:bg-gray-200 transition flex items-center gap-1.5"
+                                >
+                                    <svg class="w-3.5 h-3.5 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                    </svg>
+                                    <span>Ulangi Rekaman</span>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    @click="deleteAudio()"
+                                    class="px-3 py-2 text-xs font-semibold rounded-xl text-[#DC6464] hover:bg-[#FCEDEA] transition flex items-center gap-1"
+                                >
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                    <span>Hapus</span>
+                                </button>
+                            </div>
+
+                            <!-- CTA: Kirim untuk Diproses AI -->
+                            <button
+                                type="button"
+                                @click="submitAudio()"
+                                class="px-5 py-2.5 text-xs sm:text-sm font-bold text-white bg-[#E87559] hover:bg-[#D66448] rounded-xl shadow-xs transition active:scale-95 flex items-center gap-2"
+                            >
+                                <span>Kirim untuk Diproses AI</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- TAB 2: UNGGAH FILE AUDIO ALTERNATIF -->
+                <div x-show="activeTab === 'upload'" x-cloak class="space-y-6">
+
+                    <!-- Hidden Native File Input -->
+                    <input
+                        type="file"
+                        accept="audio/*,.mp3,.wav,.m4a,.webm,.ogg,.aac"
+                        class="sr-only"
+                        x-ref="fileInput"
+                        @change="handleFileUpload($event)"
+                    />
+
+                    <!-- Dropzone Saat Belum Ada File -->
+                    <div
+                        x-show="state !== 'stopped'"
+                        @click="triggerFileInput()"
+                        @dragover.prevent="$el.classList.add('border-[#E87559]')"
+                        @dragleave.prevent="$el.classList.remove('border-[#E87559]')"
+                        @drop.prevent="$el.classList.remove('border-[#E87559]'); handleFileUpload({ target: { files: $event.dataTransfer.files } })"
+                        class="border-2 border-dashed border-[#EEEEEE] hover:border-[#E87559] rounded-2xl p-8 sm:p-10 text-center cursor-pointer transition-all bg-[#FBFBFC] hover:bg-white space-y-3"
+                    >
+                        <div class="w-14 h-14 rounded-2xl bg-[#FCEDEA] text-[#E87559] flex items-center justify-center mx-auto shadow-2xs">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                            </svg>
+                        </div>
+                        <div class="space-y-1">
+                            <p class="text-sm font-bold text-[#252525]">Pilih Berkas Audio dari Perangkat</p>
+                            <p class="text-xs text-[#777777]">atau seret dan lepas berkas audio rekaman ke area ini</p>
+                        </div>
+                        <p class="text-[11px] text-[#777777] font-mono">Format didukung: MP3, WAV, M4A, WEBM, OGG (Maks. 15 MB)</p>
+                    </div>
+
+                    <!-- Audio Preview Saat File Diunggah -->
+                    <div x-show="state === 'stopped'" class="py-4 space-y-5">
+                        <div class="flex items-center gap-2.5 p-3 rounded-xl bg-[#DDF1EC] border border-emerald-200/60 text-emerald-800 text-xs font-semibold">
+                            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>Berkas audio berhasil dipilih. Dengarkan sebelum dikirim ke AI.</span>
+                        </div>
+
+                        <div class="p-4 sm:p-5 rounded-2xl bg-[#FBFBFC] border border-[#EEEEEE] space-y-3">
+                            <div class="flex items-center justify-between text-xs text-[#777777]">
+                                <span class="font-medium flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-[#E87559]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+                                    </svg>
+                                    <span>Berkas Audio Terpilih</span>
+                                </span>
+                            </div>
+
+                            <div class="w-full">
+                                <audio :src="audioUrl" controls class="w-full rounded-lg focus:outline-hidden"></audio>
+                            </div>
+
+                            <div class="flex flex-wrap items-center justify-between gap-2 pt-2 text-[11px] text-[#777777] border-t border-[#EEEEEE]">
+                                <span class="truncate max-w-xs font-semibold text-[#252525]" x-text="fileName"></span>
+                                <span class="px-2 py-0.5 rounded-md bg-white border border-[#EEEEEE] font-mono text-[#252525]" x-text="fileSizeFormatted"></span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center justify-between gap-3 pt-3">
+                            <button
+                                type="button"
                                 @click="deleteAudio()"
-                                class="px-3 py-2 text-xs font-semibold rounded-xl text-[#DC6464] hover:bg-[#FCEDEA] transition flex items-center gap-1"
+                                class="px-3.5 py-2 text-xs font-semibold rounded-xl text-[#DC6464] hover:bg-[#FCEDEA] transition flex items-center gap-1"
                             >
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                 </svg>
-                                <span>Hapus</span>
+                                <span>Ganti Berkas</span>
                             </button>
-                        </div>
 
-                        <!-- CTA: Kirim untuk Diproses AI -->
-                        <button
-                            type="button"
-                            @click="submitAudio()"
-                            class="px-5 py-2.5 text-xs sm:text-sm font-bold text-white bg-[#E87559] hover:bg-[#D66448] rounded-xl shadow-xs transition active:scale-95 flex items-center gap-2"
-                        >
-                            <span>Kirim untuk Diproses AI</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                            </svg>
-                        </button>
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- ======================================================== -->
-            <!-- TAB 2: UNGGAH FILE AUDIO ALTERNATIF                      -->
-            <!-- ======================================================== -->
-            <div x-show="activeTab === 'upload'" x-cloak class="space-y-6">
-
-                <!-- Hidden Native File Input -->
-                <input
-                    type="file"
-                    accept="audio/*,.mp3,.wav,.m4a,.webm,.ogg,.aac"
-                    class="sr-only"
-                    x-ref="fileInput"
-                    @change="handleFileUpload($event)"
-                />
-
-                <!-- Upload Dropzone (Ketika belum ada file yang dipilih) -->
-                <div
-                    x-show="state !== 'stopped'"
-                    @click="triggerFileInput()"
-                    class="border-2 border-dashed border-[#EEEEEE] hover:border-[#E87559] rounded-2xl p-8 sm:p-10 text-center cursor-pointer transition-colors bg-[#FBFBFC] hover:bg-[#FCEDEA]/20 group"
-                >
-                    <div class="w-14 h-14 rounded-2xl bg-[#FCEDEA] text-[#E87559] border border-[#E87559]/20 flex items-center justify-center mx-auto mb-3.5 group-hover:scale-105 transition-transform">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                        </svg>
-                    </div>
-
-                    <h3 class="text-sm sm:text-base font-bold text-[#252525] group-hover:text-[#E87559] transition-colors">
-                        Pilih Berkas Audio dari Perangkat
-                    </h3>
-                    <p class="text-xs text-[#777777] mt-1 max-w-sm mx-auto leading-relaxed">
-                        Dukung rekaman pesan suara WhatsApp atau aplikasi perekam ponsel Anda.
-                    </p>
-
-                    <div class="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#EEEEEE] text-xs font-semibold text-[#252525] shadow-2xs">
-                        <span>Pilih File Audio</span>
-                        <span class="text-[#777777]">(MP3, WAV, M4A, WEBM, OGG)</span>
-                    </div>
-
-                    <p class="text-[11px] text-[#777777] mt-3">
-                        Batas ukuran file maksimum: <strong>15 MB</strong>
-                    </p>
-                </div>
-
-                <!-- Preview File Audio yang Diunggah -->
-                <div x-show="state === 'stopped'" class="py-2 space-y-4">
-                    <div class="p-5 rounded-2xl bg-[#FBFBFC] border border-[#EEEEEE] space-y-3">
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="font-bold text-[#252525] flex items-center gap-2">
-                                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            <button
+                                type="button"
+                                @click="submitAudio()"
+                                class="px-5 py-2.5 text-xs sm:text-sm font-bold text-white bg-[#E87559] hover:bg-[#D66448] rounded-xl shadow-xs transition active:scale-95 flex items-center gap-2"
+                            >
+                                <span>Kirim untuk Diproses AI</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                                 </svg>
-                                <span class="truncate max-w-xs" x-text="fileName"></span>
-                            </span>
-                            <span class="px-2 py-0.5 rounded-md bg-white border border-[#EEEEEE] font-mono text-[11px] font-semibold text-[#252525]" x-text="fileSizeFormatted"></span>
-                        </div>
-
-                        <!-- Audio Player -->
-                        <audio :src="audioUrl" controls class="w-full rounded-lg focus:outline-hidden"></audio>
-                    </div>
-
-                    <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
-                        <div class="flex items-center gap-2">
-                            <button
-                                type="button"
-                                @click="triggerFileInput()"
-                                class="px-3.5 py-2 text-xs font-semibold rounded-xl text-[#252525] bg-gray-100 hover:bg-gray-200 transition"
-                            >
-                                Ganti File
-                            </button>
-                            <button
-                                type="button"
-                                @click="deleteAudio()"
-                                class="px-3 py-2 text-xs font-semibold rounded-xl text-[#DC6464] hover:bg-[#FCEDEA] transition"
-                            >
-                                Hapus
                             </button>
                         </div>
-
-                        <button
-                            type="button"
-                            @click="submitAudio()"
-                            class="px-5 py-2.5 text-xs sm:text-sm font-bold text-white bg-[#E87559] hover:bg-[#D66448] rounded-xl shadow-xs transition active:scale-95 flex items-center gap-2"
-                        >
-                            <span>Kirim untuk Diproses AI</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                            </svg>
-                        </button>
                     </div>
+
                 </div>
 
-            </div>
+            @endif
 
         </div>
 
@@ -424,51 +664,6 @@
 
     </div>
 
-    <!-- ======================================================== -->
-    <!-- MODAL INTEGRASI BACKEND (Kesiapan Endpoint AI Whisper)    -->
-    <!-- ======================================================== -->
-    <div
-        x-show="showIntegrationModal"
-        x-cloak
-        class="fixed inset-0 z-50 overflow-y-auto bg-black/40 backdrop-blur-xs flex items-center justify-center p-4"
-    >
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-[#EEEEEE] space-y-4">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-[#DDF1EC] text-[#43A58A] border border-emerald-200 flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="text-base font-bold text-[#252525]">Audio Siap Diproses</h3>
-                    <p class="text-xs text-[#777777]">Komponen Frontend KV-027 berhasil disiapkan.</p>
-                </div>
-            </div>
-
-            <div class="bg-[#FBFBFC] p-3.5 rounded-xl border border-[#EEEEEE] text-xs space-y-1.5 text-[#555555] leading-relaxed">
-                <p>
-                    Berkas audio berhasil direkam/dipilih dengan metadata valid:
-                </p>
-                <p class="font-mono text-[11px] text-[#252525] bg-white p-2 rounded-lg border border-[#EEEEEE]">
-                    Berkas: <span x-text="fileName"></span> (<span x-text="fileSizeFormatted"></span>)
-                </p>
-                <p class="pt-1 text-[#777777]">
-                    Pengiriman audio ke model Whisper STT saat ini menunggu finalisasi kontrak API multipart / Livewire File Upload dari Backend (Fahmi).
-                </p>
-            </div>
-
-            <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-[#EEEEEE]">
-                <button
-                    type="button"
-                    @click="showIntegrationModal = false"
-                    class="px-4 py-2 text-xs font-bold text-white bg-[#E87559] hover:bg-[#D66448] rounded-xl shadow-xs transition"
-                >
-                    Saya Mengerti
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- Script Audio Recorder Mandiri (Memastikan fungsi selalu aktif tanpa dependensi dev-server) -->
     <script>
         (function() {
@@ -494,7 +689,6 @@
                     fileSizeFormatted: '',
                     maxFileSizeBytes: 15 * 1024 * 1024,
                     errorMessage: '',
-                    showIntegrationModal: false,
 
                     init() {
                         window.addEventListener('livewire:navigating', () => {
@@ -535,24 +729,21 @@
                         this.errorMessage = '';
                         this.clearAudioPreview();
 
-                        // 1. Cek secure context
                         if (typeof window !== 'undefined' && !window.isSecureContext && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
                             this.state = 'error';
                             this.errorMessage = 'Perekaman mikrofon membutuhkan koneksi aman (HTTPS). Silakan akses aplikasi melalui URL HTTPS atau localhost.';
                             return;
                         }
 
-                        // 2. Cek ketersediaan Web MediaDevices API
                         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                             this.state = 'error';
-                            this.errorMessage = 'Browser Anda belum mendukung Web MediaDevices API. Silakan gunakan browser modern seperti Google Chrome, Microsoft Edge, atau Safari, atau gunakan opsi Unggah File Audio.';
+                            this.errorMessage = 'Browser Anda belum mendukung Web MediaDevices API. Silakan gunakan browser modern seperti Google Chrome, Edge, atau gunakan opsi Unggah File Audio.';
                             return;
                         }
 
-                        // 3. Cek MediaRecorder
                         if (typeof MediaRecorder === 'undefined') {
                             this.state = 'error';
-                            this.errorMessage = 'Browser Anda belum mendukung MediaRecorder. Silakan gunakan opsi Unggah File Audio.';
+                            this.errorMessage = 'Browser Anda belum mendukung MediaRecorder. Silakan gunakan opsi Unggah File Audio di bawah.';
                             return;
                         }
 
@@ -588,11 +779,9 @@
                                 this.cleanupMediaTracks();
                             };
 
-                            this.setupRealVisualizer(this.mediaStream);
-
-                            this.mediaRecorder.start(100);
-                            this.seconds = 0;
+                            this.mediaRecorder.start(250);
                             this.state = 'recording';
+                            this.seconds = 0;
 
                             this.timerInterval = setInterval(() => {
                                 this.seconds++;
@@ -601,57 +790,60 @@
                                 }
                             }, 1000);
 
+                            this.setupVisualizer(this.mediaStream);
                         } catch (err) {
-                            this.cleanup();
                             this.state = 'error';
-
                             if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-                                this.errorMessage = 'Izin mikrofon belum diberikan atau diblokir oleh browser. Silakan klik ikon setelan/gembok pada address bar browser untuk mengizinkan akses mikrofon lalu coba lagi.';
+                                this.errorMessage = 'Izin akses mikrofon ditolak oleh pengguna atau sistem. Harap berikan izin mikrofon pada ikon gembok di bilah alamat browser.';
                             } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
-                                this.errorMessage = 'Perangkat mikrofon tidak ditemukan. Pastikan mikrofon terpasang atau gunakan opsi Unggah File Audio.';
-                            } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
-                                this.errorMessage = 'Mikrofon sedang digunakan oleh aplikasi lain atau tidak dapat diakses.';
+                                this.errorMessage = 'Perangkat mikrofon tidak ditemukan. Harap sambungkan mikrofon atau gunakan opsi Unggah File Audio.';
                             } else {
-                                this.errorMessage = `Gagal mengaktifkan mikrofon: ${err.message || 'Terjadi kesalahan sistem'}.`;
+                                this.errorMessage = `Gagal mengaktifkan mikrofon: ${err.message || 'Kesalahan sistem tidak dikenal.'}`;
                             }
+                            this.cleanup();
                         }
                     },
 
-                    setupRealVisualizer(stream) {
+                    setupVisualizer(stream) {
                         try {
-                            const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
-                            if (!AudioCtxClass) return;
+                            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                            if (!AudioContextClass) return;
 
-                            this.audioContext = new AudioCtxClass();
+                            this.audioContext = new AudioContextClass();
                             const source = this.audioContext.createMediaStreamSource(stream);
                             this.analyser = this.audioContext.createAnalyser();
                             this.analyser.fftSize = 32;
                             source.connect(this.analyser);
 
-                            const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+                            const bufferLength = this.analyser.frequencyBinCount;
+                            const dataArray = new Uint8Array(bufferLength);
 
-                            const updateWaveform = () => {
-                                if (this.state !== 'recording') return;
+                            const updateBars = () => {
+                                if (this.state !== 'recording' || !this.analyser) return;
                                 this.analyser.getByteFrequencyData(dataArray);
 
-                                const step = Math.max(1, Math.floor(dataArray.length / 6));
-                                this.visualizerBars = [
-                                    Math.max(15, Math.min(100, Math.round(dataArray[0 * step] / 2.55))),
-                                    Math.max(15, Math.min(100, Math.round(dataArray[1 * step] / 2.55))),
-                                    Math.max(15, Math.min(100, Math.round(dataArray[2 * step] / 2.55))),
-                                    Math.max(15, Math.min(100, Math.round(dataArray[3 * step] / 2.55))),
-                                    Math.max(15, Math.min(100, Math.round(dataArray[4 * step] / 2.55))),
-                                    Math.max(15, Math.min(100, Math.round(dataArray[5 * step] / 2.55))),
-                                ];
-
-                                this.animationFrame = requestAnimationFrame(updateWaveform);
+                                const step = Math.floor(bufferLength / 6);
+                                const newBars = [];
+                                for (let i = 0; i < 6; i++) {
+                                    const val = dataArray[i * step] || 0;
+                                    const pct = Math.min(100, Math.max(10, Math.round((val / 255) * 100)));
+                                    newBars.push(pct);
+                                }
+                                this.visualizerBars = newBars;
+                                this.animationFrame = requestAnimationFrame(updateBars);
                             };
-
-                            this.animationFrame = requestAnimationFrame(updateWaveform);
-                        } catch (e) {}
+                            updateBars();
+                        } catch (e) {
+                            this.visualizerBars = [20, 45, 60, 40, 25, 15];
+                        }
                     },
 
                     stopRecording() {
+                        if (this.mediaRecorder && this.state === 'recording') {
+                            try {
+                                this.mediaRecorder.stop();
+                            } catch (e) {}
+                        }
                         if (this.timerInterval) {
                             clearInterval(this.timerInterval);
                             this.timerInterval = null;
@@ -660,16 +852,10 @@
                             cancelAnimationFrame(this.animationFrame);
                             this.animationFrame = null;
                         }
-                        if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
-                            this.mediaRecorder.stop();
-                        } else {
-                            this.cleanupMediaTracks();
-                            this.state = 'stopped';
-                        }
                     },
 
                     cancelRecording() {
-                        this.stopAllAudioPlayback();
+                        this.stopRecording();
                         this.cleanup();
                         this.clearAudioPreview();
                         this.seconds = 0;
@@ -743,7 +929,39 @@
                     },
 
                     submitAudio() {
-                        this.showIntegrationModal = true;
+                        if (!this.audioBlob && !this.uploadedFile) {
+                            this.state = 'error';
+                            this.errorMessage = 'Belum ada rekaman suara atau berkas audio yang dipilih.';
+                            return;
+                        }
+
+                        const rawBlob = this.audioBlob || this.uploadedFile;
+                        const fileName = this.fileName || 'rekaman-suara.webm';
+                        const file = rawBlob instanceof File 
+                            ? rawBlob 
+                            : new File([rawBlob], fileName, { type: rawBlob.type || 'audio/webm' });
+
+                        this.state = 'uploading';
+                        this.errorMessage = '';
+
+                        const livewire = this.$wire;
+                        if (livewire && typeof livewire.upload === 'function') {
+                            livewire.upload(
+                                'audioFile',
+                                file,
+                                () => {
+                                    this.state = 'idle';
+                                    livewire.processVoice();
+                                },
+                                (err) => {
+                                    this.state = 'error';
+                                    this.errorMessage = 'Gagal mengunggah berkas audio: ' + (err || 'Terjadi kesalahan');
+                                }
+                            );
+                        } else {
+                            this.state = 'error';
+                            this.errorMessage = 'Komponen Livewire tidak terdeteksi. Silakan muat ulang halaman.';
+                        }
                     },
 
                     getSupportedMimeType() {
@@ -839,4 +1057,3 @@
         })();
     </script>
 </div>
-

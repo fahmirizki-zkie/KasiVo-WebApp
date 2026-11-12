@@ -333,10 +333,42 @@ export function audioRecorder() {
         },
 
         /**
-         * Buka dialog konfirmasi kesiapan integrasi backend
+         * Kirim audio rekaman / berkas ke Livewire backend untuk diproses oleh AI
          */
         submitAudio() {
-            this.showIntegrationModal = true;
+            if (!this.audioBlob && !this.uploadedFile) {
+                this.state = 'error';
+                this.errorMessage = 'Belum ada rekaman suara atau berkas audio yang dipilih.';
+                return;
+            }
+
+            const rawBlob = this.audioBlob || this.uploadedFile;
+            const fileName = this.fileName || 'rekaman-suara.webm';
+            const file = rawBlob instanceof File 
+                ? rawBlob 
+                : new File([rawBlob], fileName, { type: rawBlob.type || 'audio/webm' });
+
+            this.state = 'uploading';
+            this.errorMessage = '';
+
+            const livewire = this.$wire;
+            if (livewire && typeof livewire.upload === 'function') {
+                livewire.upload(
+                    'audioFile',
+                    file,
+                    () => {
+                        this.state = 'idle';
+                        livewire.processVoice();
+                    },
+                    (error) => {
+                        this.state = 'error';
+                        this.errorMessage = 'Gagal mengunggah berkas audio: ' + (error || 'Terjadi kesalahan');
+                    }
+                );
+            } else {
+                this.state = 'error';
+                this.errorMessage = 'Komponen Livewire tidak terdeteksi. Silakan muat ulang halaman.';
+            }
         },
 
         /**
