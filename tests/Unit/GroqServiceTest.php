@@ -234,14 +234,14 @@ class GroqServiceTest extends TestCase
         Http::fake([
             'https://api.groq.com/openai/v1/chat/completions' => Http::response([
                 'error' => [
-                    'message' => 'Rate limit reached for model',
-                    'type' => 'tokens',
+                    'message' => 'Service temporarily unavailable',
+                    'type' => 'server_error',
                 ],
-            ], 429),
+            ], 500),
         ]);
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Groq API request failed [429]: Rate limit reached for model');
+        $this->expectExceptionMessage('Groq API request failed [500]: Service temporarily unavailable');
 
         $this->service->chat([['role' => 'user', 'content' => 'Halo']]);
     }

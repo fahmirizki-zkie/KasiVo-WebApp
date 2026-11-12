@@ -41,6 +41,8 @@ return [
         'vision_model' => env('GROQ_VISION_MODEL', 'qwen/qwen3.8-27b'),
         'whisper_model' => env('GROQ_WHISPER_MODEL', 'whisper-large-v3-turbo'),
         'text_model' => env('GROQ_TEXT_MODEL', 'qwen/qwen3.8-27b'),
+        'text_failover_model' => env('GROQ_TEXT_FAILOVER_MODEL', 'llama-3.3-70b-versatile'),
+        'vision_failover_model' => env('GROQ_VISION_FAILOVER_MODEL', 'qwen/qwen3.8-27b'),
         'timeout' => (int) env('GROQ_TIMEOUT', 30),
         'retry_attempts' => (int) env('GROQ_RETRY_ATTEMPTS', 2),
     ],

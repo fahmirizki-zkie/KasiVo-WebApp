@@ -2,6 +2,7 @@
 
 namespace App\Services\Ai;
 
+use App\Exceptions\AiQuotaExceededException;
 use App\Models\AiProcessingLog;
 use Exception;
 use Illuminate\Http\Client\Response;
@@ -15,6 +16,7 @@ class GroqService
     protected string $apiKey;
     protected string $baseUrl;
     protected string $textModel;
+    protected string $textFailoverModel;
     protected string $visionModel;
     protected string $whisperModel;
     protected int $timeout;
@@ -27,11 +29,13 @@ class GroqService
         ?string $visionModel = null,
         ?string $whisperModel = null,
         ?int $timeout = null,
-        ?int $retryAttempts = null
+        ?int $retryAttempts = null,
+        ?string $textFailoverModel = null
     ) {
         $this->apiKey = $apiKey ?? (string) config('services.groq.api_key', '');
         $this->baseUrl = rtrim($baseUrl ?? (string) config('services.groq.base_url', 'https://api.groq.com/openai/v1'), '/');
         $this->textModel = $textModel ?? (string) config('services.groq.text_model', 'qwen/qwen3.8-27b');
+        $this->textFailoverModel = $textFailoverModel ?? (string) config('services.groq.text_failover_model', 'llama-3.3-70b-versatile');
         $this->visionModel = $visionModel ?? (string) config('services.groq.vision_model', 'qwen/qwen3.8-27b');
         $this->whisperModel = $whisperModel ?? (string) config('services.groq.whisper_model', 'whisper-large-v3-turbo');
         $this->timeout = $timeout ?? (int) config('services.groq.timeout', 30);
@@ -68,6 +72,17 @@ class GroqService
 
         if (!$response->successful()) {
             $errorMessage = $this->extractErrorMessage($response);
+
+            // Deteksi spesifik jika terkena Rate Limit atau Kuota/Token Habis (HTTP 429)
+            if ($this->isQuotaExceededError($response->status(), $errorMessage)) {
+                Log::warning('Groq API Quota / Token Limit Exceeded', [
+                    'status' => $response->status(),
+                    'error' => $errorMessage,
+                    'model' => $selectedModel,
+                ]);
+                throw new AiQuotaExceededException('Kuota AI Anda sudah penuh atau token AI Anda sudah habis.');
+            }
+
             Log::error('Groq Chat Completion Failed', [
                 'status' => $response->status(),
                 'error' => $errorMessage,
@@ -123,7 +138,22 @@ class GroqService
                 ['role' => 'user', 'content' => $text],
             ];
 
-            $rawParsed = $this->chat($messages, $model, jsonMode: true);
+            try {
+                $rawParsed = $this->chat($messages, $model, jsonMode: true);
+            } catch (AiQuotaExceededException $e) {
+                throw $e;
+            } catch (\Throwable $e) {
+                if (!empty($this->textFailoverModel) && $this->textFailoverModel !== $model) {
+                    Log::warning("Groq primary text model {$model} failed. Retrying with failover model {$this->textFailoverModel}...", [
+                        'error' => $e->getMessage(),
+                    ]);
+                    $model = $this->textFailoverModel;
+                    $rawParsed = $this->chat($messages, $model, jsonMode: true);
+                } else {
+                    throw $e;
+                }
+            }
+
             $normalized = TransactionJsonSchema::validateAndNormalize($rawParsed);
 
             if (!empty($normalized['needs_review'])) {
@@ -297,6 +327,11 @@ class GroqService
 
             if (!$response->successful()) {
                 $err = $this->extractErrorMessage($response);
+
+                if ($this->isQuotaExceededError($response->status(), $err)) {
+                    throw new AiQuotaExceededException('Kuota AI Anda sudah penuh atau token AI Anda sudah habis.');
+                }
+
                 throw new RuntimeException("Groq Whisper STT failed [{$response->status()}]: {$err}");
             }
 
@@ -391,6 +426,23 @@ class GroqService
     {
         $json = $response->json();
         return $json['error']['message'] ?? $json['message'] ?? $response->body() ?: 'Unknown API error';
+    }
+
+    /**
+     * Deteksi apakah respon HTTP mengindikasikan Kuota / Rate Limit / Token AI telah habis.
+     */
+    public function isQuotaExceededError(int $status, string $message): bool
+    {
+        if ($status === 429) {
+            return true;
+        }
+
+        $lower = strtolower($message);
+
+        return str_contains($lower, 'rate_limit')
+            || str_contains($lower, 'tokens')
+            || str_contains($lower, 'quota')
+            || str_contains($lower, 'exhausted');
     }
 }
 
