@@ -224,7 +224,7 @@
                                             <input
                                                 type="text"
                                                 wire:model="draft.items.{{ $index }}.item_name"
-                                                value="{{ $item['item_name'] }}"
+                                                value="{{ $item['item_name'] ?? '' }}"
                                                 placeholder="Nama barang"
                                                 class="w-full px-2.5 py-1.5 rounded-lg border border-[#EEEEEE] text-xs font-medium focus:border-[#E87559]"
                                             />
@@ -235,7 +235,7 @@
                                                 step="0.1"
                                                 wire:model.lazy="draft.items.{{ $index }}.quantity"
                                                 wire:change="updateItemSubtotal({{ $index }})"
-                                                value="{{ $item['quantity'] }}"
+                                                value="{{ $item['quantity'] ?? 1 }}"
                                                 placeholder="Qty"
                                                 class="w-full px-2 py-1.5 rounded-lg border border-[#EEEEEE] text-xs text-center focus:border-[#E87559]"
                                             />
@@ -244,7 +244,7 @@
                                             <input
                                                 type="text"
                                                 wire:model="draft.items.{{ $index }}.unit"
-                                                value="{{ $item['unit'] }}"
+                                                value="{{ $item['unit'] ?? 'pcs' }}"
                                                 placeholder="Satuan"
                                                 class="w-full px-2 py-1.5 rounded-lg border border-[#EEEEEE] text-xs text-center focus:border-[#E87559]"
                                             />
@@ -254,7 +254,7 @@
                                                 type="number"
                                                 wire:model.lazy="draft.items.{{ $index }}.unit_price"
                                                 wire:change="updateItemSubtotal({{ $index }})"
-                                                value="{{ $item['unit_price'] }}"
+                                                value="{{ $item['unit_price'] ?? 0 }}"
                                                 placeholder="Harga"
                                                 class="w-full px-2 py-1.5 rounded-lg border border-[#EEEEEE] text-xs text-right focus:border-[#E87559]"
                                             />
@@ -279,6 +279,26 @@
                                     </p>
                                 @endforelse
                             </div>
+
+                            {{-- Banner Selisih Rekonsiliasi Matematika Item vs Total --}}
+                            @if($mathReconciliation && !$mathReconciliation['is_matched'])
+                                <div class="mt-3 p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-base">⚠️</span>
+                                        <div>
+                                            <p class="font-bold">Total rincian barang berbeda dengan Total Transaksi</p>
+                                            <p class="text-[11px] text-amber-800">
+                                                Rincian barang: <strong>{{ $mathReconciliation['formatted_items_sum'] }}</strong> | Total Transaksi: <strong>{{ $mathReconciliation['formatted_total_amount'] }}</strong> (Selisih: {{ $mathReconciliation['formatted_difference'] }})
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button type="button" 
+                                            wire:click="syncTotalWithItemsSum" 
+                                            class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white rounded-lg text-xs font-bold transition shadow-xs self-start sm:self-auto flex-shrink-0">
+                                        Sesuaikan Total ke {{ $mathReconciliation['formatted_items_sum'] }}
+                                    </button>
+                                </div>
+                            @endif
                         </div>
 
                     </div>
@@ -1056,4 +1076,7 @@
             }
         })();
     </script>
+
+    {{-- Modal Peringatan Transaksi Kembar / Duplikasi --}}
+    @include('livewire.partials.duplicate-warning-modal')
 </div>

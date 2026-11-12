@@ -2,9 +2,11 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Concerns\ValidatesTransactionDraft;
 use App\Models\Business;
 use App\Models\Transaction;
 use App\Services\Ai\GroqService;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Layout;
@@ -15,6 +17,7 @@ use Livewire\WithFileUploads;
 class CreateExpenseVoiceTransaction extends Component
 {
     use WithFileUploads;
+    use ValidatesTransactionDraft;
 
     public string $sourceType = 'voice';
 
@@ -155,6 +158,8 @@ class CreateExpenseVoiceTransaction extends Component
                 'items' => $items,
             ];
 
+            $this->recalculateMathReconciliation();
+
             // Pindah ke layar konfirmasi draft
             $this->step = 'review';
         } catch (\Throwable $e) {
@@ -206,6 +211,8 @@ class CreateExpenseVoiceTransaction extends Component
         if ($sum > 0) {
             $this->draft['amount'] = $sum;
         }
+
+        $this->recalculateMathReconciliation();
     }
 
     /**
@@ -230,6 +237,10 @@ class CreateExpenseVoiceTransaction extends Component
         $this->audioFile = null;
         $this->transcriptionText = null;
         $this->errorMessage = null;
+        $this->showDuplicateModal = false;
+        $this->duplicateConfirmed = false;
+        $this->duplicateInfo = null;
+        $this->mathReconciliation = null;
         $this->draft = [
             'category' => 'bahan_baku',
             'amount' => 0,
@@ -261,42 +272,61 @@ class CreateExpenseVoiceTransaction extends Component
             'draft.category' => 'required|in:bahan_baku,operasional',
             'draft.transaction_date' => 'required|date|before_or_equal:today',
             'draft.notes' => 'nullable|string|max:500',
+            'draft.items' => 'nullable|array|max:50',
+            'draft.items.*.item_name' => 'nullable|string|max:100',
         ], [
             'draft.amount.required' => 'Nominal pengeluaran wajib diisi.',
             'draft.amount.min' => 'Nominal pengeluaran minimal Rp 100.',
             'draft.category.required' => 'Pilih kategori pengeluaran.',
             'draft.transaction_date.required' => 'Tanggal transaksi wajib diisi.',
             'draft.transaction_date.before_or_equal' => 'Tanggal tidak boleh melebihi hari ini.',
+            'draft.items.max' => 'Rincian barang maksimal 50 baris.',
+            'draft.items.*.item_name.max' => 'Nama barang maksimal 100 karakter.',
         ]);
 
-        DB::transaction(function () use ($business) {
-            $transaction = $business->transactions()->create([
-                'type' => 'cash_out',
-                'category' => $this->draft['category'],
-                'amount' => (float) $this->draft['amount'],
-                'transaction_date' => $this->draft['transaction_date'],
-                'source_type' => 'voice',
-                'notes' => trim($this->draft['notes'] ?: $this->draft['merchant_name'] ?: 'Pengeluaran via Suara'),
-                'is_cash_settled' => true,
-            ]);
+        $lockKey = "business_save_tx:{$business->id}";
+        $lock = Cache::lock($lockKey, 5);
 
-            foreach ($this->draft['items'] as $item) {
-                $itemName = trim($item['item_name'] ?? '');
-                if ($itemName !== '') {
-                    $transaction->items()->create([
-                        'item_name' => $itemName,
-                        'quantity' => max(0.01, (float) ($item['quantity'] ?? 1)),
-                        'unit' => $item['unit'] ?? 'pcs',
-                        'unit_price' => (float) ($item['unit_price'] ?? 0),
-                        'subtotal' => (float) ($item['subtotal'] ?? 0),
-                    ]);
-                }
+        if (! $lock->get()) {
+            return;
+        }
+
+        try {
+            if (! $this->checkDuplicateSafety($business)) {
+                return;
             }
-        });
 
-        session()->flash('message', 'Pengeluaran sebesar Rp ' . number_format((float) $this->draft['amount'], 0, ',', '.') . ' berhasil dicatat!');
+            DB::transaction(function () use ($business) {
+                $transaction = $business->transactions()->create([
+                    'type' => 'cash_out',
+                    'category' => $this->draft['category'],
+                    'amount' => (float) $this->draft['amount'],
+                    'transaction_date' => $this->draft['transaction_date'],
+                    'source_type' => 'voice',
+                    'notes' => trim($this->draft['notes'] ?: $this->draft['merchant_name'] ?: 'Pengeluaran via Suara'),
+                    'is_cash_settled' => true,
+                ]);
 
-        return redirect()->route('transactions.index');
+                foreach ($this->draft['items'] as $item) {
+                    $itemName = trim($item['item_name'] ?? '');
+                    if ($itemName !== '') {
+                        $transaction->items()->create([
+                            'item_name' => $itemName,
+                            'quantity' => max(0.01, (float) ($item['quantity'] ?? 1)),
+                            'unit' => $item['unit'] ?? 'pcs',
+                            'unit_price' => (float) ($item['unit_price'] ?? 0),
+                            'subtotal' => (float) ($item['subtotal'] ?? 0),
+                        ]);
+                    }
+                }
+            });
+
+            session()->flash('message', 'Pengeluaran sebesar Rp ' . number_format((float) $this->draft['amount'], 0, ',', '.') . ' berhasil dicatat!');
+
+            return redirect()->route('transactions.index');
+        } finally {
+            $lock->release();
+        }
     }
 
     public function render()

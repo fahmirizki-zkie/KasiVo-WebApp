@@ -2,10 +2,12 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Concerns\ValidatesTransactionDraft;
 use App\Models\Business;
 use App\Models\Transaction;
 use App\Services\Ai\GroqService;
 use App\Services\AttachmentService;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Layout;
@@ -16,6 +18,7 @@ use Livewire\WithFileUploads;
 class CreateExpensePhotoTransaction extends Component
 {
     use WithFileUploads;
+    use ValidatesTransactionDraft;
 
     public string $sourceType = 'photo';
 
@@ -162,6 +165,8 @@ class CreateExpensePhotoTransaction extends Component
                 'items' => $items,
             ];
 
+            $this->recalculateMathReconciliation();
+
             // 3. Pindah ke layar konfirmasi draft
             $this->step = 'review';
         } catch (\Throwable $e) {
@@ -226,6 +231,8 @@ class CreateExpensePhotoTransaction extends Component
         if ($sum > 0) {
             $this->draft['amount'] = $sum;
         }
+
+        $this->recalculateMathReconciliation();
     }
 
     /**
@@ -236,6 +243,10 @@ class CreateExpensePhotoTransaction extends Component
         $this->step = 'upload';
         $this->photo = null;
         $this->errorMessage = null;
+        $this->showDuplicateModal = false;
+        $this->duplicateConfirmed = false;
+        $this->duplicateInfo = null;
+        $this->mathReconciliation = null;
         $this->draft = [
             'category' => 'bahan_baku',
             'amount' => 0,
@@ -267,53 +278,72 @@ class CreateExpensePhotoTransaction extends Component
             'draft.category' => 'required|in:bahan_baku,operasional',
             'draft.transaction_date' => 'required|date|before_or_equal:today',
             'draft.notes' => 'nullable|string|max:500',
+            'draft.items' => 'nullable|array|max:50',
+            'draft.items.*.item_name' => 'nullable|string|max:100',
         ], [
             'draft.amount.required' => 'Nominal pengeluaran wajib diisi.',
             'draft.amount.min' => 'Nominal pengeluaran minimal Rp 100.',
             'draft.category.required' => 'Pilih kategori pengeluaran.',
             'draft.transaction_date.required' => 'Tanggal transaksi wajib diisi.',
             'draft.transaction_date.before_or_equal' => 'Tanggal tidak boleh melebihi hari ini.',
+            'draft.items.max' => 'Rincian barang maksimal 50 baris.',
+            'draft.items.*.item_name.max' => 'Nama barang maksimal 100 karakter.',
         ]);
 
-        DB::transaction(function () use ($business, $attachmentService) {
-            // 1. Simpan Transaksi Kas Keluar
-            $transaction = $business->transactions()->create([
-                'type' => 'cash_out',
-                'category' => $this->draft['category'],
-                'amount' => (float) $this->draft['amount'],
-                'transaction_date' => $this->draft['transaction_date'],
-                'source_type' => 'photo',
-                'notes' => trim($this->draft['notes'] ?: $this->draft['merchant_name'] ?: 'Pengeluaran via Foto Nota'),
-                'is_cash_settled' => true,
-            ]);
+        $lockKey = "business_save_tx:{$business->id}";
+        $lock = Cache::lock($lockKey, 5);
 
-            // 2. Simpan Rincian Items Barang
-            foreach ($this->draft['items'] as $item) {
-                $name = trim($item['item_name'] ?? '');
-                if ($name !== '') {
-                    $transaction->items()->create([
-                        'item_name' => $name,
-                        'quantity' => max(0.01, (float) ($item['quantity'] ?? 1)),
-                        'unit' => $item['unit'] ?? 'pcs',
-                        'unit_price' => (float) ($item['unit_price'] ?? 0),
-                        'subtotal' => (float) ($item['subtotal'] ?? 0),
-                    ]);
+        if (! $lock->get()) {
+            return;
+        }
+
+        try {
+            if (! $this->checkDuplicateSafety($business)) {
+                return;
+            }
+
+            DB::transaction(function () use ($business, $attachmentService) {
+                // 1. Simpan Transaksi Kas Keluar
+                $transaction = $business->transactions()->create([
+                    'type' => 'cash_out',
+                    'category' => $this->draft['category'],
+                    'amount' => (float) $this->draft['amount'],
+                    'transaction_date' => $this->draft['transaction_date'],
+                    'source_type' => 'photo',
+                    'notes' => trim($this->draft['notes'] ?: $this->draft['merchant_name'] ?: 'Pengeluaran via Foto Nota'),
+                    'is_cash_settled' => true,
+                ]);
+
+                // 2. Simpan Rincian Items Barang
+                foreach ($this->draft['items'] as $item) {
+                    $name = trim($item['item_name'] ?? '');
+                    if ($name !== '') {
+                        $transaction->items()->create([
+                            'item_name' => $name,
+                            'quantity' => max(0.01, (float) ($item['quantity'] ?? 1)),
+                            'unit' => $item['unit'] ?? 'pcs',
+                            'unit_price' => (float) ($item['unit_price'] ?? 0),
+                            'subtotal' => (float) ($item['subtotal'] ?? 0),
+                        ]);
+                    }
                 }
-            }
 
-            // 3. Simpan dan Ikat Foto Bukti Struk ke tabel attachments
-            if ($this->photo) {
-                $attachmentService->upload(
-                    file: $this->photo,
-                    transactionId: $transaction->id,
-                    source: 'camera_nota'
-                );
-            }
-        });
+                // 3. Simpan dan Ikat Foto Bukti Struk ke tabel attachments
+                if ($this->photo) {
+                    $attachmentService->upload(
+                        file: $this->photo,
+                        transactionId: $transaction->id,
+                        source: 'camera_nota'
+                    );
+                }
+            });
 
-        session()->flash('message', 'Pengeluaran struk sebesar Rp ' . number_format((float) $this->draft['amount'], 0, ',', '.') . ' berhasil dicatat!');
+            session()->flash('message', 'Pengeluaran struk sebesar Rp ' . number_format((float) $this->draft['amount'], 0, ',', '.') . ' berhasil dicatat!');
 
-        return redirect()->route('transactions.index');
+            return redirect()->route('transactions.index');
+        } finally {
+            $lock->release();
+        }
     }
 
     public function render()
