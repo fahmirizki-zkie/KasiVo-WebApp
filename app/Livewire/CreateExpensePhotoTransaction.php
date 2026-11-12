@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Exceptions\AiQuotaExceededException;
 use App\Livewire\Concerns\ValidatesTransactionDraft;
 use App\Models\Business;
 use App\Models\Transaction;
@@ -59,6 +60,11 @@ class CreateExpensePhotoTransaction extends Component
      * Pesan kesalahan jika terjadi kegagalan.
      */
     public ?string $errorMessage = null;
+
+    /**
+     * Jenis kegagalan (misal: 'quota_exceeded', 'error').
+     */
+    public ?string $errorType = null;
 
     public function mount(): void
     {
@@ -169,14 +175,56 @@ class CreateExpensePhotoTransaction extends Component
 
             // 3. Pindah ke layar konfirmasi draft
             $this->step = 'review';
+            $this->errorType = null;
+            $this->errorMessage = null;
+        } catch (AiQuotaExceededException $e) {
+            Log::warning('Photo Vision AI Quota Exceeded: ' . $e->getMessage());
+            $this->errorType = 'quota_exceeded';
+            $this->errorMessage = $e->getMessage();
         } catch (\Throwable $e) {
             Log::error('Photo Transaction Extraction Failed: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
+            $this->errorType = 'error';
             $this->errorMessage = 'Gagal memproses foto nota dengan Vision AI: ' . $e->getMessage();
         } finally {
             $this->isProcessing = false;
         }
+    }
+
+    /**
+     * Penyelamat darurat: jika AI kuota penuh atau offline, pedagang langsung masuk ke layar konfirmasi
+     * dengan foto nota tetap utuh dan tinggal mengisi nominal.
+     */
+    public function proceedToEmergencyReview(): void
+    {
+        $this->draft = [
+            'category' => 'bahan_baku',
+            'amount' => 0,
+            'transaction_date' => now()->toDateString(),
+            'merchant_name' => '',
+            'notes' => 'Pengisian darurat (koreksi langsung)',
+            'confidence_score' => 1.0,
+            'needs_review' => true,
+            'unclear_fields' => ['amount'],
+            'review_reason' => 'Pengisian darurat: kuota AI penuh atau nota tidak terbaca otomatis.',
+            'items' => [],
+        ];
+
+        $this->step = 'review';
+        $this->errorMessage = null;
+        $this->errorType = null;
+        $this->recalculateMathReconciliation();
+    }
+
+    /**
+     * Coba ulang memproses foto dengan AI.
+     */
+    public function retryProcess(): void
+    {
+        $this->errorMessage = null;
+        $this->errorType = null;
+        $this->processPhoto(app(GroqService::class), app(AttachmentService::class));
     }
 
     /**
@@ -243,6 +291,7 @@ class CreateExpensePhotoTransaction extends Component
         $this->step = 'upload';
         $this->photo = null;
         $this->errorMessage = null;
+        $this->errorType = null;
         $this->showDuplicateModal = false;
         $this->duplicateConfirmed = false;
         $this->duplicateInfo = null;

@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Exceptions\AiQuotaExceededException;
 use App\Livewire\Concerns\ValidatesTransactionDraft;
 use App\Models\Business;
 use App\Models\Transaction;
@@ -56,6 +57,11 @@ class CreateExpenseTextTransaction extends Component
      * Pesan kesalahan jika terjadi kendala.
      */
     public ?string $errorMessage = null;
+
+    /**
+     * Jenis kegagalan (misal: 'quota_exceeded', 'error').
+     */
+    public ?string $errorType = null;
 
     public function mount(): void
     {
@@ -153,14 +159,57 @@ class CreateExpenseTextTransaction extends Component
 
             // Pindah ke tampilan review
             $this->step = 'review';
+            $this->errorMessage = null;
+            $this->errorType = null;
+        } catch (AiQuotaExceededException $e) {
+            Log::warning('Text AI Quota Exceeded: ' . $e->getMessage());
+            $this->errorType = 'quota_exceeded';
+            $this->errorMessage = $e->getMessage();
         } catch (\Throwable $e) {
             Log::error('Text Transaction Extraction Failed: ' . $e->getMessage(), [
                 'text' => $this->rawText,
             ]);
+            $this->errorType = 'error';
             $this->errorMessage = 'Gagal memproses catatan dengan AI: ' . $e->getMessage();
         } finally {
             $this->isProcessing = false;
         }
+    }
+
+    /**
+     * Penyelamat darurat: jika AI kuota penuh atau offline, pedagang langsung masuk ke layar konfirmasi
+     * dengan teks catatan tetap terjaga dan tinggal mengisi nominal.
+     */
+    public function proceedToEmergencyReview(): void
+    {
+        $this->draft = [
+            'type' => 'cash_out',
+            'category' => 'bahan_baku',
+            'amount' => 0,
+            'transaction_date' => now()->toDateString(),
+            'merchant_name' => '',
+            'notes' => trim($this->rawText) ?: 'Pengisian darurat (koreksi langsung)',
+            'confidence_score' => 1.0,
+            'needs_review' => true,
+            'unclear_fields' => ['amount'],
+            'review_reason' => 'Pengisian darurat: kuota AI penuh atau kendala koneksi.',
+            'items' => [],
+        ];
+
+        $this->step = 'review';
+        $this->errorMessage = null;
+        $this->errorType = null;
+        $this->recalculateMathReconciliation();
+    }
+
+    /**
+     * Coba ulang memproses teks dengan AI.
+     */
+    public function retryProcess(): void
+    {
+        $this->errorMessage = null;
+        $this->errorType = null;
+        $this->processText(app(GroqService::class));
     }
 
     /**
@@ -226,6 +275,7 @@ class CreateExpenseTextTransaction extends Component
     {
         $this->step = 'input';
         $this->errorMessage = null;
+        $this->errorType = null;
         $this->showDuplicateModal = false;
         $this->duplicateConfirmed = false;
         $this->duplicateInfo = null;

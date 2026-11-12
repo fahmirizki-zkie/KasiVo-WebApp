@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Exceptions\AiQuotaExceededException;
 use App\Livewire\Concerns\ValidatesTransactionDraft;
 use App\Models\Business;
 use App\Models\Transaction;
@@ -63,6 +64,11 @@ class CreateExpenseVoiceTransaction extends Component
      * Pesan kesalahan jika terjadi kegagalan.
      */
     public ?string $errorMessage = null;
+
+    /**
+     * Jenis kegagalan (misal: 'quota_exceeded', 'error').
+     */
+    public ?string $errorType = null;
 
     public function mount(): void
     {
@@ -162,14 +168,56 @@ class CreateExpenseVoiceTransaction extends Component
 
             // Pindah ke layar konfirmasi draft
             $this->step = 'review';
+            $this->errorMessage = null;
+            $this->errorType = null;
+        } catch (AiQuotaExceededException $e) {
+            Log::warning('Voice AI Quota Exceeded: ' . $e->getMessage());
+            $this->errorType = 'quota_exceeded';
+            $this->errorMessage = $e->getMessage();
         } catch (\Throwable $e) {
             Log::error('Voice Transaction Processing Failed: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
+            $this->errorType = 'error';
             $this->errorMessage = 'Terjadi kendala saat memproses suara dengan AI: ' . $e->getMessage();
         } finally {
             $this->isProcessing = false;
         }
+    }
+
+    /**
+     * Penyelamat darurat: jika AI kuota penuh atau offline, pedagang langsung masuk ke layar konfirmasi
+     * dengan transkrip/catatan tetap terjaga dan tinggal mengisi nominal.
+     */
+    public function proceedToEmergencyReview(): void
+    {
+        $this->draft = [
+            'category' => 'bahan_baku',
+            'amount' => 0,
+            'transaction_date' => now()->toDateString(),
+            'merchant_name' => '',
+            'notes' => trim($this->transcriptionText ?? '') ?: 'Pengeluaran via Suara (koreksi langsung)',
+            'confidence_score' => 1.0,
+            'needs_review' => true,
+            'unclear_fields' => ['amount'],
+            'review_reason' => 'Pengisian darurat: kuota AI penuh atau suara tidak terproses otomatis.',
+            'items' => [],
+        ];
+
+        $this->step = 'review';
+        $this->errorMessage = null;
+        $this->errorType = null;
+        $this->recalculateMathReconciliation();
+    }
+
+    /**
+     * Coba ulang memproses rekaman suara dengan AI.
+     */
+    public function retryProcess(): void
+    {
+        $this->errorMessage = null;
+        $this->errorType = null;
+        $this->processVoice(app(GroqService::class));
     }
 
     /**
@@ -237,6 +285,7 @@ class CreateExpenseVoiceTransaction extends Component
         $this->audioFile = null;
         $this->transcriptionText = null;
         $this->errorMessage = null;
+        $this->errorType = null;
         $this->showDuplicateModal = false;
         $this->duplicateConfirmed = false;
         $this->duplicateInfo = null;
