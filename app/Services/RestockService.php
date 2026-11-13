@@ -147,16 +147,23 @@ class RestockService
                 $avgIntervalDays = round(array_sum($intervals) / count($intervals), 1);
             }
 
+            $avgQuantity = ($purchaseCount > 0) ? round($totalQuantity / $purchaseCount, 2) : 0.0;
+
             $aggregated[] = [
                 'item_name' => $data['display_name'],
                 'canonical_name' => $key,
                 'purchase_count' => $purchaseCount,
+                'total_purchases' => $purchaseCount,
                 'unique_purchase_days' => $uniqueDaysCount,
                 'total_quantity' => $totalQuantity,
                 'unit' => $dominantUnit,
+                'dominant_unit' => $dominantUnit,
+                'average_quantity_per_purchase' => $avgQuantity,
+                'avg_quantity_per_purchase' => $avgQuantity,
                 'total_spent' => $totalSpent,
                 'formatted_total_spent' => 'Rp ' . number_format($totalSpent, 0, ',', '.'),
                 'average_unit_price' => $avgUnitPrice,
+                'avg_unit_price' => $avgUnitPrice,
                 'formatted_average_price' => 'Rp ' . number_format($avgUnitPrice, 0, ',', '.'),
                 'first_purchase_date' => $firstDate,
                 'last_purchase_date' => $lastDate,
@@ -314,11 +321,243 @@ class RestockService
     }
 
     /**
-     * Mengambil ikhtisar lengkap saran restock (gabungan status kecukupan bisnis & item).
+     * Menghitung selang hari antar-pembelian (purchase intervals) dari daftar tanggal yang berurutan.
+     * Sesuai DoD KV-047: Menghitung delta hari, rata-rata interval, min, dan max.
      */
-    public function getRestockOverview(Business $business): array
+    public function calculateItemIntervals(array $purchaseDates): array
+    {
+        $dates = array_values(array_unique($purchaseDates));
+        sort($dates);
+
+        $count = count($dates);
+        if ($count < 2) {
+            return [
+                'has_intervals' => false,
+                'intervals' => [],
+                'average_interval_days' => 0,
+                'min_interval_days' => 0,
+                'max_interval_days' => 0,
+            ];
+        }
+
+        $intervals = [];
+        for ($i = 1; $i < $count; $i++) {
+            $prev = Carbon::parse($dates[$i - 1])->startOfDay();
+            $curr = Carbon::parse($dates[$i])->startOfDay();
+            $diff = (int) $prev->diffInDays($curr);
+            $intervals[] = max(1, $diff);
+        }
+
+        $avg = (int) round(array_sum($intervals) / count($intervals));
+        $avg = max(1, $avg);
+
+        return [
+            'has_intervals' => true,
+            'intervals' => $intervals,
+            'average_interval_days' => $avg,
+            'min_interval_days' => min($intervals),
+            'max_interval_days' => max($intervals),
+        ];
+    }
+
+    /**
+     * Menghasilkan saran restock berbasis pola siklus belanja untuk 1 item bahan baku.
+     * Mengkategorikan urgensi: 'overdue', 'due_today', 'upcoming', 'safe'.
+     * DoD KV-047: Saran didasarkan pola pembelian, bukan jumlah stok pasti.
+     */
+    public function generateItemRestockSuggestion(array $itemData, ?Carbon $referenceDate = null): array
+    {
+        $itemName = $itemData['item_name'] ?? 'Bahan Baku';
+        $dates = $itemData['purchase_dates'] ?? [];
+        $uniqueDays = $itemData['unique_purchase_days'] ?? count($dates);
+
+        if ($uniqueDays < 2 || count($dates) < 2) {
+            return [
+                'item_name' => $itemName,
+                'is_recommended' => false,
+                'urgency' => 'insufficient_history',
+                'urgency_label' => 'Riwayat Belum Cukup',
+                'average_interval_days' => null,
+                'days_since_last_purchase' => null,
+                'days_until_restock' => null,
+                'last_purchase_date' => $itemData['last_purchase_date'] ?? null,
+                'estimated_next_purchase_date' => null,
+                'suggested_quantity' => (float) ($itemData['avg_quantity_per_purchase'] ?? 0),
+                'unit' => $itemData['dominant_unit'] ?? 'pcs',
+                'avg_unit_price' => (float) ($itemData['avg_unit_price'] ?? 0),
+                'estimated_cost' => (float) (($itemData['avg_quantity_per_purchase'] ?? 0) * ($itemData['avg_unit_price'] ?? 0)),
+                'pattern_reason' => sprintf('Item %s belum memiliki riwayat tanggal pembelian yang cukup untuk membaca pola siklus belanja berkala.', $itemName),
+            ];
+        }
+
+        $intervalInfo = $this->calculateItemIntervals($dates);
+        $avgInterval = $intervalInfo['average_interval_days'];
+
+        $lastPurchaseDate = Carbon::parse($itemData['last_purchase_date'])->startOfDay();
+        $today = ($referenceDate ? $referenceDate->copy() : Carbon::today())->startOfDay();
+
+        $estimatedNextDate = $lastPurchaseDate->copy()->addDays($avgInterval);
+        $daysSinceLast = (int) $lastPurchaseDate->diffInDays($today, false);
+        $daysUntilRestock = $avgInterval - $daysSinceLast;
+
+        $suggestedQuantity = (float) round(
+            $itemData['avg_quantity_per_purchase']
+            ?? $itemData['average_quantity_per_purchase']
+            ?? (($itemData['purchase_count'] ?? 0) > 0 ? $itemData['total_quantity'] / $itemData['purchase_count'] : 1),
+            2
+        );
+        $avgUnitPrice = (float) ($itemData['average_unit_price'] ?? $itemData['avg_unit_price'] ?? 0);
+        $estimatedCost = (float) round($suggestedQuantity * $avgUnitPrice, 2);
+        $unit = $itemData['unit'] ?? $itemData['dominant_unit'] ?? 'pcs';
+        $qtyDisplay = ($suggestedQuantity == (int) $suggestedQuantity) ? (string) (int) $suggestedQuantity : (string) $suggestedQuantity;
+
+        if ($daysUntilRestock < 0) {
+            $overdueDays = abs($daysUntilRestock);
+            $urgency = 'overdue';
+            $urgencyLabel = 'Perlu Segera (Lewat Siklus)';
+            $isRecommended = true;
+            $patternReason = sprintf(
+                '%s biasanya dibeli setiap %d hari sekali, dan sudah %d hari belum dibeli (terakhir dibeli %s sebanyak %s %s). Pola menunjukkan waktu belanja rutin telah terlewat %d hari.',
+                $itemName,
+                $avgInterval,
+                $daysSinceLast,
+                $lastPurchaseDate->translatedFormat('d M Y'),
+                $qtyDisplay,
+                $unit,
+                $overdueDays
+            );
+        } elseif ($daysUntilRestock === 0) {
+            $urgency = 'due_today';
+            $urgencyLabel = 'Perlu Restock Hari Ini';
+            $isRecommended = true;
+            $patternReason = sprintf(
+                '%s rata-rata dibeli setiap %d hari sekali (terakhir dibeli %d hari lalu sebanyak %s %s). Berdasarkan siklus ini, estimasi waktu belanja rutin berikutnya adalah hari ini.',
+                $itemName,
+                $avgInterval,
+                $daysSinceLast,
+                $qtyDisplay,
+                $unit
+            );
+        } elseif ($daysUntilRestock <= 2) {
+            $urgency = 'upcoming';
+            $urgencyLabel = sprintf('Perlu Restock %d Hari Lagi', $daysUntilRestock);
+            $isRecommended = true;
+            $patternReason = sprintf(
+                '%s rata-rata dibeli setiap %d hari sekali (terakhir dibeli %d hari lalu). Berdasarkan siklus ini, waktu belanja rutin diperkirakan tiba dalam %d hari lagi.',
+                $itemName,
+                $avgInterval,
+                $daysSinceLast,
+                $daysUntilRestock
+            );
+        } else {
+            $urgency = 'safe';
+            $urgencyLabel = 'Stok Pola Masih Aman';
+            $isRecommended = false;
+            $patternReason = sprintf(
+                '%s rata-rata dibeli setiap %d hari sekali (terakhir dibeli %d hari lalu). Berdasarkan kebiasaan belanja berkala, jadwal pembelian berikutnya masih berjarak %d hari.',
+                $itemName,
+                $avgInterval,
+                $daysSinceLast,
+                $daysUntilRestock
+            );
+        }
+
+        return [
+            'item_name' => $itemName,
+            'is_recommended' => $isRecommended,
+            'urgency' => $urgency,
+            'urgency_label' => $urgencyLabel,
+            'average_interval_days' => $avgInterval,
+            'days_since_last_purchase' => $daysSinceLast,
+            'days_until_restock' => $daysUntilRestock,
+            'last_purchase_date' => $lastPurchaseDate->toDateString(),
+            'estimated_next_purchase_date' => $estimatedNextDate->toDateString(),
+            'suggested_quantity' => $suggestedQuantity,
+            'unit' => $unit,
+            'avg_unit_price' => $avgUnitPrice,
+            'estimated_cost' => $estimatedCost,
+            'pattern_reason' => $patternReason,
+            'intervals_data' => $intervalInfo,
+        ];
+    }
+
+    /**
+     * Menghasilkan daftar rekomendasi restock lengkap untuk suatu bisnis (DoD KV-047).
+     * Terurut berdasarkan prioritas urgensi: overdue -> due_today -> upcoming -> safe.
+     */
+    public function generateRestockRecommendations(Business $business, ?Carbon $referenceDate = null): array
     {
         $sufficiency = $this->evaluateDataSufficiency($business);
+
+        if (!$sufficiency['is_sufficient']) {
+            return [
+                'is_sufficient' => false,
+                'sufficiency' => $sufficiency,
+                'recommendations' => [],
+                'recommended_items' => [],
+                'safe_items' => [],
+                'recommended_count' => 0,
+                'safe_count' => 0,
+                'total_analyzed_count' => 0,
+                'total_estimated_budget' => 0.0,
+                'disclaimer' => self::DISCLAIMER,
+            ];
+        }
+
+        $items = $this->getItemPurchaseHistory($business);
+        $allRecommendations = [];
+
+        foreach ($items as $item) {
+            if (($item['unique_purchase_days'] ?? 0) >= 2) {
+                $suggestion = $this->generateItemRestockSuggestion($item, $referenceDate);
+                $allRecommendations[] = array_merge($item, $suggestion);
+            }
+        }
+
+        // Urutkan berdasarkan prioritas urgensi: overdue (1), due_today (2), upcoming (3), safe (4)
+        $priorityMap = [
+            'overdue' => 1,
+            'due_today' => 2,
+            'upcoming' => 3,
+            'safe' => 4,
+        ];
+
+        usort($allRecommendations, function ($a, $b) use ($priorityMap) {
+            $pA = $priorityMap[$a['urgency']] ?? 99;
+            $pB = $priorityMap[$b['urgency']] ?? 99;
+
+            if ($pA !== $pB) {
+                return $pA <=> $pB;
+            }
+
+            return ($a['days_until_restock'] ?? 0) <=> ($b['days_until_restock'] ?? 0);
+        });
+
+        $recommended = array_values(array_filter($allRecommendations, fn($r) => $r['is_recommended']));
+        $safe = array_values(array_filter($allRecommendations, fn($r) => !$r['is_recommended']));
+        $totalEstimatedBudget = (float) array_sum(array_column($recommended, 'estimated_cost'));
+
+        return [
+            'is_sufficient' => true,
+            'sufficiency' => $sufficiency,
+            'recommendations' => $allRecommendations,
+            'recommended_items' => $recommended,
+            'safe_items' => $safe,
+            'recommended_count' => count($recommended),
+            'safe_count' => count($safe),
+            'total_analyzed_count' => count($allRecommendations),
+            'total_estimated_budget' => $totalEstimatedBudget,
+            'disclaimer' => self::DISCLAIMER,
+        ];
+    }
+
+    /**
+     * Mengambil ikhtisar lengkap saran restock (gabungan status kecukupan bisnis & item).
+     */
+    public function getRestockOverview(Business $business, ?Carbon $referenceDate = null): array
+    {
+        $recommendationData = $this->generateRestockRecommendations($business, $referenceDate);
+        $sufficiency = $recommendationData['sufficiency'];
         $items = $this->getItemPurchaseHistory($business);
 
         $analyzedItems = [];
@@ -342,6 +581,12 @@ class RestockService
             'items' => $items,
             'ready_items' => $analyzedItems,
             'pending_items' => $insufficientItems,
+            'recommendations' => $recommendationData['recommendations'],
+            'recommended_items' => $recommendationData['recommended_items'],
+            'safe_items' => $recommendationData['safe_items'],
+            'recommended_count' => $recommendationData['recommended_count'],
+            'safe_count' => $recommendationData['safe_count'],
+            'total_estimated_budget' => $recommendationData['total_estimated_budget'],
             'total_items_count' => count($items),
             'ready_items_count' => count($analyzedItems),
             'disclaimer' => self::DISCLAIMER,
