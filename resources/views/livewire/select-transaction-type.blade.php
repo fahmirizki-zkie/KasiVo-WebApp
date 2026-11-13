@@ -185,6 +185,12 @@
                                 </svg>
                                 <span>Ketik Teks</span>
                             </a>
+                            <a href="{{ route('transactions.import-digital') }}" wire:navigate class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#FBFBFC] hover:bg-[#DDF1EC] border border-[#EEEEEE] hover:border-emerald-500/30 text-[#252525] hover:text-emerald-700 font-medium transition-colors">
+                                <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                </svg>
+                                <span>Impor Digital</span>
+                            </a>
                         </div>
                     </div>
                 </div>
