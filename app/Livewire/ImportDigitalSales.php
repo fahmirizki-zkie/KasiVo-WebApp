@@ -3,10 +3,14 @@
 namespace App\Livewire;
 
 use App\Exceptions\AiQuotaExceededException;
+use App\Livewire\Concerns\ValidatesTransactionDraft;
 use App\Models\Business;
 use App\Services\Ai\TransactionJsonSchema;
 use App\Services\AttachmentService;
 use App\Services\DigitalSalesParserService;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -16,6 +20,7 @@ use Livewire\WithFileUploads;
 class ImportDigitalSales extends Component
 {
     use WithFileUploads;
+    use ValidatesTransactionDraft;
 
     /**
      * Berkas yang diunggah (tangkapan layar / dokumen spreadsheet CSV/XLSX).
@@ -54,6 +59,24 @@ class ImportDigitalSales extends Component
      * @var array<string, mixed>
      */
     public array $parsedData = [];
+
+    /**
+     * Draf transaksi untuk validasi duplikasi & keselamatan data.
+     *
+     * @var array<string, mixed>
+     */
+    public array $draft = [
+        'amount' => 0.0,
+        'type' => 'cash_in',
+        'category' => 'penjualan',
+        'transaction_date' => '',
+        'notes' => '',
+    ];
+
+    /**
+     * Status seleksi semua baris data spreadsheet.
+     */
+    public bool $selectAllRows = true;
 
     /**
      * Pesan kesalahan jika format ditolak atau proses parsing gagal.
@@ -118,7 +141,7 @@ class ImportDigitalSales extends Component
      */
     public function removeFile(): void
     {
-        $this->reset(['uploadedFile', 'fileMeta', 'fileType', 'errorMessage', 'parsedData']);
+        $this->reset(['uploadedFile', 'fileMeta', 'fileType', 'errorMessage', 'parsedData', 'draft']);
         $this->errorType = 'general';
         $this->step = 'upload';
     }
@@ -179,7 +202,17 @@ class ImportDigitalSales extends Component
                 );
             }
 
-            // Transisi ke tahap pratinjau hasil ekstraksi (DoD KV-036)
+            // Inisialisasi persetujuan semua baris (DoD KV-037)
+            if (!empty($this->parsedData['rows'])) {
+                foreach ($this->parsedData['rows'] as &$row) {
+                    $row['approved'] = true;
+                }
+                unset($row);
+            }
+            $this->selectAllRows = true;
+            $this->syncDraftForValidation();
+
+            // Transisi ke tahap pratinjau hasil ekstraksi (DoD KV-036 & KV-037)
             $this->step = 'review';
         } catch (AiQuotaExceededException $e) {
             $this->errorType = 'quota';
@@ -226,13 +259,92 @@ class ImportDigitalSales extends Component
                     'fee_amount' => 0.0,
                     'platform' => $effectivePlatform,
                     'notes' => 'Pencatatan Penjualan Digital Mandiri',
+                    'approved' => true,
                 ],
             ],
         ];
 
+        $this->selectAllRows = true;
+        $this->syncDraftForValidation();
+
         $this->errorMessage = null;
         $this->errorType = 'general';
         $this->step = 'review';
+    }
+
+    /**
+     * Toggle persetujuan baris transaksi tertentu (DoD KV-037).
+     */
+    public function toggleRowApproval(int $index): void
+    {
+        if (isset($this->parsedData['rows'][$index])) {
+            $current = !empty($this->parsedData['rows'][$index]['approved']);
+            $this->parsedData['rows'][$index]['approved'] = !$current;
+            $this->recalculateApprovedTotal();
+        }
+    }
+
+    /**
+     * Toggle pilih semua baris transaksi (DoD KV-037).
+     */
+    public function toggleSelectAll(): void
+    {
+        $this->selectAllRows = !$this->selectAllRows;
+
+        if (!empty($this->parsedData['rows'])) {
+            foreach ($this->parsedData['rows'] as &$row) {
+                $row['approved'] = $this->selectAllRows;
+            }
+            unset($row);
+        }
+
+        $this->recalculateApprovedTotal();
+    }
+
+    /**
+     * Hitung ulang total penjualan hanya dari baris-baris yang disetujui (DoD KV-037).
+     */
+    public function recalculateApprovedTotal(): void
+    {
+        if (empty($this->parsedData['rows'])) {
+            return;
+        }
+
+        $totalApproved = 0.0;
+        $totalGross = 0.0;
+        $totalFee = 0.0;
+        $approvedCount = 0;
+
+        foreach ($this->parsedData['rows'] as $row) {
+            if (!empty($row['approved'])) {
+                $totalApproved += (float) ($row['amount'] ?? 0);
+                $totalGross += (float) ($row['gross_amount'] ?? $row['amount'] ?? 0);
+                $totalFee += (float) ($row['fee_amount'] ?? 0);
+                $approvedCount++;
+            }
+        }
+
+        $this->parsedData['total_amount'] = $totalApproved;
+        $this->parsedData['net_amount'] = $totalApproved;
+        $this->parsedData['gross_amount'] = $totalGross;
+        $this->parsedData['fee_amount'] = $totalFee;
+        $this->parsedData['order_count'] = $approvedCount;
+
+        $this->syncDraftForValidation();
+    }
+
+    /**
+     * Sinkronisasi draf transaksi agar konsisten dengan `ValidatesTransactionDraft`.
+     */
+    protected function syncDraftForValidation(): void
+    {
+        $this->draft = [
+            'amount' => (float) ($this->parsedData['total_amount'] ?? 0),
+            'type' => 'cash_in',
+            'category' => 'penjualan',
+            'transaction_date' => $this->parsedData['transaction_date'] ?? now()->toDateString(),
+            'notes' => $this->parsedData['notes'] ?? 'Impor Penjualan Digital',
+        ];
     }
 
     /**
@@ -243,6 +355,7 @@ class ImportDigitalSales extends Component
         $clean = TransactionJsonSchema::sanitizeNumeric($amount);
         $this->parsedData['total_amount'] = $clean;
         $this->parsedData['net_amount'] = $clean;
+        $this->syncDraftForValidation();
     }
 
     /**
@@ -251,6 +364,102 @@ class ImportDigitalSales extends Component
     public function updateParsedDate(string $date): void
     {
         $this->parsedData['transaction_date'] = $date;
+        $this->syncDraftForValidation();
+    }
+
+    /**
+     * Simpan transaksi penjualan digital ke database kas masuk (DoD KV-037).
+     */
+    public function saveTransaction(AttachmentService $attachmentService)
+    {
+        $business = auth()->user()?->businesses()->first();
+
+        if (!$business) {
+            session()->flash('message', 'Silakan daftarkan profil usaha Anda terlebih dahulu.');
+            return redirect()->route('onboarding');
+        }
+
+        $this->syncDraftForValidation();
+
+        // 1. Validasi baris disetujui
+        if (!empty($this->parsedData['rows'])) {
+            $hasApproved = false;
+            foreach ($this->parsedData['rows'] as $r) {
+                if (!empty($r['approved'])) {
+                    $hasApproved = true;
+                    break;
+                }
+            }
+            if (!$hasApproved) {
+                $this->errorMessage = 'Tidak ada baris transaksi yang disetujui. Centang setidaknya satu baris transaksi untuk disimpan.';
+                return null;
+            }
+        }
+
+        $approvedTotal = (float) ($this->parsedData['total_amount'] ?? 0);
+        if ($approvedTotal <= 0) {
+            $this->errorMessage = 'Nominal total penjualan harus lebih dari Rp 0.';
+            return null;
+        }
+
+        // 2. Proteksi Duplikasi (Threshold 10 Menit)
+        if (!$this->checkDuplicateSafety($business)) {
+            return null;
+        }
+
+        // 3. Proteksi Atomic Cache Lock (5 detik)
+        $lockKey = "import_digital_sales_lock_{$business->id}";
+        $lock = Cache::lock($lockKey, 5);
+
+        if (!$lock->get()) {
+            return null;
+        }
+
+        try {
+            $transactionDate = $this->parsedData['transaction_date'] ?? now()->toDateString();
+            $platform = $this->parsedData['platform'] ?? 'other';
+            $notes = trim((string) ($this->parsedData['notes'] ?? ''));
+
+            if (!$notes) {
+                $notes = "Impor Penjualan Digital ({$platform})";
+            }
+
+            $tx = DB::transaction(function () use ($business, $approvedTotal, $transactionDate, $notes, $attachmentService) {
+                $transaction = $business->transactions()->create([
+                    'type' => 'cash_in',
+                    'category' => 'penjualan',
+                    'amount' => $approvedTotal,
+                    'transaction_date' => $transactionDate,
+                    'source_type' => 'digital_import',
+                    'notes' => $notes,
+                    'is_cash_settled' => true,
+                ]);
+
+                // Simpan berkas bukti ke tabel attachments jika ada
+                if ($this->uploadedFile && $this->uploadedFile instanceof \Illuminate\Http\UploadedFile) {
+                    try {
+                        $attachmentService->uploadDigitalImport(
+                            file: $this->uploadedFile,
+                            transactionId: $transaction->id,
+                            source: 'digital_import'
+                        );
+                    } catch (\Throwable $e) {
+                        Log::warning('Gagal mengunggah lampiran berkas impor digital', [
+                            'transaction_id' => $transaction->id,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+                }
+
+                return $transaction;
+            });
+
+            session()->flash('message', 'Penjualan digital sebesar Rp ' . number_format($approvedTotal, 0, ',', '.') . ' berhasil dicatat ke kas masuk!');
+
+            return redirect()->route('transactions.index');
+        } finally {
+            $lock->release();
+        }
     }
 
     /**

@@ -316,7 +316,7 @@
             </div>
         @endif
 
-        <!-- TAHAP 4: PRATINJAU HASIL EKSTRAKSI (DoD KV-036: JUMLAH DAN TANGGAL DAPAT DITINJAU) -->
+        <!-- TAHAP 4: PRATINJAU HASIL EKSTRAKSI & KONFIRMASI SIMPAN (DoD KV-037) -->
         @if ($step === 'review' && !empty($parsedData))
             <div class="space-y-6">
 
@@ -426,15 +426,20 @@
                     </div>
                 </div>
 
-                <!-- Tabel Rincian Baris Data (Jika Berasal dari Spreadsheet Multi-Row) -->
+                <!-- Tabel Rincian Baris Data dengan Checkbox Persetujuan (DoD KV-037) -->
                 @if (!empty($parsedData['rows']) && count($parsedData['rows']) > 1)
                     <div class="bg-white rounded-2xl p-5 sm:p-6 border border-[#EEEEEE] shadow-xs">
                         <div class="flex items-center justify-between mb-3 pb-3 border-b border-[#EEEEEE]">
-                            <h3 class="text-xs sm:text-sm font-bold text-[#252525]">
-                                Rincian Baris Transaksi Terdeteksi ({{ count($parsedData['rows']) }} Baris)
-                            </h3>
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-xs sm:text-sm font-bold text-[#252525]">
+                                    Pilih Baris Transaksi yang Disetujui
+                                </h3>
+                                <span class="text-[11px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold">
+                                    {{ count(array_filter($parsedData['rows'], fn($r) => !empty($r['approved']))) }} / {{ count($parsedData['rows']) }} Baris Disetujui
+                                </span>
+                            </div>
                             <span class="text-xs font-semibold text-emerald-700">
-                                Total: Rp {{ number_format($parsedData['total_amount'] ?? 0, 0, ',', '.') }}
+                                Total Disetujui: Rp {{ number_format($parsedData['total_amount'] ?? 0, 0, ',', '.') }}
                             </span>
                         </div>
 
@@ -442,6 +447,15 @@
                             <table class="w-full text-left text-xs">
                                 <thead>
                                     <tr class="border-b border-[#EEEEEE] text-[#777777]">
+                                        <th class="py-2 px-2 text-center w-8">
+                                            <input
+                                                type="checkbox"
+                                                wire:click="toggleSelectAll"
+                                                {{ $selectAllRows ? 'checked' : '' }}
+                                                class="rounded border-[#DCDCDC] text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                                                title="Pilih Semua Baris"
+                                            />
+                                        </th>
                                         <th class="py-2 px-2 font-semibold">Tanggal</th>
                                         <th class="py-2 px-2 font-semibold">Platform</th>
                                         <th class="py-2 px-2 font-semibold">Keterangan</th>
@@ -449,28 +463,31 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-[#EEEEEE]">
-                                    @foreach (array_slice($parsedData['rows'], 0, 10) as $row)
-                                        <tr>
-                                            <td class="py-2 px-2 font-medium text-[#252525]">{{ $row['date'] ?? '-' }}</td>
-                                            <td class="py-2 px-2 capitalize text-[#777777]">{{ $row['platform'] ?? '-' }}</td>
-                                            <td class="py-2 px-2 text-[#777777] truncate max-w-xs">{{ $row['notes'] ?? '-' }}</td>
-                                            <td class="py-2 px-2 font-bold text-emerald-700 text-right">
+                                    @foreach ($parsedData['rows'] as $index => $row)
+                                        <tr class="{{ empty($row['approved']) ? 'opacity-40 bg-slate-50' : 'hover:bg-[#FBFBFC]' }} transition-colors">
+                                            <td class="py-2.5 px-2 text-center">
+                                                <input
+                                                    type="checkbox"
+                                                    wire:click="toggleRowApproval({{ $index }})"
+                                                    {{ !empty($row['approved']) ? 'checked' : '' }}
+                                                    class="rounded border-[#DCDCDC] text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                                                />
+                                            </td>
+                                            <td class="py-2.5 px-2 font-medium text-[#252525]">{{ $row['date'] ?? '-' }}</td>
+                                            <td class="py-2.5 px-2 capitalize text-[#777777]">{{ $row['platform'] ?? '-' }}</td>
+                                            <td class="py-2.5 px-2 text-[#777777] truncate max-w-xs">{{ $row['notes'] ?? '-' }}</td>
+                                            <td class="py-2.5 px-2 font-bold text-emerald-700 text-right">
                                                 Rp {{ number_format($row['amount'] ?? 0, 0, ',', '.') }}
                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
-                            @if (count($parsedData['rows']) > 10)
-                                <p class="text-[11px] text-[#777777] text-center mt-2">
-                                    ... dan {{ count($parsedData['rows']) - 10 }} baris transaksi lainnya.
-                                </p>
-                            @endif
                         </div>
                     </div>
                 @endif
 
-                <!-- Tombol Aksi Bawah: Ganti Berkas & Siap Simpan (DoD KV-036) -->
+                <!-- Tombol Aksi Bawah: Ganti Berkas & Konfirmasi Simpan (DoD KV-037) -->
                 <div class="bg-white rounded-2xl p-4 sm:p-5 border border-[#EEEEEE] flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
                     <button
                         type="button"
@@ -484,21 +501,29 @@
                     </button>
 
                     <div class="w-full sm:w-auto flex items-center gap-2">
-                        <span class="text-xs text-[#777777] hidden sm:inline">Data siap ditinjau</span>
                         <button
                             type="button"
+                            wire:click="saveTransaction"
+                            wire:loading.attr="disabled"
                             class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-colors"
                         >
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <span wire:loading.remove wire:target="saveTransaction">Konfirmasi & Simpan ke Kas Masuk</span>
+                            <span wire:loading wire:target="saveTransaction" class="inline-flex items-center gap-2">
+                                <span class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
+                                <span>Menyimpan...</span>
+                            </span>
+                            <svg wire:loading.remove wire:target="saveTransaction" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                             </svg>
-                            <span>Konfirmasi & Simpan ke Kas Masuk</span>
                         </button>
                     </div>
                 </div>
 
             </div>
         @endif
+
+        <!-- MODAL PERINGATAN TRANSAKSI DUPLIKAT (PENCEGAHAN IMPOR GANDA - DoD KV-037) -->
+        @include('livewire.partials.duplicate-warning-modal')
 
     </div>
 </div>
