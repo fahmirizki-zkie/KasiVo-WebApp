@@ -7,6 +7,7 @@ use App\Livewire\CreateExpenseVoiceTransaction;
 use App\Livewire\CreateIncomeTransaction;
 use App\Livewire\Dashboard;
 use App\Livewire\ImportDigitalSales;
+use App\Livewire\RestockSuggestion;
 use App\Livewire\SelectTransactionType;
 use App\Livewire\TransactionHistory;
 use Illuminate\Support\Facades\Route;
@@ -42,12 +43,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('transactions', TransactionHistory::class)->name('transactions.index');
 
-    Route::get('restock', function () {
-        return view('placeholder', [
-            'title' => 'Saran Restock Bahan',
-            'description' => 'Rekomendasi pembelian bahan baku berbasis pola belanja mingguan.'
-        ]);
-    })->name('restock');
+    // Halaman Saran Restock Berbasis Pola (Task KV-049)
+    Route::get('restock', RestockSuggestion::class)->name('restock');
+    Route::get('saran-restock', RestockSuggestion::class)->name('restock.index');
 
     Route::get('business-profile', function () {
         return view('placeholder', [
