@@ -20,9 +20,41 @@ class AttachmentService
     ];
 
     /**
+     * Tipe MIME gambar screenshot yang diizinkan untuk impor penjualan digital.
+     */
+    public const DIGITAL_IMPORT_IMAGE_MIMES = [
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+    ];
+
+    /**
+     * Tipe MIME dokumen spreadsheet/tabular yang diizinkan untuk impor penjualan digital.
+     */
+    public const DIGITAL_IMPORT_DOC_MIMES = [
+        'text/csv',
+        'text/plain',
+        'application/csv',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.ms-excel',
+    ];
+
+    /**
+     * Ekstensi berkas yang diizinkan untuk impor penjualan digital.
+     */
+    public const DIGITAL_IMPORT_ALLOWED_EXTENSIONS = [
+        'jpg', 'jpeg', 'png', 'webp', 'csv', 'xlsx', 'xls',
+    ];
+
+    /**
      * Batas ukuran maksimum file: 5 MB (dalam bytes).
      */
     public const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
+
+    /**
+     * Batas ukuran maksimum dokumen impor digital: 10 MB (dalam bytes).
+     */
+    public const MAX_DOC_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 
     /**
      * Upload dan simpan file bukti transaksi ke storage dan database.
@@ -83,6 +115,50 @@ class AttachmentService
                 'Ukuran file melebihi batas maksimum 5 MB.'
             );
         }
+    }
+
+    /**
+     * Validasi berkas impor penjualan digital (tangkapan layar atau dokumen tabular CSV/XLSX).
+     *
+     * @param UploadedFile $file
+     * @return string 'screenshot'|'spreadsheet'
+     * @throws InvalidArgumentException jika format atau ukuran berkas tidak didukung
+     */
+    public function validateDigitalImportFile(UploadedFile $file): string
+    {
+        $extension = strtolower($file->getClientOriginalExtension() ?: '');
+        $mime = strtolower($file->getMimeType() ?: '');
+
+        $isImageExt = in_array($extension, ['jpg', 'jpeg', 'png', 'webp'], true);
+        $isDocExt = in_array($extension, ['csv', 'xlsx', 'xls'], true);
+
+        $isImageMime = in_array($mime, self::DIGITAL_IMPORT_IMAGE_MIMES, true);
+        $isDocMime = in_array($mime, self::DIGITAL_IMPORT_DOC_MIMES, true);
+
+        // Jika tangkapan layar (screenshot)
+        if (($isImageExt || $isImageMime) && !$isDocExt) {
+            if ($file->getSize() > self::MAX_FILE_SIZE_BYTES) {
+                throw new InvalidArgumentException(
+                    'Ukuran tangkapan layar melebihi batas maksimum 5 MB.'
+                );
+            }
+            return 'screenshot';
+        }
+
+        // Jika dokumen tabular (CSV / Excel)
+        if ($isDocExt || $isDocMime) {
+            if ($file->getSize() > self::MAX_DOC_FILE_SIZE_BYTES) {
+                throw new InvalidArgumentException(
+                    'Ukuran berkas dokumen melebihi batas maksimum 10 MB.'
+                );
+            }
+            return 'spreadsheet';
+        }
+
+        $displayExt = $extension ? ".{$extension}" : ($mime ?: 'tidak dikenal');
+        throw new InvalidArgumentException(
+            "Format berkas '{$displayExt}' tidak didukung. Harap unggah tangkapan layar (.png, .jpg, .webp) atau dokumen data (.csv, .xlsx)."
+        );
     }
 
     /**

@@ -5,6 +5,7 @@ use App\Livewire\CreateExpensePhotoTransaction;
 use App\Livewire\CreateExpenseTextTransaction;
 use App\Livewire\CreateExpenseVoiceTransaction;
 use App\Livewire\CreateIncomeTransaction;
+use App\Livewire\ImportDigitalSales;
 use App\Livewire\SelectTransactionType;
 use App\Livewire\TransactionHistory;
 use Illuminate\Support\Facades\Route;
@@ -35,6 +36,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('transactions/create-foto', CreateExpensePhotoTransaction::class)->name('transactions.photo');
 
     Route::get('transactions/create-penjualan', CreateIncomeTransaction::class)->name('transactions.income');
+
+    Route::get('transactions/import-digital', ImportDigitalSales::class)->name('transactions.import-digital');
 
     Route::get('transactions', TransactionHistory::class)->name('transactions.index');
 
