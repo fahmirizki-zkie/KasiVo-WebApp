@@ -28,8 +28,8 @@ class CashFlowService
     {
         $aggregation = Transaction::where('business_id', $business->id)
             ->where('is_cash_settled', true)
-            ->when($startDate, fn($q) => $q->where('transaction_date', '>=', $startDate->toDateString()))
-            ->when($endDate, fn($q) => $q->where('transaction_date', '<=', $endDate->toDateString()))
+            ->when($startDate, fn($q) => $q->whereDate('transaction_date', '>=', $startDate))
+            ->when($endDate, fn($q) => $q->whereDate('transaction_date', '<=', $endDate))
             ->selectRaw("
                 COALESCE(SUM(CASE WHEN type = 'cash_in' THEN amount ELSE 0 END), 0) as total_cash_in,
                 COALESCE(SUM(CASE WHEN type = 'cash_out' THEN amount ELSE 0 END), 0) as total_cash_out,
@@ -70,8 +70,8 @@ class CashFlowService
     {
         $records = Transaction::where('business_id', $business->id)
             ->where('is_cash_settled', true)
-            ->when($startDate, fn($q) => $q->where('transaction_date', '>=', $startDate->toDateString()))
-            ->when($endDate, fn($q) => $q->where('transaction_date', '<=', $endDate->toDateString()))
+            ->when($startDate, fn($q) => $q->whereDate('transaction_date', '>=', $startDate))
+            ->when($endDate, fn($q) => $q->whereDate('transaction_date', '<=', $endDate))
             ->selectRaw("
                 type,
                 category,
@@ -141,8 +141,8 @@ class CashFlowService
 
         $records = Transaction::where('business_id', $business->id)
             ->where('is_cash_settled', true)
-            ->where('transaction_date', '>=', $start->toDateString())
-            ->where('transaction_date', '<=', $end->toDateString())
+            ->whereDate('transaction_date', '>=', $start)
+            ->whereDate('transaction_date', '<=', $end)
             ->selectRaw("
                 transaction_date,
                 type,

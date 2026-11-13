@@ -5,6 +5,7 @@ use App\Livewire\CreateExpensePhotoTransaction;
 use App\Livewire\CreateExpenseTextTransaction;
 use App\Livewire\CreateExpenseVoiceTransaction;
 use App\Livewire\CreateIncomeTransaction;
+use App\Livewire\Dashboard;
 use App\Livewire\ImportDigitalSales;
 use App\Livewire\SelectTransactionType;
 use App\Livewire\TransactionHistory;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome');
 
-Route::view('dashboard', 'dashboard')
+Route::get('dashboard', Dashboard::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
