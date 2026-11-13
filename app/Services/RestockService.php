@@ -5,10 +5,23 @@ namespace App\Services;
 use App\Models\Business;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
+use App\Services\Ai\GroqService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class RestockService
 {
+    protected ?GroqService $groqService;
+
+    public function __construct(?GroqService $groqService = null)
+    {
+        $this->groqService = $groqService;
+    }
+
+    public function getGroqService(): GroqService
+    {
+        return $this->groqService ??= app(GroqService::class);
+    }
     /**
      * Ambang batas minimal rentang hari histori untuk analisis restock.
      */
@@ -589,7 +602,208 @@ class RestockService
             'total_estimated_budget' => $recommendationData['total_estimated_budget'],
             'total_items_count' => count($items),
             'ready_items_count' => count($analyzedItems),
+            'ai_explanation' => $this->explainRestockWithAi($business, $referenceDate),
             'disclaimer' => self::DISCLAIMER,
+        ];
+    }
+
+    /**
+     * Menjelaskan rekomendasi restock dalam kalimat sederhana dan ramah UMKM menggunakan Groq LLM (DoD KV-048).
+     * Dilengkapi fallback deterministik anti-crash jika AI tidak dapat diakses atau kuota habis.
+     */
+    public function explainRestockWithAi(
+        Business $business,
+        ?Carbon $referenceDate = null,
+        ?GroqService $customGroq = null
+    ): array {
+        $recommendationData = $this->generateRestockRecommendations($business, $referenceDate);
+        $sufficiency = $recommendationData['sufficiency'] ?? [];
+
+        // 1. Kasus histori data belum cukup (< 7 hari)
+        if (!$recommendationData['is_sufficient']) {
+            $currentSpan = (int) ($sufficiency['current_span_days'] ?? 0);
+            $threshold = (int) ($sufficiency['threshold_days'] ?? self::THRESHOLD_DAYS);
+            $remaining = (int) ($sufficiency['remaining_days'] ?? $threshold);
+
+            return [
+                'is_sufficient' => false,
+                'is_ai_generated' => false,
+                'source' => 'rule_engine',
+                'summary_headline' => 'Pencatatan Belanja Belum Mencapai 7 Hari',
+                'ai_explanation' => sprintf(
+                    'Sistem KasiVo baru mencatat riwayat belanja bahan selama %d hari. Diperlukan minimal %d hari riwayat belanja (sisa %d hari lagi) agar pola siklus belanja rutin usaha %s dapat dianalisis.',
+                    $currentSpan,
+                    $threshold,
+                    $remaining,
+                    $business->name ?? 'Anda'
+                ),
+                'actionable_advice' => 'Terus catat setiap pembelian bahan baku harian Anda melalui nota foto, suara, atau teks agar rekomendasi otomatis segera aktif.',
+                'data_limitations' => 'Analisis membutuhkan minimal 7 hari kalender transaksi belanja bahan baku untuk memastikan pola interval berulang yang valid.',
+                'disclaimer' => self::DISCLAIMER,
+                'recommendations_data' => $recommendationData,
+            ];
+        }
+
+        $recommended = $recommendationData['recommended_items'] ?? [];
+        $safe = $recommendationData['safe_items'] ?? [];
+        $spanDays = (int) ($sufficiency['current_span_days'] ?? 0);
+
+        // 2. Kasus seluruh bahan saat ini dalam kondisi aman (belum ada yang perlu restock)
+        if (empty($recommended)) {
+            return [
+                'is_sufficient' => true,
+                'is_ai_generated' => false,
+                'source' => 'rule_engine',
+                'summary_headline' => 'Semua Bahan Baku Masih Dalam Siklus Aman',
+                'ai_explanation' => sprintf(
+                    'Berdasarkan analisis pola belanja berkala selama %d hari terakhir, seluruh bahan baku (%d jenis) saat ini masih dalam jadwal aman dan belum memasuki siklus belanja rutin berikutnya.',
+                    $spanDays,
+                    count($safe)
+                ),
+                'actionable_advice' => 'Tidak ada belanja bahan mendesak hari ini. Pantau kembali jadwal belanja berkala Anda besok atau lusa.',
+                'data_limitations' => sprintf('Prediksi didasarkan pada siklus interval belanja %d hari terakhir, BUKAN melacak jumlah fisik sisa stok aktual di tempat usaha.', $spanDays),
+                'disclaimer' => self::DISCLAIMER,
+                'recommendations_data' => $recommendationData,
+            ];
+        }
+
+        // 3. Kasus terdapat bahan yang disarankan restock -> panggil Groq LLM
+        $fallback = $this->buildFallbackRestockExplanation($recommendationData);
+
+        try {
+            $groq = $customGroq ?? $this->getGroqService();
+
+            $systemPrompt = <<<PROMPT
+Anda adalah KasiVo AI Assistant, asisten cerdas operasional dan keuangan untuk UMKM F&B (kuliner/warung/kafe) di Indonesia.
+Tugas Anda: Mengubah ringkasan perhitungan pola pembelian bahan baku menjadi narasi penjelasan yang ramah, praktis, to-the-point, dan mudah dipahami pemilik warung/kafe.
+
+PANDUAN & ATURAN WAJIB (DoD KasiVo):
+1. Alasan saran harus jelas: jelaskan bahan prioritas yang perlu dibeli, urgensinya (terlewat siklus atau tepat tiba hari ini), siklus biasanya (misal tiap 4 hari), dan estimasi anggaran yang perlu disiapkan.
+2. Keterbatasan data harus jelas: TEGASKAN bahwa rekomendasi ini berbasis pola kebiasaan siklus belanja berkala, BUKAN melacak atau mengklaim jumlah fisik sisa stok aktual di gudang/dapur.
+3. Gunakan bahasa Indonesia sehari-hari yang santun, profesional, dan menyemangati pemilik usaha.
+4. Keluarkan respon HANYA dalam format JSON valid tanpa markdown tambahan:
+{
+    "summary_headline": "Judul ringkas & informatif (maksimal 1 kalimat)",
+    "ai_explanation": "Penjelasan naratif 2-3 kalimat yang mengalir, merangkum bahan prioritas dan alasan siklusnya",
+    "actionable_advice": "1 tips praktis belanja atau persiapan operasional untuk pemilik usaha",
+    "data_limitations": "Pernyataan keterbatasan data yang jelas dan transparan"
+}
+PROMPT;
+
+            $payloadItems = array_map(function ($item) {
+                return [
+                    'item_name' => $item['item_name'],
+                    'urgency' => $item['urgency'],
+                    'urgency_label' => $item['urgency_label'],
+                    'average_interval_days' => $item['average_interval_days'],
+                    'days_since_last_purchase' => $item['days_since_last_purchase'],
+                    'days_until_restock' => $item['days_until_restock'],
+                    'suggested_quantity' => $item['suggested_quantity'],
+                    'unit' => $item['unit'],
+                    'estimated_cost' => $item['estimated_cost'],
+                    'pattern_reason' => $item['pattern_reason'],
+                ];
+            }, $recommended);
+
+            $userContent = json_encode([
+                'business_name' => $business->name ?? 'Usaha Anda',
+                'history_span_days' => $spanDays,
+                'total_estimated_budget' => $recommendationData['total_estimated_budget'],
+                'recommended_items' => $payloadItems,
+                'safe_items_count' => count($safe),
+            ], JSON_UNESCAPED_UNICODE);
+
+            $messages = [
+                ['role' => 'system', 'content' => $systemPrompt],
+                ['role' => 'user', 'content' => $userContent],
+            ];
+
+            $response = $groq->chat($messages, jsonMode: true);
+
+            if (!empty($response['ai_explanation'])) {
+                return [
+                    'is_sufficient' => true,
+                    'is_ai_generated' => true,
+                    'source' => 'groq_llm',
+                    'summary_headline' => $response['summary_headline'] ?? $fallback['summary_headline'],
+                    'ai_explanation' => $response['ai_explanation'],
+                    'actionable_advice' => $response['actionable_advice'] ?? $fallback['actionable_advice'],
+                    'data_limitations' => $response['data_limitations'] ?? $fallback['data_limitations'],
+                    'disclaimer' => self::DISCLAIMER,
+                    'recommendations_data' => $recommendationData,
+                ];
+            }
+
+            return $fallback;
+        } catch (\Throwable $e) {
+            Log::warning('Groq Restock Explanation Fallback Triggered', [
+                'business_id' => $business->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return $fallback;
+        }
+    }
+
+    /**
+     * Membangun narasi penjelasan restock deterministik sebagai fallback anti-crash (DoD KV-048).
+     */
+    public function buildFallbackRestockExplanation(array $recommendationData): array
+    {
+        $sufficiency = $recommendationData['sufficiency'] ?? [];
+        $recommended = $recommendationData['recommended_items'] ?? [];
+        $spanDays = (int) ($sufficiency['current_span_days'] ?? 0);
+        $totalBudget = (float) ($recommendationData['total_estimated_budget'] ?? 0);
+
+        $overdueCount = count(array_filter($recommended, fn($i) => ($i['urgency'] ?? '') === 'overdue'));
+        $dueTodayCount = count(array_filter($recommended, fn($i) => ($i['urgency'] ?? '') === 'due_today'));
+        $upcomingCount = count(array_filter($recommended, fn($i) => ($i['urgency'] ?? '') === 'upcoming'));
+
+        $itemDescriptions = array_map(function ($i) {
+            $qty = (float) ($i['suggested_quantity'] ?? 0);
+            $qtyStr = ($qty == (int) $qty) ? (string) (int) $qty : (string) $qty;
+            return $i['item_name'] . ' (' . $qtyStr . ' ' . ($i['unit'] ?? '') . ')';
+        }, $recommended);
+
+        $itemsStr = implode(', ', $itemDescriptions);
+        $headline = sprintf('Ada %d Bahan Baku yang Disarankan untuk Restock', count($recommended));
+
+        $urgencyClauses = [];
+        if ($overdueCount > 0) {
+            $urgencyClauses[] = "{$overdueCount} bahan sudah melewati siklus belanja biasanya";
+        }
+        if ($dueTodayCount > 0) {
+            $urgencyClauses[] = "{$dueTodayCount} bahan tepat tiba jadwal belanja rutinnya hari ini";
+        }
+        if ($upcomingCount > 0) {
+            $urgencyClauses[] = "{$upcomingCount} bahan jadwal rutinnya tiba dalam 1-2 hari ke depan";
+        }
+
+        $explanation = sprintf(
+            'Berdasarkan riwayat belanja %d hari terakhir, %s: %s. Estimasi total anggaran belanja yang perlu disiapkan sekitar Rp %s.',
+            $spanDays,
+            implode(' dan ', $urgencyClauses),
+            $itemsStr,
+            number_format($totalBudget, 0, ',', '.')
+        );
+
+        $advice = 'Disarankan untuk memeriksa tempat penyimpanan bahan dan menyiapkan dana operasional belanja agar produksi usaha berjalan lancar.';
+
+        $limitations = sprintf(
+            'Rekomendasi ini dihitung dari analisis interval riwayat belanja %d hari terakhir dan kebiasaan belanja berkala, BUKAN merupakan pelacakan sisa stok fisik riil di tempat usaha Anda.',
+            $spanDays
+        );
+
+        return [
+            'is_sufficient' => true,
+            'is_ai_generated' => false,
+            'source' => 'rule_engine_fallback',
+            'summary_headline' => $headline,
+            'ai_explanation' => $explanation,
+            'actionable_advice' => $advice,
+            'data_limitations' => $limitations,
+            'disclaimer' => self::DISCLAIMER,
+            'recommendations_data' => $recommendationData,
         ];
     }
 
