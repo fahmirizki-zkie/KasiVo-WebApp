@@ -99,6 +99,36 @@ class AttachmentService
     }
 
     /**
+     * Upload dan simpan berkas bukti impor penjualan digital (screenshot atau spreadsheet CSV/XLSX).
+     */
+    public function uploadDigitalImport(
+        UploadedFile $file,
+        ?int $transactionId = null,
+        string $source = 'digital_import'
+    ): Attachment {
+        $detectedType = $this->validateDigitalImportFile($file);
+
+        $folderPath = 'attachments/' . date('Y/m');
+        $extension = $file->getClientOriginalExtension() ?: ($detectedType === 'screenshot' ? 'jpg' : 'csv');
+        $uniqueFileName = Str::random(32) . '.' . strtolower($extension);
+
+        $storedPath = $file->storeAs($folderPath, $uniqueFileName, 'public');
+
+        if (!$storedPath) {
+            throw new \RuntimeException('Gagal menyimpan berkas impor digital ke storage disk.');
+        }
+
+        return Attachment::create([
+            'transaction_id' => $transactionId,
+            'file_path' => $storedPath,
+            'file_name' => $file->getClientOriginalName(),
+            'mime_type' => $file->getMimeType() ?: ($detectedType === 'screenshot' ? 'image/jpeg' : 'text/csv'),
+            'file_size_bytes' => $file->getSize(),
+            'source' => $source,
+        ]);
+    }
+
+    /**
      * Validasi format dan ukuran file.
      */
     public function validateFile(UploadedFile $file): void
