@@ -4,8 +4,11 @@ namespace App\Services;
 
 use App\Models\Business;
 use App\Services\Ai\GroqService;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Barryvdh\DomPDF\PDF as DomPdfWrapper;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class BusinessReportService
 {
@@ -309,6 +312,40 @@ PROMPT;
     ): array {
         $aiNarrative = $this->generateAiNarrative($business, $period, $customStart, $customEnd, $customGroq);
         return $this->getProfileReportData($business, $period, $customStart, $customEnd, $aiNarrative);
+    }
+
+    /**
+     * Menghasilkan dokumen PDF profil usaha standar A4 Portrait siap unduh/stream (DoD KV-052).
+     */
+    public function renderPdf(
+        Business $business,
+        string $period = 'this_month',
+        ?string $customStart = null,
+        ?string $customEnd = null,
+        ?GroqService $customGroq = null
+    ): DomPdfWrapper {
+        $reportData = $this->getCompleteProfileReportWithAi($business, $period, $customStart, $customEnd, $customGroq);
+
+        /** @var DomPdfWrapper $pdf */
+        $pdf = Pdf::loadView('pdf.business-profile', $reportData);
+        $pdf->setPaper('a4', 'portrait');
+
+        return $pdf;
+    }
+
+    /**
+     * Menghasilkan nama berkas PDF yang rapi dan informatif untuk dokumen yang diunduh.
+     */
+    public function generatePdfFilename(
+        Business $business,
+        string $period = 'this_month',
+        ?string $customStart = null,
+        ?string $customEnd = null
+    ): string {
+        $safeName = Str::slug($business->name ?: 'usaha');
+        $dateSuffix = Carbon::now()->format('Ymd');
+
+        return "KasiVo-Profil-Usaha-{$safeName}-{$period}-{$dateSuffix}.pdf";
     }
 }
 
