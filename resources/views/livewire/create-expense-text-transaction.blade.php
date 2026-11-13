@@ -14,14 +14,7 @@
                         <span>Pencatatan Cepat Teks</span>
                     </span>
 
-                    <a href="{{ route('transactions.create') }}" 
-                       wire:navigate
-                       class="text-xs text-[#777777] hover:text-[#E87559] flex items-center gap-1 transition-colors">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                        </svg>
-                        <span>Ganti Jalur</span>
-                    </a>
+                    @include('livewire.partials.expense-mode-switcher', ['currentMode' => 'text'])
                 </div>
 
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-[#252525] tracking-tight">
@@ -32,60 +25,87 @@
                 </p>
             </div>
 
-            <!-- Pesan Error Backend / Livewire -->
+            <!-- Tab Pintas Navigasi 3 Moda Pengeluaran -->
+            @include('livewire.partials.expense-mode-tabs', ['currentMode' => 'text'])
+
+            <!-- Pesan Error Backend / Livewire (Layout Responsif & Terstruktur) -->
             @if($errorMessage)
-                @if($errorType === 'quota_exceeded')
-                    <div class="mb-6 p-4 rounded-2xl bg-red-50 border-2 border-red-200 text-[#252525] text-xs sm:text-sm flex flex-col sm:flex-row items-start justify-between gap-4 shadow-sm">
-                        <div class="flex items-start gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-red-100 text-red-600 flex items-center justify-center shrink-0">
-                                <span class="text-base">⚠️</span>
-                            </div>
-                            <div class="flex-1">
-                                <p class="font-extrabold text-red-700 text-sm">Kuota AI Anda Sudah Penuh / Token AI Anda Sudah Habis</p>
-                                <p class="mt-1 text-red-900 leading-relaxed text-xs">
-                                    Layanan AI mencapai batas panggilan saat ini. Jangan khawatir, catatan teks Anda tidak hilang! Klik tombol di samping untuk mencatat transaksi ini secara langsung.
-                                </p>
-                            </div>
+                @php
+                    $isQuota = $errorType === 'quota_exceeded';
+                    $isApiKeyMissing = str_contains(strtolower($errorMessage), 'api key') || str_contains(strtolower($errorMessage), 'groq_api_key');
+                @endphp
+
+                <div class="relative w-full mb-6 p-5 sm:p-6 rounded-2xl border transition-all shadow-xs {{ $isQuota ? 'bg-amber-50 border-amber-200' : 'bg-[#FCEDEA]/80 border-[#E87559]/30' }}"
+                     role="alert">
+
+                    <!-- Tombol Tutup di Kanan Atas -->
+                    <button type="button"
+                            wire:click="$set('errorMessage', null)"
+                            class="absolute top-4 right-4 p-2 rounded-xl text-[#777777] hover:text-[#252525] hover:bg-black/5 transition-colors focus:outline-none"
+                            title="Tutup pesan"
+                            aria-label="Tutup pesan">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+
+                    <!-- Konten Alert: Icon Kiri + Area Teks Utama -->
+                    <div class="flex items-start gap-3.5 sm:gap-4 pr-8">
+                        <!-- Icon Peringatan di Sebelah Kiri -->
+                        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center shrink-0 mt-0.5 shadow-2xs {{ $isQuota ? 'bg-amber-100 text-amber-700' : 'bg-white text-[#DC6464] border border-[#E87559]/20' }}">
+                            <svg class="w-5 h-5 sm:w-5.5 sm:h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
                         </div>
-                        <div class="flex items-center gap-2 w-full sm:w-auto shrink-0 pt-2 sm:pt-0">
-                            <button type="button" 
-                                    wire:click="proceedToEmergencyReview"
-                                    class="flex-1 sm:flex-none px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold rounded-xl text-xs transition shadow-xs flex items-center justify-center gap-1.5">
-                                <span>✍️</span>
-                                <span>Koreksi Nominal Langsung</span>
-                            </button>
-                            <button type="button" 
-                                    wire:click="retryProcess"
-                                    class="px-3 py-2.5 bg-white hover:bg-gray-50 border border-red-300 text-red-700 font-semibold rounded-xl text-xs transition">
-                                🔄 Coba Ulang
-                            </button>
+
+                        <!-- Area Konten Utama -->
+                        <div class="flex-1 min-w-0">
+                            <!-- Judul Alert -->
+                            <h4 class="text-sm sm:text-base font-extrabold {{ $isQuota ? 'text-amber-900' : 'text-[#252525]' }}">
+                                @if($isQuota)
+                                    Kuota AI Anda Sudah Penuh / Token AI Anda Sudah Habis
+                                @else
+                                    Perhatian
+                                @endif
+                            </h4>
+
+                            <!-- Deskripsi Pesan Error Ramah Pengguna -->
+                            <div class="mt-1 text-xs sm:text-sm text-[#555555] leading-relaxed space-y-1">
+                                @if($isQuota)
+                                    <p>Layanan AI mencapai batas panggilan saat ini. Jangan khawatir, catatan teks Anda tidak hilang! Anda masih bisa mencatat transaksi ini secara langsung.</p>
+                                @elseif($isApiKeyMissing)
+                                    <p class="font-semibold text-[#252525]">AI Parsing belum dapat digunakan.</p>
+                                    <p class="text-xs text-[#777777]">Konfigurasi GROQ_API_KEY belum tersedia di sistem. Catatan teks Anda tetap aman.</p>
+                                @else
+                                    <p class="font-semibold text-[#252525]">AI belum dapat memproses catatan teks ini.</p>
+                                    <p class="text-xs text-[#777777]">{{ $errorMessage }}. Catatan teks Anda tetap aman.</p>
+                                @endif
+                            </div>
+
+                            <!-- Tombol Aksi di Bawah Deskripsi (Tinggi Min 48px) -->
+                            <div class="mt-4 pt-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                                <button type="button"
+                                        wire:click="proceedToEmergencyReview"
+                                        class="min-h-[48px] px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold rounded-xl text-xs sm:text-sm transition shadow-xs flex items-center justify-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                    </svg>
+                                    <span>Lanjut Catat Manual (Koreksi Nominal Langsung)</span>
+                                </button>
+
+                                <button type="button"
+                                        wire:click="retryProcess"
+                                        class="min-h-[48px] px-4 py-2.5 bg-white hover:bg-gray-50 active:bg-gray-100 border border-[#EEEEEE] hover:border-[#E87559]/30 text-[#252525] font-semibold rounded-xl text-xs sm:text-sm transition shadow-2xs flex items-center justify-center gap-2">
+                                    <svg class="w-4 h-4 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                    </svg>
+                                    <span>Coba Lagi Nanti</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                @else
-                    <div class="mb-6 p-4 rounded-2xl bg-[#FCEDEA] border border-[#E87559]/20 text-[#252525] text-xs sm:text-sm flex flex-col sm:flex-row items-start justify-between gap-4">
-                        <div class="flex items-start gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-white text-[#DC6464] flex items-center justify-center shrink-0 shadow-xs">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                                </svg>
-                            </div>
-                            <div class="flex-1">
-                                <p class="font-bold text-[#DC6464]">Perhatian</p>
-                                <p class="mt-0.5 text-[#555555] leading-relaxed">{{ $errorMessage }}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
-                            <button type="button" 
-                                    wire:click="proceedToEmergencyReview"
-                                    class="flex-1 sm:flex-none px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition">
-                                ✍️ Koreksi Nominal Langsung
-                            </button>
-                            <button type="button" 
-                                    wire:click="$set('errorMessage', null)" 
-                                    class="px-3 py-2 text-xs text-[#777777] hover:underline font-semibold">Tutup</button>
-                        </div>
-                    </div>
-                @endif
+
+                </div>
             @endif
 
             <!-- ======================================================== -->
@@ -368,7 +388,9 @@
                             @if($mathReconciliation && !$mathReconciliation['is_matched'])
                                 <div class="mt-3 p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                                     <div class="flex items-center gap-2">
-                                        <span class="text-base">⚠️</span>
+                                        <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                        </svg>
                                         <div>
                                             <p class="font-bold">Total rincian barang berbeda dengan Total Transaksi</p>
                                             <p class="text-[11px] text-amber-800">
@@ -463,33 +485,48 @@
                             <button
                                 type="button"
                                 wire:click="applyTemplate('Tadi sore beli telur ayam 2kg 56rb sama minyak goreng 2L 35rb di Toko Berkah')"
-                                class="px-3 py-1.5 rounded-xl bg-[#FBFBFC] hover:bg-[#FCEDEA] border border-[#EEEEEE] hover:border-[#E87559]/30 text-[#555555] hover:text-[#E87559] font-medium transition text-left"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FBFBFC] hover:bg-[#FCEDEA] border border-[#EEEEEE] hover:border-[#E87559]/30 text-[#555555] hover:text-[#E87559] font-medium transition text-left shadow-2xs"
                             >
-                                🍳 Telur & Minyak Goreng
+                                <svg class="w-3.5 h-3.5 text-[#E87559] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2 11h20M3.5 11l1.6 7.4a2 2 0 002 1.6h9.8a2 2 0 002-1.6l1.6-7.4M4.5 15.5h15M5 11l4-7M19 11l-4-7M9 11l1 9M15 11l-1 9"/>
+                                </svg>
+                                <span>Telur & Minyak Goreng</span>
                             </button>
 
                             <button
                                 type="button"
                                 wire:click="applyTemplate('Beli gas elpiji 3kg 2 tabung total 44rb tadi pagi')"
-                                class="px-3 py-1.5 rounded-xl bg-[#FBFBFC] hover:bg-[#FCEDEA] border border-[#EEEEEE] hover:border-[#E87559]/30 text-[#555555] hover:text-[#E87559] font-medium transition text-left"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FBFBFC] hover:bg-[#FCEDEA] border border-[#EEEEEE] hover:border-[#E87559]/30 text-[#555555] hover:text-[#E87559] font-medium transition text-left shadow-2xs"
                             >
-                                🔥 Gas Elpiji 3kg
+                                <svg class="w-3.5 h-3.5 text-[#E87559] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"/>
+                                </svg>
+                                <span>Gas Elpiji 3kg</span>
                             </button>
 
                             <button
                                 type="button"
                                 wire:click="applyTemplate('Beli cup plastik 16oz 1 dus 120rb sama sedotan 15rb')"
-                                class="px-3 py-1.5 rounded-xl bg-[#FBFBFC] hover:bg-[#FCEDEA] border border-[#EEEEEE] hover:border-[#E87559]/30 text-[#555555] hover:text-[#E87559] font-medium transition text-left"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FBFBFC] hover:bg-[#FCEDEA] border border-[#EEEEEE] hover:border-[#E87559]/30 text-[#555555] hover:text-[#E87559] font-medium transition text-left shadow-2xs"
                             >
-                                🥤 Cup Plastik & Sedotan
+                                <svg class="w-3.5 h-3.5 text-[#E87559] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m7.5 4.27 9 5.15M21 8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
+                                </svg>
+                                <span>Cup Plastik & Sedotan</span>
                             </button>
 
                             <button
                                 type="button"
                                 wire:click="applyTemplate('Alhamdulillah penjualan warung hari ini tembus 850rb')"
-                                class="px-3 py-1.5 rounded-xl bg-[#FBFBFC] hover:bg-[#DDF1EC] border border-[#EEEEEE] hover:border-emerald-300 text-[#555555] hover:text-emerald-800 font-medium transition text-left"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FBFBFC] hover:bg-[#DDF1EC] border border-[#EEEEEE] hover:border-emerald-300 text-[#555555] hover:text-emerald-800 font-medium transition text-left shadow-2xs"
                             >
-                                💰 Omzet Penjualan 850rb
+                                <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12V7H5a2 2 0 010-4h14v4"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 5v14a2 2 0 002 2h16v-5"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 12a2 2 0 000 4h4v-4z"/>
+                                </svg>
+                                <span>Omzet Penjualan 850rb</span>
                             </button>
                         </div>
                     </div>
