@@ -10,6 +10,16 @@ use Carbon\Carbon;
 class RestockService
 {
     /**
+     * Ambang batas minimal rentang hari histori untuk analisis restock.
+     */
+    public const THRESHOLD_DAYS = 7;
+
+    /**
+     * Klausul transparansi resmi KasiVo (DoD KV-046: Tidak mengklaim stok aktual).
+     */
+    public const DISCLAIMER = 'Saran restock didasarkan pada analisis pola interval pembelian rutin (kebiasaan belanja berulang), BUKAN melacak atau mengklaim jumlah fisik sisa stok aktual di tempat usaha Anda.';
+
+    /**
      * Mengagregasi histori pembelian bahan baku per item untuk suatu bisnis.
      * Sesuai DoD KV-045: Menghitung frekuensi pembelian, total kuantitas, unit dominan,
      * serta ringkasan tanggal pertama & terakhir pembelian.
@@ -216,7 +226,125 @@ class RestockService
             'latest_date' => $latestDate->toDateString(),
             'span_days' => (int) $spanDays,
             'unique_transaction_days' => (int) $uniqueDays,
-            'is_sufficient_for_prediction' => $spanDays >= 7,
+            'is_sufficient_for_prediction' => $spanDays >= self::THRESHOLD_DAYS,
+        ];
+    }
+
+    /**
+     * Mengevaluasi aturan kecukupan data 7 hari tingkat bisnis (DoD KV-046).
+     * Ambang batas 7 hari, tanggal update, dan disclaimer tidak mengklaim stok fisik.
+     */
+    public function evaluateDataSufficiency(Business $business): array
+    {
+        $span = $this->getBusinessHistorySpan($business);
+        $threshold = self::THRESHOLD_DAYS;
+        $now = Carbon::now();
+
+        if (!$span['has_history']) {
+            return [
+                'is_sufficient' => false,
+                'status' => 'insufficient_data',
+                'status_label' => 'Data Belum Cukup',
+                'threshold_days' => $threshold,
+                'current_span_days' => 0,
+                'remaining_days' => $threshold,
+                'last_updated_at' => $now->toIso8601String(),
+                'formatted_last_updated' => $now->translatedFormat('d F Y, H:i') . ' WIB',
+                'last_purchase_date' => null,
+                'guidance_message' => 'Belum ada riwayat pembelian bahan baku yang tercatat. Mulai catat belanja bahan Anda untuk mengaktifkan saran restock otomatis (minimal ' . $threshold . ' hari).',
+                'disclaimer' => self::DISCLAIMER,
+            ];
+        }
+
+        $currentSpan = (int) $span['span_days'];
+        $isSufficient = $currentSpan >= $threshold;
+        $remainingDays = max(0, $threshold - $currentSpan);
+
+        $guidance = $isSufficient
+            ? 'Riwayat belanja bahan baku sudah mencakup ' . $currentSpan . ' hari. Data memadai untuk memprediksi pola belanja berkala.'
+            : 'Pencatatan belanja bahan baru berjalan ' . $currentSpan . ' hari. KasiVo membutuhkan minimal ' . $threshold . ' hari riwayat belanja (sisa ' . $remainingDays . ' hari lagi) untuk membaca pola restock usaha Anda.';
+
+        return [
+            'is_sufficient' => $isSufficient,
+            'status' => $isSufficient ? 'sufficient' : 'insufficient_data',
+            'status_label' => $isSufficient ? 'Data Cukup untuk Analisis' : 'Data Belum Cukup',
+            'threshold_days' => $threshold,
+            'current_span_days' => $currentSpan,
+            'remaining_days' => $remainingDays,
+            'last_updated_at' => $now->toIso8601String(),
+            'formatted_last_updated' => $now->translatedFormat('d F Y, H:i') . ' WIB',
+            'last_purchase_date' => $span['latest_date'],
+            'guidance_message' => $guidance,
+            'disclaimer' => self::DISCLAIMER,
+        ];
+    }
+
+    /**
+     * Mengevaluasi kecukupan data tingkat item bahan baku.
+     * Item memerlukan minimal 2 kali pembelian pada tanggal berbeda untuk membaca interval pola.
+     */
+    public function evaluateItemSufficiency(array $itemData, array $businessSufficiency): array
+    {
+        if (!$businessSufficiency['is_sufficient']) {
+            return [
+                'is_sufficient' => false,
+                'status' => 'insufficient_data',
+                'status_label' => 'Data Belum Cukup',
+                'reason' => 'Riwayat usaha belum mencapai ambang ' . self::THRESHOLD_DAYS . ' hari.',
+            ];
+        }
+
+        $uniqueDays = $itemData['unique_purchase_days'] ?? count($itemData['purchase_dates'] ?? []);
+
+        if ($uniqueDays < 2) {
+            return [
+                'is_sufficient' => false,
+                'status' => 'insufficient_data',
+                'status_label' => 'Perlu Riwayat Tambahan',
+                'reason' => 'Item baru tercatat 1 kali pembelian. Membutuhkan minimal 2 kali pembelian pada tanggal berbeda untuk menghitung interval belanja rutin.',
+            ];
+        }
+
+        return [
+            'is_sufficient' => true,
+            'status' => 'sufficient',
+            'status_label' => 'Siap Dianalisis',
+            'reason' => 'Data item memadai dengan ' . $uniqueDays . ' tanggal pembelian berbeda.',
+        ];
+    }
+
+    /**
+     * Mengambil ikhtisar lengkap saran restock (gabungan status kecukupan bisnis & item).
+     */
+    public function getRestockOverview(Business $business): array
+    {
+        $sufficiency = $this->evaluateDataSufficiency($business);
+        $items = $this->getItemPurchaseHistory($business);
+
+        $analyzedItems = [];
+        $insufficientItems = [];
+
+        foreach ($items as $item) {
+            $itemSufficiency = $this->evaluateItemSufficiency($item, $sufficiency);
+            $enriched = array_merge($item, [
+                'sufficiency' => $itemSufficiency,
+            ]);
+
+            if ($itemSufficiency['is_sufficient']) {
+                $analyzedItems[] = $enriched;
+            } else {
+                $insufficientItems[] = $enriched;
+            }
+        }
+
+        return [
+            'sufficiency' => $sufficiency,
+            'items' => $items,
+            'ready_items' => $analyzedItems,
+            'pending_items' => $insufficientItems,
+            'total_items_count' => count($items),
+            'ready_items_count' => count($analyzedItems),
+            'disclaimer' => self::DISCLAIMER,
         ];
     }
 
@@ -229,4 +357,3 @@ class RestockService
         return mb_convert_case($clean, MB_CASE_TITLE, 'UTF-8');
     }
 }
-
