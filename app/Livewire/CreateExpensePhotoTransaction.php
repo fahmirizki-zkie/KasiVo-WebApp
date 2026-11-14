@@ -6,6 +6,7 @@ use App\Exceptions\AiQuotaExceededException;
 use App\Livewire\Concerns\ValidatesTransactionDraft;
 use App\Models\Business;
 use App\Models\Transaction;
+use App\Services\Ai\GeminiService;
 use App\Services\Ai\GroqService;
 use App\Services\AttachmentService;
 use Illuminate\Support\Facades\Cache;
@@ -97,10 +98,13 @@ class CreateExpensePhotoTransaction extends Component
     }
 
     /**
-     * Proses foto nota menggunakan Vision AI (Groq Qwen Multimodal).
+     * Proses foto nota menggunakan Vision AI (Primary: Google Gemini, Fallback: Groq).
      */
-    public function processPhoto(GroqService $groqService, AttachmentService $attachmentService): void
-    {
+    public function processPhoto(
+        GeminiService $geminiService,
+        GroqService $groqService,
+        AttachmentService $attachmentService
+    ): void {
         $this->errorMessage = null;
 
         $this->validate([
@@ -126,16 +130,40 @@ class CreateExpensePhotoTransaction extends Component
             $fileContent = file_get_contents($filePath);
             $base64 = base64_encode($fileContent);
             $mimeType = $this->photo->getMimeType() ?: 'image/jpeg';
+            $additionalContext = "Usaha: {$business->name} ({$business->business_type})";
 
             // 1. Ekstraksi multimodal foto struk
-            $extracted = $groqService->extractFromImage(
-                base64Image: $base64,
-                mimeType: $mimeType,
-                additionalContext: "Usaha: {$business->name} ({$business->business_type})",
-                businessType: $business->business_type,
-                businessId: $business->id,
-                userId: auth()->id()
-            );
+            // Primary: Google Gemini Multimodal Vision
+            // Secondary (Auto-Fallback): Groq Vision jika Gemini tidak tersedia atau error
+            $extracted = null;
+
+            if ($geminiService->isConfigured()) {
+                try {
+                    $extracted = $geminiService->extractFromImage(
+                        base64Image: $base64,
+                        mimeType: $mimeType,
+                        additionalContext: $additionalContext,
+                        businessType: $business->business_type,
+                        businessId: $business->id,
+                        userId: auth()->id()
+                    );
+                } catch (AiQuotaExceededException $e) {
+                    Log::warning('Gemini Vision quota exceeded, falling back to Groq Vision: ' . $e->getMessage());
+                } catch (\Throwable $e) {
+                    Log::warning('Gemini Vision extraction failed, falling back to Groq Vision: ' . $e->getMessage());
+                }
+            }
+
+            if ($extracted === null) {
+                $extracted = $groqService->extractFromImage(
+                    base64Image: $base64,
+                    mimeType: $mimeType,
+                    additionalContext: $additionalContext,
+                    businessType: $business->business_type,
+                    businessId: $business->id,
+                    userId: auth()->id()
+                );
+            }
 
             // 2. Normalisasi rincian items barang
             $items = [];
@@ -199,8 +227,8 @@ class CreateExpensePhotoTransaction extends Component
     {
         $raw = strtolower($e->getMessage());
 
-        if (str_contains($raw, 'api key') || str_contains($raw, 'groq_api_key')) {
-            return 'Layanan AI belum tersedia saat ini (Konfigurasi GROQ_API_KEY belum tersedia di sistem). Anda tetap dapat mencatat transaksi secara manual.';
+        if (str_contains($raw, 'api key') || str_contains($raw, 'groq_api_key') || str_contains($raw, 'gemini_api_key')) {
+            return 'Layanan AI belum tersedia saat ini (Konfigurasi API Key belum tersedia di sistem). Anda tetap dapat mencatat transaksi secara manual.';
         }
 
         if (

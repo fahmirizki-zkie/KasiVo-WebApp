@@ -33,7 +33,7 @@
                     $isApiKeyMissing = str_contains(strtolower($errorMessage), 'api key') || str_contains(strtolower($errorMessage), 'groq_api_key');
                 @endphp
 
-                <div class="relative w-full mb-6 p-5 sm:p-6 rounded-2xl border transition-all shadow-xs {{ $isQuota ? 'bg-amber-50 border-amber-200' : 'bg-[#FCEDEA]/80 border-[#E87559]/30' }}"
+                <div class="relative w-full max-w-3xl mx-auto mb-6 p-5 sm:p-6 rounded-2xl border transition-all shadow-xs {{ $isQuota ? 'bg-amber-50 border-amber-200' : 'bg-[#FCEDEA]/80 border-[#E87559]/30' }}"
                      role="alert">
 
                     <!-- Tombol Tutup di Kanan Atas -->
@@ -149,7 +149,7 @@
             <!-- TAMPILAN 2: LAYAR KONFIRMASI REVIEW DRAFT HASIL AI       -->
             <!-- ======================================================== -->
             @elseif($step === 'review')
-                <div class="space-y-6">
+                <div class="space-y-6 max-w-3xl mx-auto w-full">
 
                     <!-- Bubble Catatan Asli Pengguna -->
                     @if($rawText)
@@ -457,7 +457,7 @@
             <!-- TAMPILAN 3: FORMULIR INPUT TEKS BEBAS                     -->
             <!-- ======================================================== -->
             @else
-                <form wire:submit="processText" class="space-y-6">
+                <form wire:submit="processText" class="space-y-6 max-w-2xl mx-auto w-full">
 
                     <!-- Textarea Input Utama -->
                     <div>

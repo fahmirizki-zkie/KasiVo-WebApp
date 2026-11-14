@@ -224,5 +224,137 @@ class PhotoTransactionIntegrationTest extends TestCase
             ->set('photo', $largeImage)
             ->assertHasErrors(['photo' => 'max']);
     }
+
+    public function test_process_photo_uses_gemini_vision_as_primary_engine(): void
+    {
+        config([
+            'services.gemini.api_key' => 'AIzaSyMockTestKeyForGemini123456789',
+            'services.gemini.model' => 'gemini-1.5-flash',
+        ]);
+
+        Http::fake([
+            'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent*' => Http::response([
+                'candidates' => [
+                    [
+                        'content' => [
+                            'parts' => [
+                                [
+                                    'text' => json_encode([
+                                        'type' => 'cash_out',
+                                        'category' => 'bahan_baku',
+                                        'total_amount' => 210000,
+                                        'transaction_date' => '2026-11-14',
+                                        'merchant_name' => 'Pasar Induk Sayur',
+                                        'notes' => 'Belanja di Pasar Induk Sayur',
+                                        'confidence_score' => 0.99,
+                                        'needs_review' => false,
+                                        'items' => [
+                                            [
+                                                'item_name' => 'Cabai Rawit Merah 2kg',
+                                                'quantity' => 2,
+                                                'unit' => 'kg',
+                                                'price_per_unit' => 60000,
+                                                'subtotal' => 120000,
+                                            ],
+                                            [
+                                                'item_name' => 'Bawang Putih Kating 3kg',
+                                                'quantity' => 3,
+                                                'unit' => 'kg',
+                                                'price_per_unit' => 30000,
+                                                'subtotal' => 90000,
+                                            ],
+                                        ],
+                                    ]),
+                                ],
+                            ],
+                            'role' => 'model',
+                        ],
+                        'finishReason' => 'STOP',
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $photo = UploadedFile::fake()->image('nota-pasar-induk.jpg', 600, 800);
+
+        Livewire::actingAs($this->user)
+            ->test(CreateExpensePhotoTransaction::class)
+            ->set('photo', $photo)
+            ->call('processPhoto')
+            ->assertSet('step', 'review')
+            ->assertSet('draft.category', 'bahan_baku')
+            ->assertSet('draft.amount', 210000)
+            ->assertSet('draft.merchant_name', 'Pasar Induk Sayur')
+            ->assertSet('draft.items.0.item_name', 'Cabai Rawit Merah 2kg')
+            ->assertSee('Cabai Rawit Merah 2kg')
+            ->assertSee('Pasar Induk Sayur');
+
+        $this->assertDatabaseHas('ai_processing_logs', [
+            'business_id' => $this->business->id,
+            'user_id' => $this->user->id,
+            'raw_input_type' => 'image',
+            'model_used' => 'gemini:gemini-1.5-flash',
+            'status' => 'success',
+        ]);
+    }
+
+    public function test_process_photo_falls_back_to_groq_when_gemini_fails_or_quota_exceeded(): void
+    {
+        config([
+            'services.gemini.api_key' => 'AIzaSyMockTestKeyForGemini123456789',
+            'services.gemini.model' => 'gemini-1.5-flash',
+            'services.groq.api_key' => 'gsk_mock_test_key_12345',
+        ]);
+
+        // Gemini mengembalikan error 429 (Resource Exhausted)
+        // Groq merespons dengan sukses
+        Http::fake([
+            'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent*' => Http::response([
+                'error' => [
+                    'code' => 429,
+                    'message' => 'Quota exceeded for Gemini Flash.',
+                ],
+            ], 429),
+            'https://api.groq.com/openai/v1/chat/completions' => Http::response([
+                'choices' => [
+                    [
+                        'message' => [
+                            'content' => json_encode([
+                                'type' => 'cash_out',
+                                'category' => 'operasional',
+                                'total_amount' => 45000,
+                                'transaction_date' => '2026-11-14',
+                                'merchant_name' => 'Toko Plastik Makmur',
+                                'notes' => 'Beli kantong kresek dan mika',
+                                'confidence_score' => 0.90,
+                                'needs_review' => false,
+                                'items' => [
+                                    [
+                                        'item_name' => 'Cup Plastik 16oz',
+                                        'quantity' => 1,
+                                        'unit' => 'pack',
+                                        'price_per_unit' => 45000,
+                                        'subtotal' => 45000,
+                                    ],
+                                ],
+                            ]),
+                        ],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $photo = UploadedFile::fake()->image('nota-fallback.jpg', 600, 800);
+
+        Livewire::actingAs($this->user)
+            ->test(CreateExpensePhotoTransaction::class)
+            ->set('photo', $photo)
+            ->call('processPhoto')
+            ->assertSet('step', 'review')
+            ->assertSet('draft.category', 'operasional')
+            ->assertSet('draft.amount', 45000)
+            ->assertSet('draft.merchant_name', 'Toko Plastik Makmur')
+            ->assertSee('Cup Plastik 16oz');
+    }
 }
 

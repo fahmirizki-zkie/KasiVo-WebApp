@@ -34,7 +34,7 @@
                     $isApiKeyMissing = str_contains(strtolower($errorMessage), 'api key') || str_contains(strtolower($errorMessage), 'groq_api_key');
                 @endphp
 
-                <div class="relative w-full mb-6 p-5 sm:p-6 rounded-2xl border transition-all shadow-xs {{ $isQuota ? 'bg-amber-50 border-amber-200' : 'bg-[#FCEDEA]/80 border-[#E87559]/30' }}"
+                <div class="relative w-full max-w-3xl mx-auto mb-6 p-5 sm:p-6 rounded-2xl border transition-all shadow-xs {{ $isQuota ? 'bg-amber-50 border-amber-200' : 'bg-[#FCEDEA]/80 border-[#E87559]/30' }}"
                      role="alert">
 
                     <!-- Tombol Tutup di Kanan Atas -->
@@ -155,7 +155,7 @@
             <!-- TAMPILAN 2: LAYAR KONFIRMASI REVIEW HASIL VISION AI      -->
             <!-- ======================================================== -->
             @elseif($step === 'review')
-                <div class="space-y-6">
+                <div class="space-y-6 max-w-3xl mx-auto w-full">
 
                     <!-- Pratinjau Thumbnail Foto Struk Asli -->
                     <div class="p-4 rounded-2xl bg-[#FBFBFC] border border-[#EEEEEE] flex flex-col sm:flex-row items-center gap-4">
@@ -421,7 +421,7 @@
             <!-- TAMPILAN 3: INTERFACE KAMERA & UNGGAH BERKAS             -->
             <!-- ======================================================== -->
             @else
-                <div class="space-y-6">
+                <div class="space-y-6 max-w-2xl mx-auto w-full">
 
                     <!-- Hidden Inputs untuk Kamera dan File Picker -->
                     <input
@@ -477,17 +477,17 @@
                                     <button
                                         type="button"
                                         onclick="document.getElementById('cameraInput').click()"
-                                        class="p-5 rounded-2xl border border-[#EEEEEE] hover:border-[#E87559] bg-white text-center cursor-pointer transition-all space-y-3 group shadow-2xs hover:shadow-xs"
+                                        class="p-5 sm:p-6 rounded-2xl border border-[#EEEEEE] hover:border-[#E87559] bg-white text-center cursor-pointer transition-all space-y-3 group shadow-2xs hover:shadow-xs"
                                     >
-                                        <div class="w-13 h-13 rounded-2xl bg-[#FCEDEA] text-[#E87559] flex items-center justify-center mx-auto shadow-2xs group-hover:scale-105 transition-transform">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <div class="w-14 h-14 rounded-2xl bg-[#FCEDEA] text-[#E87559] flex items-center justify-center mx-auto shadow-2xs group-hover:scale-105 transition-transform">
+                                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
                                             </svg>
                                         </div>
                                         <div class="space-y-1">
-                                            <p class="text-sm font-bold text-[#252525] group-hover:text-[#E87559] transition-colors">Ambil Foto Nota</p>
-                                            <p class="text-xs text-[#777777]">Ambil Foto via Kamera ponsel langsung</p>
+                                            <p class="text-sm font-bold text-[#252525] group-hover:text-[#E87559] transition-colors">Buka Kamera Perangkat</p>
+                                            <p class="text-xs text-[#777777] leading-relaxed">Ambil Foto via Kamera langsung dari jarak dekat agar tulisan terbaca jelas (hindari memotret terlalu jauh)</p>
                                         </div>
                                     </button>
 
@@ -495,25 +495,23 @@
                                     <button
                                         type="button"
                                         onclick="document.getElementById('galleryInput').click()"
-                                        class="p-5 rounded-2xl border border-[#EEEEEE] hover:border-[#E87559] bg-white text-center cursor-pointer transition-all space-y-3 group shadow-2xs hover:shadow-xs"
+                                        class="p-5 sm:p-6 rounded-2xl border border-[#EEEEEE] hover:border-[#E87559] bg-white text-center cursor-pointer transition-all space-y-3 group shadow-2xs hover:shadow-xs"
                                     >
-                                        <div class="w-13 h-13 rounded-2xl bg-gray-100 text-[#777777] flex items-center justify-center mx-auto shadow-2xs group-hover:scale-105 transition-transform">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        <div class="w-14 h-14 rounded-2xl bg-[#E1F0F7] text-[#0284C7] flex items-center justify-center mx-auto shadow-2xs group-hover:scale-105 transition-transform">
+                                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                                             </svg>
                                         </div>
                                         <div class="space-y-1">
                                             <p class="text-sm font-bold text-[#252525] group-hover:text-[#E87559] transition-colors">Pilih dari Galeri</p>
-                                            <p class="text-xs text-[#777777]">Unggah berkas atau tangkapan layar struk</p>
+                                            <p class="text-xs text-[#777777]">Unggah berkas struk (<span class="font-semibold text-[#252525]">JPG, JPEG, PNG, WEBP</span>)</p>
                                         </div>
                                     </button>
                                 </div>
 
                                 <div class="mt-4 pt-4 border-t border-[#EEEEEE]/80 flex flex-wrap items-center justify-center gap-2 text-[11px] text-[#777777]">
                                     <span class="font-medium text-[#252525]">Format yang didukung:</span>
-                                    <span class="px-2 py-0.5 rounded-md bg-gray-100 font-semibold text-[#555555]">JPG, JPEG, PNG, WEBP</span>
-                                    <span>&bull;</span>
-                                    <span>Maksimal ukuran file: <strong>5 MB</strong></span>
+                                    <span class="px-2 py-0.5 rounded-md bg-white border border-[#EEEEEE] font-semibold text-[#555555]">JPG, JPEG, PNG, WEBP (maks 5 MB)</span>
                                 </div>
                             </div>
                         </div>

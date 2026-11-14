@@ -179,15 +179,15 @@
                     @endforeach
                 </div>
 
-                <!-- Footer Modal: Kembali ke Pilih Jenis Utama -->
+                <!-- Footer Modal: Beralih ke Catat Penjualan -->
                 <div class="p-4 sm:p-5 bg-gray-50 border-t border-[#EEEEEE] flex items-center justify-between text-xs">
-                    <a href="{{ route('transactions.create') }}" 
+                    <a href="{{ route('transactions.income') }}"
                        wire:navigate
-                       class="text-[#777777] hover:text-[#E87559] font-medium flex items-center gap-1.5 transition-colors">
+                       class="text-[#777777] hover:text-[#43A58A] font-medium flex items-center gap-1.5 transition-colors">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                         </svg>
-                        <span>Pilih Jenis Lain (Penjualan / Pengeluaran)</span>
+                        <span>Beralih ke Catat Penjualan</span>
                     </a>
 
                     <button type="button" 
