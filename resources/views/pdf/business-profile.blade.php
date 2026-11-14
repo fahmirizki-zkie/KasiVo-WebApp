@@ -6,7 +6,7 @@
     <style>
         @page {
             size: a4 portrait;
-            margin: 16mm 14mm 16mm 14mm;
+            margin: 10mm 12mm 12mm 12mm;
         }
 
         * {
@@ -17,13 +17,13 @@
 
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: 10pt;
-            line-height: 1.45;
-            color: #252525;
+            font-size: 8.8pt;
+            line-height: 1.5;
+            color: #1E293B;
             background-color: #FFFFFF;
         }
 
-        /* Utility Helpers */
+        /* Utility */
         .w-full { width: 100%; }
         .text-left { text-align: left; }
         .text-center { text-align: center; }
@@ -31,14 +31,6 @@
         .font-bold { font-weight: bold; }
         .uppercase { text-transform: uppercase; }
 
-        /* Typography & Colors */
-        .color-primary { color: #E87559; }
-        .color-success { color: #2E7D68; }
-        .color-dark { color: #252525; }
-        .color-muted { color: #666666; }
-        .color-light-muted { color: #888888; }
-
-        /* Header Layout Table */
         table.layout-table {
             width: 100%;
             border-collapse: collapse;
@@ -50,375 +42,547 @@
             padding: 0;
         }
 
-        .header-box {
-            padding-bottom: 12px;
-            border-bottom: 2px solid #E87559;
-            margin-bottom: 14px;
+        /* 1. HERO EXECUTIVE HEADER (DARK NAVY & CORAL) */
+        .hero-header {
+            background-color: #0F172A;
+            color: #FFFFFF;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+        }
+
+        .brand-badge {
+            display: inline-block;
+            background-color: #E87559;
+            color: #FFFFFF;
+            font-size: 13pt;
+            font-weight: 800;
+            padding: 4px 9px;
+            border-radius: 6px;
+            letter-spacing: -0.5px;
+            line-height: 1;
         }
 
         .brand-title {
-            font-size: 16pt;
-            font-weight: bold;
-            color: #E87559;
+            display: inline-block;
+            font-size: 18pt;
+            font-weight: 800;
+            color: #FFFFFF;
             letter-spacing: -0.5px;
+            vertical-align: middle;
+            margin-left: 6px;
+        }
+
+        .brand-title span {
+            color: #E87559;
         }
 
         .brand-subtitle {
-            font-size: 8pt;
-            font-weight: 600;
-            color: #777777;
+            font-size: 7.2pt;
+            font-weight: 700;
+            color: #94A3B8;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.2px;
+            margin-top: 4px;
+        }
+
+        .doc-heading {
+            font-size: 14pt;
+            font-weight: 800;
+            color: #FFFFFF;
+            letter-spacing: -0.3px;
+            margin-top: 8px;
+            text-transform: uppercase;
+        }
+
+        .doc-sub {
+            font-size: 8pt;
+            color: #94A3B8;
             margin-top: 2px;
         }
 
-        .doc-title {
-            font-size: 13pt;
-            font-weight: bold;
-            color: #252525;
-            margin-top: 6px;
-        }
-
-        .doc-meta {
-            font-size: 8pt;
-            color: #666666;
-            line-height: 1.5;
-        }
-
-        .doc-meta-label {
-            font-weight: bold;
-            color: #252525;
-        }
-
-        /* Section Containers */
-        .section-title {
-            font-size: 9.5pt;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #252525;
-            padding-bottom: 4px;
-            margin-bottom: 6px;
-            border-bottom: 1px solid #E5E7EB;
-        }
-
-        .card-box {
-            background-color: #FBFBFC;
-            border: 1px solid #E5E7EB;
+        .header-meta-box {
+            background-color: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 8px;
-            padding: 10px 12px;
-            margin-bottom: 12px;
+            padding: 8px 12px;
+            font-size: 7.5pt;
+            line-height: 1.6;
+            color: #E2E8F0;
         }
 
-        /* Info Grid Table */
+        .meta-lbl {
+            color: #94A3B8;
+            font-weight: 600;
+            display: inline-block;
+            width: 80px;
+        }
+
+        .meta-val {
+            color: #FFFFFF;
+            font-weight: 700;
+        }
+
+        /* 2. BUSINESS PROFILE SECTION */
+        .card-box {
+            border: 1px solid #E2E8F0;
+            border-radius: 10px;
+            background-color: #FFFFFF;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .card-header-bar {
+            background-color: #F8FAFC;
+            border-bottom: 1px solid #E2E8F0;
+            padding: 9px 16px;
+            font-size: 8pt;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #0F172A;
+        }
+
+        .card-content {
+            padding: 14px 16px;
+        }
+
         table.info-table {
             width: 100%;
             border-collapse: collapse;
         }
 
         table.info-table td {
-            padding: 3px 4px;
+            padding: 5px 8px;
             font-size: 8.5pt;
             vertical-align: top;
         }
 
-        table.info-table td.label {
-            width: 32%;
-            color: #666666;
-            font-weight: normal;
+        table.info-table td.col-l {
+            width: 115px;
+            color: #64748B;
+            font-weight: 500;
         }
 
-        table.info-table td.value {
-            width: 68%;
-            color: #252525;
-            font-weight: bold;
+        table.info-table td.col-v {
+            color: #0F172A;
+            font-weight: 700;
         }
 
-        /* Financial 3-Card Summary Grid */
-        table.stat-grid {
+        .badge-pill-cat {
+            display: inline-block;
+            background-color: #EFF6FF;
+            color: #1D4ED8;
+            border: 1px solid #BFDBFE;
+            padding: 2.5px 8px;
+            border-radius: 4px;
+            font-size: 7.2pt;
+            font-weight: 700;
+        }
+
+        /* 3. THREE FINANCIAL KPI HIGHLIGHTS */
+        table.kpi-row {
             width: 100%;
             border-collapse: separate;
-            border-spacing: 8px 0;
-            margin-bottom: 12px;
+            border-spacing: 10px 0;
+            margin-bottom: 16px;
         }
 
-        table.stat-grid td {
-            vertical-align: top;
-            padding: 10px 12px;
-            border-radius: 8px;
+        table.kpi-row td.kpi-cell {
             width: 33.33%;
+            border-radius: 10px;
+            padding: 14px 16px;
+            vertical-align: top;
         }
 
-        .card-stat-in {
-            background-color: #F0F9F5;
-            border: 1px solid #CDE9DE;
-            border-top: 3px solid #43A58A;
+        .kpi-in {
+            background-color: #F0FDF4;
+            border: 1.5px solid #BBF7D0;
+            border-top: 4.5px solid #10B981;
         }
 
-        .card-stat-out {
-            background-color: #FFF5F2;
-            border: 1px solid #FCD8D0;
-            border-top: 3px solid #E87559;
+        .kpi-out {
+            background-color: #FFF1F2;
+            border: 1.5px solid #FECDD3;
+            border-top: 4.5px solid #E87559;
         }
 
-        .card-stat-net {
+        .kpi-net {
             background-color: #F8FAFC;
-            border: 1px solid #E2E8F0;
-            border-top: 3px solid #252525;
+            border: 1.5px solid #CBD5E1;
+            border-top: 4.5px solid #0F172A;
         }
 
-        .stat-card-title {
-            font-size: 7.5pt;
-            font-weight: bold;
+        .kpi-tag-label {
+            font-size: 7.8pt;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #666666;
-            margin-bottom: 4px;
+            letter-spacing: 0.6px;
+            margin-bottom: 6px;
         }
 
-        .stat-card-amount {
-            font-size: 13pt;
-            font-weight: bold;
+        .kpi-num-large {
+            font-size: 16.5pt;
+            font-weight: 800;
             letter-spacing: -0.5px;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
+            line-height: 1.15;
         }
 
-        .stat-card-desc {
+        .kpi-sub-desc {
             font-size: 7.5pt;
-            color: #777777;
+            color: #64748B;
         }
 
-        .badge-status {
+        .status-badge-green {
             display: inline-block;
-            font-size: 7pt;
-            font-weight: bold;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-top: 4px;
-        }
-
-        .badge-surplus {
             background-color: #D1FAE5;
             color: #065F46;
+            border: 1px solid #A7F3D0;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 7.2pt;
+            font-weight: 700;
+            margin-top: 6px;
         }
 
-        .badge-deficit {
+        .status-badge-red {
+            display: inline-block;
             background-color: #FEE2E2;
             color: #991B1B;
+            border: 1px solid #FECACA;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 7.2pt;
+            font-weight: 700;
+            margin-top: 6px;
         }
 
-        /* Breakdown Tables Layout */
-        table.two-col-grid {
+        /* 4. BREAKDOWN SIDE-BY-SIDE PANELS */
+        table.breakdown-two-col {
             width: 100%;
             border-collapse: separate;
-            border-spacing: 8px 0;
-            margin-bottom: 12px;
+            border-spacing: 10px 0;
+            margin-bottom: 16px;
         }
 
-        table.two-col-grid td.col-half {
+        table.breakdown-two-col td.panel-col {
             width: 50%;
             vertical-align: top;
             padding: 0;
         }
 
-        table.data-table {
+        .table-panel {
+            border: 1px solid #E2E8F0;
+            border-radius: 10px;
+            background-color: #FFFFFF;
+            overflow: hidden;
+            min-height: 155px;
+        }
+
+        .table-panel-header-in {
+            background-color: #10B981;
+            color: #FFFFFF;
+            padding: 9px 14px;
+            font-size: 8.5pt;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .table-panel-header-out {
+            background-color: #E87559;
+            color: #FFFFFF;
+            padding: 9px 14px;
+            font-size: 8.5pt;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        table.data-grid {
             width: 100%;
             border-collapse: collapse;
-            font-size: 8pt;
-            border: 1px solid #E5E7EB;
-            border-radius: 6px;
-            overflow: hidden;
+            font-size: 8.2pt;
         }
 
-        table.data-table th {
-            padding: 6px 8px;
-            font-size: 7.5pt;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid #E5E7EB;
-        }
-
-        table.data-table th.th-in {
-            background-color: #E2F2ED;
-            color: #1E6652;
-        }
-
-        table.data-table th.th-out {
-            background-color: #FCEDEA;
-            color: #B5452B;
-        }
-
-        table.data-table td {
-            padding: 5px 8px;
-            border-bottom: 1px solid #F3F4F6;
-            color: #252525;
-        }
-
-        table.data-table tr:nth-child(even) td {
-            background-color: #FBFBFC;
-        }
-
-        table.data-table tr.total-row td {
-            font-weight: bold;
-            background-color: #F3F4F6;
-            border-top: 1px solid #E5E7EB;
-            border-bottom: none;
-        }
-
-        /* AI Narrative Box */
-        .ai-narrative-box {
-            background-color: #FFF9F7;
-            border: 1px solid #FCD8D0;
-            border-left: 4px solid #E87559;
-            border-radius: 6px;
-            padding: 10px 12px;
-            margin-bottom: 12px;
-        }
-
-        .ai-badge {
-            display: inline-block;
-            font-size: 7pt;
-            font-weight: bold;
-            background-color: #FCEDEA;
-            color: #E87559;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-bottom: 4px;
-        }
-
-        .ai-headline {
-            font-size: 9.5pt;
-            font-weight: bold;
-            color: #252525;
-            margin-bottom: 4px;
-        }
-
-        .ai-text {
-            font-size: 8pt;
-            line-height: 1.45;
-            color: #444444;
-        }
-
-        /* Disclaimer Section (DoD Wajib KV-050) */
-        .disclaimer-box {
+        table.data-grid th {
+            padding: 7px 10px;
             background-color: #F8FAFC;
-            border: 1px solid #E2E8F0;
-            border-radius: 6px;
-            padding: 8px 10px;
-            margin-top: 8px;
-        }
-
-        .disclaimer-title {
-            font-size: 7.5pt;
-            font-weight: bold;
             color: #475569;
+            font-weight: 700;
+            font-size: 7.2pt;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 3px;
+            border-bottom: 1px solid #E2E8F0;
         }
 
-        .disclaimer-text {
-            font-size: 7pt;
-            line-height: 1.4;
+        table.data-grid td {
+            padding: 7px 10px;
+            border-bottom: 1px solid #F1F5F9;
+            color: #1E293B;
+            vertical-align: middle;
+        }
+
+        table.data-grid tr:nth-child(even) td {
+            background-color: #FAFAFC;
+        }
+
+        table.data-grid tr.total-bar td {
+            font-weight: 800;
+            background-color: #F1F5F9;
+            border-top: 1.5px solid #CBD5E1;
+            border-bottom: none;
+            color: #0F172A;
+            padding: 8px 10px;
+        }
+
+        .empty-notice-container {
+            padding: 30px 16px;
+            text-align: center;
+        }
+
+        .empty-notice-title {
+            color: #475569;
+            font-size: 8.5pt;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .empty-notice-sub {
+            color: #94A3B8;
+            font-size: 7.5pt;
+            line-height: 1.45;
+        }
+
+        /* 5. AI INTELLIGENCE SUMMARY CARD */
+        .ai-intelligence-box {
+            background-color: #FFFDF7;
+            border: 1px solid #FDE68A;
+            border-left: 5px solid #E87559;
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 16px;
+        }
+
+        .ai-pill-label {
+            display: inline-block;
+            background-color: #FEF3C7;
+            color: #B45309;
+            border: 1px solid #FCD34D;
+            padding: 2.5px 8px;
+            border-radius: 4px;
+            font-size: 7.2pt;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 6px;
+        }
+
+        .ai-title-bold {
+            font-size: 10.5pt;
+            font-weight: 800;
+            color: #0F172A;
+            margin-bottom: 6px;
+        }
+
+        .ai-body-text {
+            font-size: 8.5pt;
+            line-height: 1.6;
+            color: #334155;
+            text-align: justify;
+        }
+
+        /* 6. LEGAL COMPLIANCE & DIGITAL VERIFICATION SEAL (DoD KV-050) */
+        table.legal-seal-row {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 10px 0;
+            margin-bottom: 14px;
+        }
+
+        table.legal-seal-row td.col-disclaimer {
+            width: 66%;
+            vertical-align: top;
+            padding: 0;
+        }
+
+        table.legal-seal-row td.col-stamp {
+            width: 34%;
+            vertical-align: top;
+            padding: 0;
+        }
+
+        .disclaimer-panel {
+            background-color: #F8FAFC;
+            border: 1px solid #CBD5E1;
+            border-radius: 10px;
+            padding: 12px 14px;
+            min-height: 102px;
+        }
+
+        .disclaimer-panel-title {
+            font-size: 7.5pt;
+            font-weight: 800;
+            color: #334155;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 4px;
+        }
+
+        .disclaimer-panel-text {
+            font-size: 7.2pt;
+            line-height: 1.5;
             color: #64748B;
             text-align: justify;
         }
 
-        /* Footer Note */
-        .footer-note {
-            margin-top: 8px;
-            font-size: 7pt;
-            color: #94A3B8;
+        .digital-seal-panel {
+            background-color: #F8FAFC;
+            border: 1px dashed #94A3B8;
+            border-radius: 10px;
+            padding: 12px 14px;
             text-align: center;
+            min-height: 102px;
+        }
+
+        .seal-pill {
+            display: inline-block;
+            background-color: #E2E8F0;
+            color: #1E293B;
+            font-size: 7.2pt;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .seal-name {
+            font-size: 9pt;
+            font-weight: 800;
+            color: #0F172A;
+            margin-top: 2px;
+        }
+
+        .seal-firm {
+            font-size: 7.5pt;
+            color: #475569;
+            margin-top: 1px;
+        }
+
+        .seal-date {
+            font-size: 6.8pt;
+            color: #94A3B8;
+            line-height: 1.4;
+            margin-top: 5px;
+        }
+
+        /* 7. FOOTER NOTE */
+        .page-footer-note {
+            border-top: 1px solid #E2E8F0;
+            padding-top: 8px;
+            font-size: 7.2pt;
+            color: #94A3B8;
         }
     </style>
 </head>
 <body>
 
-    <!-- 1. HEADER DOKUMEN & IDENTITAS KASIVO -->
-    <div class="header-box">
+    <!-- 1. HERO EXECUTIVE HEADER (DARK NAVY & CORAL ACCENT) -->
+    <div class="hero-header">
         <table class="layout-table">
             <tr>
-                <td style="width: 58%;">
-                    <div class="brand-title">KasiVo</div>
-                    <div class="brand-subtitle">Smart Business POS & Kasir Online</div>
-                    <div class="doc-title">{{ $document['title'] }}</div>
+                <td style="width: 55%; vertical-align: middle;">
+                    <div>
+                        <span class="brand-badge">KV</span>
+                        <span class="brand-title">Kasi<span>Vo</span></span>
+                    </div>
+                    <div class="brand-subtitle">Smart Business POS & Financial OS</div>
+                    <div class="doc-heading">{{ $document['title'] }}</div>
+                    <div class="doc-sub">Laporan Profil Usaha & Rekapitulasi Arus Kas Mandiri UMKM</div>
                 </td>
-                <td style="width: 42%; text-align: right;" class="doc-meta">
-                    <div><span class="doc-meta-label">No. Dokumen:</span> {{ $document['document_number'] }}</div>
-                    <div><span class="doc-meta-label">Tanggal Cetak:</span> {{ $document['formatted_generated_at'] }}</div>
-                    <div><span class="doc-meta-label">Periode:</span> {{ $period['label'] }}</div>
-                    <div><span class="doc-meta-label">Rentang:</span> {{ $period['formatted_range'] }}</div>
+                <td style="width: 45%; vertical-align: middle;">
+                    <div class="header-meta-box" style="margin-left: auto; width: 95%;">
+                        <div><span class="meta-lbl">No. Dokumen:</span> <span class="meta-val">{{ $document['document_number'] }}</span></div>
+                        <div><span class="meta-lbl">Tanggal Cetak:</span> <span class="meta-val">{{ $document['formatted_generated_at'] }}</span></div>
+                        <div><span class="meta-lbl">Periode:</span> <span class="meta-val">{{ $period['label'] }}</span></div>
+                        <div><span class="meta-lbl">Rentang:</span> <span class="meta-val">{{ $period['formatted_range'] }}</span></div>
+                    </div>
                 </td>
             </tr>
         </table>
     </div>
 
-    <!-- 2. IDENTITAS USAHA & PEMILIK (KV-010) -->
+    <!-- 2. IDENTITAS PROFIL USAHA & PEMILIK (KV-010) -->
     <div class="card-box">
-        <div class="section-title">Identitas Usaha & Periode Laporan</div>
-        <table class="layout-table">
-            <tr>
-                <td style="width: 50%; padding-right: 8px;">
-                    <table class="info-table">
-                        <tr>
-                            <td class="label">Nama Usaha</td>
-                            <td class="value">: {{ $business['name'] }}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Jenis Usaha</td>
-                            <td class="value">: {{ $business['business_type_label'] }}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Terdaftar Sejak</td>
-                            <td class="value">: {{ $business['registered_date'] }}</td>
-                        </tr>
-                    </table>
-                </td>
-                <td style="width: 50%; padding-left: 8px; border-left: 1px solid #EEEEEE;">
-                    <table class="info-table">
-                        <tr>
-                            <td class="label">Nama Pemilik</td>
-                            <td class="value">: {{ $business['owner_name'] }}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Email Akun</td>
-                            <td class="value">: {{ $business['owner_email'] }}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Periode Laporan</td>
-                            <td class="value">: {{ $period['label'] }} ({{ $period['formatted_range'] }})</td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
+        <div class="card-header-bar">
+            Identitas Profil Usaha & Periode Laporan
+        </div>
+        <div class="card-content">
+            <table class="layout-table">
+                <tr>
+                    <td style="width: 50%; padding-right: 14px;">
+                        <table class="info-table">
+                            <tr>
+                                <td class="col-l">Nama Usaha</td>
+                                <td class="col-v">: {{ $business['name'] }}</td>
+                            </tr>
+                            <tr>
+                                <td class="col-l">Jenis Usaha</td>
+                                <td class="col-v">: <span class="badge-pill-cat">{{ $business['business_type_label'] }}</span></td>
+                            </tr>
+                            <tr>
+                                <td class="col-l">Terdaftar Sejak</td>
+                                <td class="col-v">: {{ $business['registered_date'] }}</td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="width: 50%; padding-left: 14px; border-left: 1px solid #F1F5F9;">
+                        <table class="info-table">
+                            <tr>
+                                <td class="col-l">Nama Pemilik</td>
+                                <td class="col-v">: {{ $business['owner_name'] }}</td>
+                            </tr>
+                            <tr>
+                                <td class="col-l">Email Akun</td>
+                                <td class="col-v">: {{ $business['owner_email'] }}</td>
+                            </tr>
+                            <tr>
+                                <td class="col-l">Periode Laporan</td>
+                                <td class="col-v">: {{ $period['label'] }} ({{ $period['formatted_range'] }})</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
     </div>
 
-    <!-- 3. RINGKASAN FINANSIAL ARUS KAS (KV-038) -->
-    <table class="stat-grid">
+    <!-- 3. TIGA KARTU RINGKASAN FINANSIAL ARUS KAS (KV-038) -->
+    <table class="kpi-row">
         <tr>
             <!-- Kas Masuk -->
-            <td class="card-stat-in">
-                <div class="stat-card-title">Total Kas Masuk</div>
-                <div class="stat-card-amount color-success">{{ $cash_flow['formatted_cash_in'] }}</div>
-                <div class="stat-card-desc">{{ $cash_flow['cash_in_count'] }} transaksi pemasukan</div>
+            <td class="kpi-cell kpi-in">
+                <div class="kpi-tag-label" style="color: #15803D;">TOTAL KAS MASUK</div>
+                <div class="kpi-num-large" style="color: #15803D;">{{ $cash_flow['formatted_cash_in'] }}</div>
+                <div class="kpi-sub-desc">{{ $cash_flow['cash_in_count'] }} transaksi pemasukan</div>
             </td>
 
             <!-- Kas Keluar -->
-            <td class="card-stat-out">
-                <div class="stat-card-title">Total Kas Keluar</div>
-                <div class="stat-card-amount color-primary">{{ $cash_flow['formatted_cash_out'] }}</div>
-                <div class="stat-card-desc">{{ $cash_flow['cash_out_count'] }} transaksi belanja/beban</div>
+            <td class="kpi-cell kpi-out">
+                <div class="kpi-tag-label" style="color: #BE123C;">TOTAL KAS KELUAR</div>
+                <div class="kpi-num-large" style="color: #BE123C;">{{ $cash_flow['formatted_cash_out'] }}</div>
+                <div class="kpi-sub-desc">{{ $cash_flow['cash_out_count'] }} transaksi belanja/beban</div>
             </td>
 
             <!-- Arus Kas Bersih -->
-            <td class="card-stat-net">
-                <div class="stat-card-title">Arus Kas Bersih</div>
-                <div class="stat-card-amount color-dark">{{ $cash_flow['formatted_net'] }}</div>
+            <td class="kpi-cell kpi-net">
+                <div class="kpi-tag-label" style="color: #0F172A;">ARUS KAS BERSIH</div>
+                <div class="kpi-num-large" style="color: #0F172A;">{{ $cash_flow['formatted_net'] }}</div>
                 <div>
-                    <span class="badge-status {{ $cash_flow['is_negative'] ? 'badge-deficit' : 'badge-surplus' }}">
+                    <span class="{{ $cash_flow['is_negative'] ? 'status-badge-red' : 'status-badge-green' }}">
                         {{ $cash_flow['status_label'] }}
                     </span>
                 </div>
@@ -426,104 +590,134 @@
         </tr>
     </table>
 
-    <!-- 4. RINCIAN KATEGORI PEMASUKAN & PENGELUARAN -->
-    <table class="two-col-grid">
+    <!-- 4. RINCIAN KATEGORI PEMASUKAN & PENGELUARAN (DUA PANEL BERDAMPINGAN) -->
+    <table class="breakdown-two-col">
         <tr>
-            <!-- Kolom Pemasukan -->
-            <td class="col-half">
-                <div class="section-title" style="color: #1E6652;">Rincian Pemasukan</div>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th class="th-in text-left">Kategori</th>
-                            <th class="th-in text-right">Total</th>
-                            <th class="th-in text-right" style="width: 20%;">Porsi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($categories['cash_in'] as $inCat)
+            <!-- Panel Pemasukan -->
+            <td class="panel-col">
+                <div class="table-panel">
+                    <div class="table-panel-header-in">Rincian Pemasukan</div>
+                    <table class="data-grid">
+                        <thead>
                             <tr>
-                                <td>{{ $inCat['label'] }}</td>
-                                <td class="text-right font-bold">{{ $inCat['formatted_total'] }}</td>
-                                <td class="text-right">{{ $inCat['percentage'] }}%</td>
+                                <th class="text-left" style="width: 50%;">Kategori</th>
+                                <th class="text-right" style="width: 32%;">Total</th>
+                                <th class="text-right" style="width: 18%;">Porsi</th>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="3" class="text-center color-muted" style="padding: 10px;">
-                                    Belum ada data kas masuk pada periode ini.
-                                </td>
-                            </tr>
-                        @endforelse
-                        @if (!empty($categories['cash_in']))
-                            <tr class="total-row">
-                                <td>Total Pemasukan</td>
-                                <td class="text-right">{{ $cash_flow['formatted_cash_in'] }}</td>
-                                <td class="text-right">100%</td>
-                            </tr>
-                        @endif
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @forelse ($categories['cash_in'] as $inCat)
+                                <tr>
+                                    <td>{{ $inCat['label'] }}</td>
+                                    <td class="text-right font-bold" style="color: #15803D;">{{ $inCat['formatted_total'] }}</td>
+                                    <td class="text-right" style="color: #64748B;">{{ $inCat['percentage'] }}%</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="empty-notice-container">
+                                        <div class="empty-notice-title">Belum ada data kas masuk pada periode ini.</div>
+                                        <div class="empty-notice-sub">Pencatatan omzet penjualan akan otomatis direkapitulasi di sini.</div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                            @if (!empty($categories['cash_in']))
+                                <tr class="total-bar">
+                                    <td>Total Pemasukan</td>
+                                    <td class="text-right" style="color: #15803D;">{{ $cash_flow['formatted_cash_in'] }}</td>
+                                    <td class="text-right">100%</td>
+                                </tr>
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
             </td>
 
-            <!-- Kolom Pengeluaran -->
-            <td class="col-half">
-                <div class="section-title" style="color: #B5452B;">Rincian Pengeluaran</div>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th class="th-out text-left">Kategori</th>
-                            <th class="th-out text-right">Total</th>
-                            <th class="th-out text-right" style="width: 20%;">Porsi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($categories['cash_out'] as $outCat)
+            <!-- Panel Pengeluaran -->
+            <td class="panel-col">
+                <div class="table-panel">
+                    <div class="table-panel-header-out">Rincian Pengeluaran</div>
+                    <table class="data-grid">
+                        <thead>
                             <tr>
-                                <td>{{ $outCat['label'] }}</td>
-                                <td class="text-right font-bold">{{ $outCat['formatted_total'] }}</td>
-                                <td class="text-right">{{ $outCat['percentage'] }}%</td>
+                                <th class="text-left" style="width: 50%;">Kategori</th>
+                                <th class="text-right" style="width: 32%;">Total</th>
+                                <th class="text-right" style="width: 18%;">Porsi</th>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="3" class="text-center color-muted" style="padding: 10px;">
-                                    Belum ada data kas keluar pada periode ini.
-                                </td>
-                            </tr>
-                        @endforelse
-                        @if (!empty($categories['cash_out']))
-                            <tr class="total-row">
-                                <td>Total Pengeluaran</td>
-                                <td class="text-right">{{ $cash_flow['formatted_cash_out'] }}</td>
-                                <td class="text-right">100%</td>
-                            </tr>
-                        @endif
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @forelse ($categories['cash_out'] as $outCat)
+                                <tr>
+                                    <td>{{ $outCat['label'] }}</td>
+                                    <td class="text-right font-bold" style="color: #BE123C;">{{ $outCat['formatted_total'] }}</td>
+                                    <td class="text-right" style="color: #64748B;">{{ $outCat['percentage'] }}%</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="empty-notice-container">
+                                        <div class="empty-notice-title">Belum ada data kas keluar pada periode ini.</div>
+                                        <div class="empty-notice-sub">Pencatatan belanja & beban usaha akan otomatis direkapitulasi di sini.</div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                            @if (!empty($categories['cash_out']))
+                                <tr class="total-bar">
+                                    <td>Total Pengeluaran</td>
+                                    <td class="text-right" style="color: #BE123C;">{{ $cash_flow['formatted_cash_out'] }}</td>
+                                    <td class="text-right">100%</td>
+                                </tr>
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
             </td>
         </tr>
     </table>
 
-    <!-- 5. CATATAN RINGKASAN NARASI USAHA (AI NARRATIVE) -->
+    <!-- 5. RINGKASAN NARASI EKSEKUTIF CERDAS AI -->
     @if (!empty($ai_narrative))
-        <div class="ai-narrative-box">
-            <div class="ai-badge">Ringkasan Narasi Cerdas KasiVo</div>
-            <div class="ai-headline">{{ $ai_narrative['headline'] ?? 'Ikhtisar Operasional KasiVo' }}</div>
-            <div class="ai-text">{{ $ai_narrative['narrative'] ?? $ai_narrative['content'] ?? '' }}</div>
+        <div class="ai-intelligence-box">
+            <div class="ai-pill-label">✦ Ringkasan Narasi Cerdas KasiVo</div>
+            <div class="ai-title-bold">{{ $ai_narrative['headline'] ?? 'Ikhtisar Operasional KasiVo' }}</div>
+            <div class="ai-body-text">{{ $ai_narrative['narrative'] ?? $ai_narrative['content'] ?? '' }}</div>
         </div>
     @endif
 
-    <!-- 6. PERNYATAAN KEPATUHAN & BATASAN DOKUMEN (DISCLAIMER RESMI KV-050) -->
-    <div class="disclaimer-box">
-        <div class="disclaimer-title">Pernyataan Kepatuhan & Batasan Dokumen (Disclaimer)</div>
-        <div class="disclaimer-text">
-            {{ $disclaimer }}
-        </div>
-    </div>
+    <!-- 6. PERNYATAAN KEPATUHAN & LEMBAR INTEGRITAS DATA (DoD Wajib KV-050) -->
+    <table class="legal-seal-row">
+        <tr>
+            <td class="col-disclaimer">
+                <div class="disclaimer-panel">
+                    <div class="disclaimer-panel-title">Pernyataan Kepatuhan & Batasan Dokumen (Disclaimer)</div>
+                    <div class="disclaimer-panel-text">
+                        {{ $disclaimer }}
+                    </div>
+                </div>
+            </td>
+            <td class="col-stamp">
+                <div class="digital-seal-panel">
+                    <span class="seal-pill">Integritas Data Digital</span>
+                    <div class="seal-name">{{ $business['owner_name'] }}</div>
+                    <div class="seal-firm">{{ $business['name'] }}</div>
+                    <div class="seal-date">
+                        Tercatat pada Sistem KasiVo POS<br>
+                        {{ $document['formatted_generated_at'] }}
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
 
-    <!-- 7. FOOTER IDENTITAS SISTEM -->
-    <div class="footer-note">
-        Dokumen ini dibuat otomatis oleh KasiVo Smart Business POS & Kasir Online pada {{ $document['formatted_generated_at'] }}. Halaman 1 dari 1.
-    </div>
+    <!-- 7. FOOTER BAR -->
+    <table class="layout-table page-footer-note">
+        <tr>
+            <td style="width: 60%;">
+                Dokumen resmi profil usaha mandiri ini digenerate secara digital oleh Sistem KasiVo Smart POS & Kasir Online.
+            </td>
+            <td style="width: 40%; text-align: right;">
+                Halaman 1 dari 1 • Validasi Digital Mandiri
+            </td>
+        </tr>
+    </table>
 
 </body>
 </html>
