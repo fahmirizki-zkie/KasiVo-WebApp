@@ -59,7 +59,7 @@
             <button type="button"
                     wire:click="setPeriod('this_month')"
                     class="px-3.5 py-1.5 rounded-lg transition-all {{ $period === 'this_month' ? 'bg-white text-[#E87559] shadow-xs font-bold' : 'text-[#777777] hover:text-[#252525]' }}">
-                Bulan Ini (Default)
+                Bulan Ini
             </button>
         </div>
     </div>

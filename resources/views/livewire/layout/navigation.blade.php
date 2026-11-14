@@ -19,6 +19,19 @@ new class extends Component
 @php
     $currentRoute = request()->route()?->getName();
     
+    // Saran Restock Dynamic Count (hanya tampil jika ada rekomendasi saran restock riil)
+    $navUser = auth()->user();
+    $navBusiness = $navUser?->business ?? $navUser?->businesses()->first();
+    $restockCount = 0;
+    if ($navBusiness) {
+        try {
+            $restockOverview = app(\App\Services\RestockService::class)->getRestockOverview($navBusiness);
+            $restockCount = (int) ($restockOverview['recommended_count'] ?? 0);
+        } catch (\Throwable $e) {
+            $restockCount = 0;
+        }
+    }
+    
     // Page Title Resolver
     $pageTitle = match($currentRoute) {
         'dashboard' => 'Dashboard',
@@ -217,9 +230,11 @@ new class extends Component
                     </div>
                     <span>Restock</span>
                 </div>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ request()->routeIs('restock') ? 'bg-[#E87559] text-white' : 'bg-[#FCEDEA] text-[#E87559]' }}">
-                    2 Perlu
-                </span>
+                @if ($restockCount > 0)
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ request()->routeIs('restock') ? 'bg-[#E87559] text-white' : 'bg-[#FCEDEA] text-[#E87559]' }}">
+                        {{ $restockCount }} Perlu
+                    </span>
+                @endif
             </a>
 
             <!-- 4. Profil Usaha -->
@@ -547,7 +562,9 @@ new class extends Component
                             <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('restock') ? 'text-[#E87559]' : 'text-[#777777]' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                             <span>Restock Bahan</span>
                         </div>
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#FCEDEA] text-[#E87559]">2 Perlu</span>
+                        @if ($restockCount > 0)
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#FCEDEA] text-[#E87559]">{{ $restockCount }} Perlu</span>
+                        @endif
                     </a>
 
                     <!-- Profil Usaha -->

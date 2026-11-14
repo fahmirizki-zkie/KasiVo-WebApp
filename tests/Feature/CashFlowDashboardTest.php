@@ -86,7 +86,7 @@ class CashFlowDashboardTest extends TestCase
         Livewire::actingAs($this->user)
             ->test(Dashboard::class)
             ->assertSet('period', 'this_month')
-            ->assertSee('Bulan Ini (Default)');
+            ->assertSee('Bulan Ini');
     }
 
     /**

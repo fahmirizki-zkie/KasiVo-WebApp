@@ -18,14 +18,16 @@ class BusinessProfilePdfController extends Controller
     public function download(Request $request): Response
     {
         $user = $request->user();
-        $business = $user?->business;
+        $business = $user?->businesses()->whereHas('transactions')->latest('id')->first()
+            ?? $user?->business
+            ?? $user?->businesses()->first();
 
         if (!$business) {
             return redirect()->route('onboarding')->with('warning', 'Silakan lengkapi profil usaha Anda terlebih dahulu sebelum mengunduh laporan PDF.');
         }
 
         $validated = $request->validate([
-            'period' => 'nullable|string|in:this_month,last_month,this_year,all,custom',
+            'period' => 'nullable|string|in:today,last_7_days,7_days,this_month,last_month,this_year,all,all_time,custom',
             'start_date' => 'nullable|date_format:Y-m-d',
             'end_date' => 'nullable|date_format:Y-m-d|after_or_equal:start_date',
             'stream' => 'nullable|boolean',

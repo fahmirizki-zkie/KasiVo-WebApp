@@ -278,6 +278,7 @@ class CashFlowService
                 break;
 
             case 'all':
+            case 'all_time':
                 return [
                     'start_date' => null,
                     'end_date' => null,

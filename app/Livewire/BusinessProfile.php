@@ -29,7 +29,9 @@ class BusinessProfile extends Component
             return null;
         }
 
-        return $user->businesses()->first();
+        return $user->businesses()->whereHas('transactions')->latest('id')->first()
+            ?? $user->business
+            ?? $user->businesses()->first();
     }
 
     public function render(BusinessReportService $reportService)

@@ -6,7 +6,7 @@
     <style>
         @page {
             size: a4 portrait;
-            margin: 10mm 12mm 12mm 12mm;
+            margin: 12mm 15mm 12mm 15mm;
         }
 
         * {
@@ -17,8 +17,8 @@
 
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: 8.8pt;
-            line-height: 1.5;
+            font-size: 8.5pt;
+            line-height: 1.45;
             color: #1E293B;
             background-color: #FFFFFF;
         }
@@ -42,682 +42,531 @@
             padding: 0;
         }
 
-        /* 1. HERO EXECUTIVE HEADER (DARK NAVY & CORAL) */
-        .hero-header {
-            background-color: #0F172A;
-            color: #FFFFFF;
-            border-radius: 12px;
-            padding: 16px 20px;
-            margin-bottom: 16px;
+        /* 1. LETTERHEAD FORMAL & BERSIH */
+        .letterhead-box {
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #0F172A;
         }
 
-        .brand-badge {
-            display: inline-block;
-            background-color: #E87559;
-            color: #FFFFFF;
+        .header-subline {
+            font-size: 7pt;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 3px;
+            font-weight: 600;
+        }
+
+        .meta-table {
+            font-size: 7.5pt;
+            line-height: 1.5;
+            color: #334155;
+            margin-left: auto;
+        }
+
+        .meta-table td {
+            padding: 1px 0;
+        }
+
+        .meta-label {
+            color: #64748B;
+            font-weight: 600;
+            padding-right: 6px;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .meta-value {
+            color: #0F172A;
+            font-weight: 700;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        /* 2. DOKUMEN TITLE */
+        .doc-header-box {
+            text-align: center;
+            margin-bottom: 14px;
+            padding: 4px 0;
+        }
+
+        .doc-title {
             font-size: 13pt;
             font-weight: 800;
-            padding: 4px 9px;
-            border-radius: 6px;
-            letter-spacing: -0.5px;
-            line-height: 1;
-        }
-
-        .brand-title {
-            display: inline-block;
-            font-size: 18pt;
-            font-weight: 800;
-            color: #FFFFFF;
-            letter-spacing: -0.5px;
-            vertical-align: middle;
-            margin-left: 6px;
-        }
-
-        .brand-title span {
-            color: #E87559;
-        }
-
-        .brand-subtitle {
-            font-size: 7.2pt;
-            font-weight: 700;
-            color: #94A3B8;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            margin-top: 4px;
-        }
-
-        .doc-heading {
-            font-size: 14pt;
-            font-weight: 800;
-            color: #FFFFFF;
-            letter-spacing: -0.3px;
-            margin-top: 8px;
-            text-transform: uppercase;
-        }
-
-        .doc-sub {
-            font-size: 8pt;
-            color: #94A3B8;
-            margin-top: 2px;
-        }
-
-        .header-meta-box {
-            background-color: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 7.5pt;
-            line-height: 1.6;
-            color: #E2E8F0;
-        }
-
-        .meta-lbl {
-            color: #94A3B8;
-            font-weight: 600;
-            display: inline-block;
-            width: 80px;
-        }
-
-        .meta-val {
-            color: #FFFFFF;
-            font-weight: 700;
-        }
-
-        /* 2. BUSINESS PROFILE SECTION */
-        .card-box {
-            border: 1px solid #E2E8F0;
-            border-radius: 10px;
-            background-color: #FFFFFF;
-            overflow: hidden;
-            margin-bottom: 16px;
-        }
-
-        .card-header-bar {
-            background-color: #F8FAFC;
-            border-bottom: 1px solid #E2E8F0;
-            padding: 9px 16px;
-            font-size: 8pt;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
             color: #0F172A;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            line-height: 1.2;
         }
 
-        .card-content {
-            padding: 14px 16px;
-        }
-
-        table.info-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        table.info-table td {
-            padding: 5px 8px;
-            font-size: 8.5pt;
-            vertical-align: top;
-        }
-
-        table.info-table td.col-l {
-            width: 115px;
+        .doc-subtitle {
+            font-size: 7.8pt;
             color: #64748B;
+            margin-top: 3px;
             font-weight: 500;
         }
 
-        table.info-table td.col-v {
+        /* 3. SECTION HEADINGS */
+        .section-heading {
+            font-size: 8.5pt;
+            font-weight: 700;
             color: #0F172A;
-            font-weight: 700;
-        }
-
-        .badge-pill-cat {
-            display: inline-block;
-            background-color: #EFF6FF;
-            color: #1D4ED8;
-            border: 1px solid #BFDBFE;
-            padding: 2.5px 8px;
-            border-radius: 4px;
-            font-size: 7.2pt;
-            font-weight: 700;
-        }
-
-        /* 3. THREE FINANCIAL KPI HIGHLIGHTS */
-        table.kpi-row {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 10px 0;
-            margin-bottom: 16px;
-        }
-
-        table.kpi-row td.kpi-cell {
-            width: 33.33%;
-            border-radius: 10px;
-            padding: 14px 16px;
-            vertical-align: top;
-        }
-
-        .kpi-in {
-            background-color: #F0FDF4;
-            border: 1.5px solid #BBF7D0;
-            border-top: 4.5px solid #10B981;
-        }
-
-        .kpi-out {
-            background-color: #FFF1F2;
-            border: 1.5px solid #FECDD3;
-            border-top: 4.5px solid #E87559;
-        }
-
-        .kpi-net {
-            background-color: #F8FAFC;
-            border: 1.5px solid #CBD5E1;
-            border-top: 4.5px solid #0F172A;
-        }
-
-        .kpi-tag-label {
-            font-size: 7.8pt;
-            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.6px;
+            letter-spacing: 0.4px;
+            padding-bottom: 3px;
+            margin-top: 10px;
             margin-bottom: 6px;
+            border-bottom: 1px solid #CBD5E1;
         }
 
-        .kpi-num-large {
-            font-size: 16.5pt;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            margin-bottom: 4px;
-            line-height: 1.15;
-        }
-
-        .kpi-sub-desc {
-            font-size: 7.5pt;
-            color: #64748B;
-        }
-
-        .status-badge-green {
-            display: inline-block;
-            background-color: #D1FAE5;
-            color: #065F46;
-            border: 1px solid #A7F3D0;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 7.2pt;
-            font-weight: 700;
-            margin-top: 6px;
-        }
-
-        .status-badge-red {
-            display: inline-block;
-            background-color: #FEE2E2;
-            color: #991B1B;
-            border: 1px solid #FECACA;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 7.2pt;
-            font-weight: 700;
-            margin-top: 6px;
-        }
-
-        /* 4. BREAKDOWN SIDE-BY-SIDE PANELS */
-        table.breakdown-two-col {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 10px 0;
-            margin-bottom: 16px;
-        }
-
-        table.breakdown-two-col td.panel-col {
-            width: 50%;
-            vertical-align: top;
-            padding: 0;
-        }
-
-        .table-panel {
-            border: 1px solid #E2E8F0;
-            border-radius: 10px;
-            background-color: #FFFFFF;
-            overflow: hidden;
-            min-height: 155px;
-        }
-
-        .table-panel-header-in {
-            background-color: #10B981;
-            color: #FFFFFF;
-            padding: 9px 14px;
-            font-size: 8.5pt;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-        }
-
-        .table-panel-header-out {
-            background-color: #E87559;
-            color: #FFFFFF;
-            padding: 9px 14px;
-            font-size: 8.5pt;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-        }
-
-        table.data-grid {
+        /* 4. IDENTITAS USAHA TABLE */
+        .info-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 8.2pt;
+            font-size: 8pt;
+            margin-bottom: 12px;
+            border: 1px solid #E2E8F0;
         }
 
-        table.data-grid th {
-            padding: 7px 10px;
-            background-color: #F8FAFC;
-            color: #475569;
-            font-weight: 700;
-            font-size: 7.2pt;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid #E2E8F0;
-        }
-
-        table.data-grid td {
-            padding: 7px 10px;
+        .info-table td {
+            padding: 5px 8px;
+            vertical-align: top;
             border-bottom: 1px solid #F1F5F9;
-            color: #1E293B;
-            vertical-align: middle;
         }
 
-        table.data-grid tr:nth-child(even) td {
-            background-color: #FAFAFC;
+        .info-label {
+            width: 20%;
+            color: #64748B;
+            font-weight: 600;
+            background-color: #F8FAFC;
+            border-right: 1px solid #E2E8F0;
         }
 
-        table.data-grid tr.total-bar td {
-            font-weight: 800;
-            background-color: #F1F5F9;
-            border-top: 1.5px solid #CBD5E1;
-            border-bottom: none;
+        .info-value {
+            width: 30%;
             color: #0F172A;
-            padding: 8px 10px;
+            font-weight: 600;
         }
 
-        .empty-notice-container {
-            padding: 30px 16px;
-            text-align: center;
-        }
-
-        .empty-notice-title {
-            color: #475569;
-            font-size: 8.5pt;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .empty-notice-sub {
-            color: #94A3B8;
-            font-size: 7.5pt;
-            line-height: 1.45;
-        }
-
-        /* 5. AI INTELLIGENCE SUMMARY CARD */
-        .ai-intelligence-box {
-            background-color: #FFFDF7;
-            border: 1px solid #FDE68A;
-            border-left: 5px solid #E87559;
-            border-radius: 10px;
-            padding: 14px 18px;
-            margin-bottom: 16px;
-        }
-
-        .ai-pill-label {
-            display: inline-block;
-            background-color: #FEF3C7;
-            color: #B45309;
-            border: 1px solid #FCD34D;
-            padding: 2.5px 8px;
-            border-radius: 4px;
-            font-size: 7.2pt;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            margin-bottom: 6px;
-        }
-
-        .ai-title-bold {
-            font-size: 10.5pt;
-            font-weight: 800;
-            color: #0F172A;
-            margin-bottom: 6px;
-        }
-
-        .ai-body-text {
-            font-size: 8.5pt;
-            line-height: 1.6;
-            color: #334155;
-            text-align: justify;
-        }
-
-        /* 6. LEGAL COMPLIANCE & DIGITAL VERIFICATION SEAL (DoD KV-050) */
-        table.legal-seal-row {
+        /* 5. KPI METRICS (3 CARDS) */
+        .kpi-table {
             width: 100%;
             border-collapse: separate;
-            border-spacing: 10px 0;
-            margin-bottom: 14px;
+            border-spacing: 8px 0;
+            margin-bottom: 12px;
         }
 
-        table.legal-seal-row td.col-disclaimer {
-            width: 66%;
-            vertical-align: top;
-            padding: 0;
+        .kpi-card {
+            background-color: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 6px;
+            padding: 8px 10px;
+            text-align: left;
         }
 
-        table.legal-seal-row td.col-stamp {
-            width: 34%;
-            vertical-align: top;
-            padding: 0;
+        .kpi-card.income {
+            border-top: 3px solid #10B981;
         }
 
-        .disclaimer-panel {
-            background-color: #F8FAFC;
-            border: 1px solid #CBD5E1;
-            border-radius: 10px;
-            padding: 12px 14px;
-            min-height: 102px;
+        .kpi-card.expense {
+            border-top: 3px solid #E87559;
         }
 
-        .disclaimer-panel-title {
-            font-size: 7.5pt;
-            font-weight: 800;
-            color: #334155;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            margin-bottom: 4px;
+        .kpi-card.net {
+            border-top: 3px solid #0F172A;
         }
 
-        .disclaimer-panel-text {
-            font-size: 7.2pt;
-            line-height: 1.5;
-            color: #64748B;
-            text-align: justify;
-        }
-
-        .digital-seal-panel {
-            background-color: #F8FAFC;
-            border: 1px dashed #94A3B8;
-            border-radius: 10px;
-            padding: 12px 14px;
-            text-align: center;
-            min-height: 102px;
-        }
-
-        .seal-pill {
-            display: inline-block;
-            background-color: #E2E8F0;
-            color: #1E293B;
-            font-size: 7.2pt;
-            font-weight: 800;
-            padding: 3px 8px;
-            border-radius: 4px;
-            margin-bottom: 5px;
+        .kpi-title {
+            font-size: 6.8pt;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            color: #64748B;
+            margin-bottom: 2px;
         }
 
-        .seal-name {
-            font-size: 9pt;
+        .kpi-amount {
+            font-size: 11pt;
             font-weight: 800;
-            color: #0F172A;
+            line-height: 1.2;
+        }
+
+        .kpi-amount.income { color: #047857; }
+        .kpi-amount.expense { color: #B91C1C; }
+        .kpi-amount.net { color: #0F172A; }
+
+        .kpi-desc {
+            font-size: 6.8pt;
+            color: #64748B;
             margin-top: 2px;
         }
 
-        .seal-firm {
+        .kpi-badge {
+            display: inline-block;
+            font-size: 6.5pt;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 3px;
+            margin-top: 3px;
+        }
+
+        .kpi-badge.surplus {
+            background-color: #ECFDF5;
+            color: #065F46;
+            border: 1px solid #A7F3D0;
+        }
+
+        .kpi-badge.deficit {
+            background-color: #FEF2F2;
+            color: #991B1B;
+            border: 1px solid #FECACA;
+        }
+
+        /* 6. TABEL RINCIAN KATEGORI */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
             font-size: 7.5pt;
+        }
+
+        .data-table th {
+            background-color: #F8FAFC;
             color: #475569;
-            margin-top: 1px;
-        }
-
-        .seal-date {
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            padding: 5px 6px;
+            border-top: 1px solid #CBD5E1;
+            border-bottom: 1px solid #CBD5E1;
             font-size: 6.8pt;
-            color: #94A3B8;
-            line-height: 1.4;
-            margin-top: 5px;
         }
 
-        /* 7. FOOTER NOTE */
-        .page-footer-note {
-            border-top: 1px solid #E2E8F0;
-            padding-top: 8px;
-            font-size: 7.2pt;
+        .data-table td {
+            padding: 4px 6px;
+            border-bottom: 1px solid #E2E8F0;
+            color: #1E293B;
+        }
+
+        .data-table tr.total-row td {
+            font-weight: 800;
+            background-color: #F8FAFC;
+            border-top: 1px solid #CBD5E1;
+            border-bottom: 1px solid #0F172A;
+            color: #0F172A;
+        }
+
+        /* 7. AI SMART BRIEF / NARASI */
+        .narrative-box {
+            background-color: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-left: 3px solid #E87559;
+            border-radius: 4px;
+            padding: 8px 10px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .narrative-title {
+            font-size: 7.5pt;
+            font-weight: 700;
+            color: #0F172A;
+            margin-bottom: 3px;
+        }
+
+        .narrative-text {
+            font-size: 7.5pt;
+            line-height: 1.45;
+            color: #334155;
+        }
+
+        /* 8. DISCLAIMER & KEPATUHAN */
+        .disclaimer-box {
+            background-color: #FFFFFF;
+            border: 1px dashed #CBD5E1;
+            border-radius: 4px;
+            padding: 6px 9px;
+            margin-top: 10px;
+            margin-bottom: 12px;
+        }
+
+        .disclaimer-title {
+            font-size: 6.5pt;
+            font-weight: 800;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .disclaimer-text {
+            font-size: 6.8pt;
+            line-height: 1.35;
+            color: #64748B;
+        }
+
+        /* 9. SIGNATURE / PENGESAHAN */
+        .sign-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 7.5pt;
+            margin-top: 8px;
+        }
+
+        .sign-table td {
+            vertical-align: top;
+            padding: 0;
+        }
+
+        .signature-line {
+            width: 160px;
+            border-bottom: 1px solid #0F172A;
+            margin-top: 36px;
+            margin-bottom: 3px;
+        }
+
+        /* 10. FOOTER */
+        .footer-note {
+            font-size: 6.5pt;
             color: #94A3B8;
+            border-top: 1px solid #E2E8F0;
+            padding-top: 6px;
+            margin-top: 12px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
-    <!-- 1. HERO EXECUTIVE HEADER (DARK NAVY & CORAL ACCENT) -->
-    <div class="hero-header">
+    @php
+        // Ambil logo asli KasiVo dari path fisik dan ubah ke format base64
+        $logoPath = public_path('images/kasivo-logo.png');
+        $logoBase64 = file_exists($logoPath)
+            ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
+            : null;
+    @endphp
+
+    <!-- 1. LETTERHEAD FORMAL DENGAN LOGO ASLI KASIVO -->
+    <div class="letterhead-box">
         <table class="layout-table">
             <tr>
-                <td style="width: 55%; vertical-align: middle;">
-                    <div>
-                        <span class="brand-badge">KV</span>
-                        <span class="brand-title">Kasi<span>Vo</span></span>
-                    </div>
-                    <div class="brand-subtitle">Smart Business POS & Financial OS</div>
-                    <div class="doc-heading">{{ $document['title'] }}</div>
-                    <div class="doc-sub">Laporan Profil Usaha & Rekapitulasi Arus Kas Mandiri UMKM</div>
+                <td style="width: 50%;">
+                    @if ($logoBase64)
+                        <img src="{{ $logoBase64 }}" style="height: 34px; width: auto;" alt="KasiVo" />
+                    @else
+                        <div style="font-size: 18pt; font-weight: 800; color: #E87559; letter-spacing: -0.5px;">KasiVo</div>
+                    @endif
+                    <div class="header-subline">Sistem POS Cerdas &amp; Rekapitulasi Finansial UMKM</div>
                 </td>
-                <td style="width: 45%; vertical-align: middle;">
-                    <div class="header-meta-box" style="margin-left: auto; width: 95%;">
-                        <div><span class="meta-lbl">No. Dokumen:</span> <span class="meta-val">{{ $document['document_number'] }}</span></div>
-                        <div><span class="meta-lbl">Tanggal Cetak:</span> <span class="meta-val">{{ $document['formatted_generated_at'] }}</span></div>
-                        <div><span class="meta-lbl">Periode:</span> <span class="meta-val">{{ $period['label'] }}</span></div>
-                        <div><span class="meta-lbl">Rentang:</span> <span class="meta-val">{{ $period['formatted_range'] }}</span></div>
-                    </div>
+                <td style="width: 50%; text-align: right;">
+                    <table class="meta-table">
+                        <tr>
+                            <td class="meta-label">No. Dokumen:</td>
+                            <td class="meta-value">{{ $document['document_number'] ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="meta-label">Tanggal Cetak:</td>
+                            <td class="meta-value">{{ $document['formatted_generated_at'] ?? now()->translatedFormat('d F Y, H:i') . ' WIB' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="meta-label">Periode Laporan:</td>
+                            <td class="meta-value">{{ $period['label'] ?? 'Bulan Ini' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="meta-label">Rentang Waktu:</td>
+                            <td class="meta-value">{{ $period['formatted_range'] ?? '-' }}</td>
+                        </tr>
+                    </table>
                 </td>
             </tr>
         </table>
     </div>
 
-    <!-- 2. IDENTITAS PROFIL USAHA & PEMILIK (KV-010) -->
-    <div class="card-box">
-        <div class="card-header-bar">
-            Identitas Profil Usaha & Periode Laporan
-        </div>
-        <div class="card-content">
-            <table class="layout-table">
-                <tr>
-                    <td style="width: 50%; padding-right: 14px;">
-                        <table class="info-table">
-                            <tr>
-                                <td class="col-l">Nama Usaha</td>
-                                <td class="col-v">: {{ $business['name'] }}</td>
-                            </tr>
-                            <tr>
-                                <td class="col-l">Jenis Usaha</td>
-                                <td class="col-v">: <span class="badge-pill-cat">{{ $business['business_type_label'] }}</span></td>
-                            </tr>
-                            <tr>
-                                <td class="col-l">Terdaftar Sejak</td>
-                                <td class="col-v">: {{ $business['registered_date'] }}</td>
-                            </tr>
-                        </table>
-                    </td>
-                    <td style="width: 50%; padding-left: 14px; border-left: 1px solid #F1F5F9;">
-                        <table class="info-table">
-                            <tr>
-                                <td class="col-l">Nama Pemilik</td>
-                                <td class="col-v">: {{ $business['owner_name'] }}</td>
-                            </tr>
-                            <tr>
-                                <td class="col-l">Email Akun</td>
-                                <td class="col-v">: {{ $business['owner_email'] }}</td>
-                            </tr>
-                            <tr>
-                                <td class="col-l">Periode Laporan</td>
-                                <td class="col-v">: {{ $period['label'] }} ({{ $period['formatted_range'] }})</td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-        </div>
+    <!-- 2. JUDUL DOKUMEN FORMAL -->
+    <div class="doc-header-box">
+        <div class="doc-title">LAPORAN KEUANGAN &amp; PROFIL USAHA</div>
+        <div class="doc-subtitle">Ikhtisar Kinerja Operasional dan Ringkasan Arus Kas Masuk &amp; Keluar</div>
     </div>
 
-    <!-- 3. TIGA KARTU RINGKASAN FINANSIAL ARUS KAS (KV-038) -->
-    <table class="kpi-row">
+    <!-- 3. IDENTITAS USAHA & PEMILIK -->
+    <div class="section-heading">1. Identitas Usaha &amp; Pemilik</div>
+    <table class="info-table">
         <tr>
-            <!-- Kas Masuk -->
-            <td class="kpi-cell kpi-in">
-                <div class="kpi-tag-label" style="color: #15803D;">TOTAL KAS MASUK</div>
-                <div class="kpi-num-large" style="color: #15803D;">{{ $cash_flow['formatted_cash_in'] }}</div>
-                <div class="kpi-sub-desc">{{ $cash_flow['cash_in_count'] }} transaksi pemasukan</div>
-            </td>
+            <td class="info-label">Nama Usaha</td>
+            <td class="info-value">{{ $business['name'] ?? '-' }}</td>
+            <td class="info-label">Nama Pemilik</td>
+            <td class="info-value">{{ $business['owner_name'] ?? '-' }}</td>
+        </tr>
+        <tr>
+            <td class="info-label">Jenis Usaha</td>
+            <td class="info-value">{{ $business['business_type_label'] ?? 'UMKM F&B' }}</td>
+            <td class="info-label">Email Akun</td>
+            <td class="info-value">{{ $business['owner_email'] ?? '-' }}</td>
+        </tr>
+        <tr>
+            <td class="info-label">Terdaftar Sejak</td>
+            <td class="info-value">{{ $business['registered_date'] ?? '-' }}</td>
+            <td class="info-label">Basis Pencatatan</td>
+            <td class="info-value">Kas Masuk &amp; Kas Keluar (Cash-Basis)</td>
+        </tr>
+    </table>
 
-            <!-- Kas Keluar -->
-            <td class="kpi-cell kpi-out">
-                <div class="kpi-tag-label" style="color: #BE123C;">TOTAL KAS KELUAR</div>
-                <div class="kpi-num-large" style="color: #BE123C;">{{ $cash_flow['formatted_cash_out'] }}</div>
-                <div class="kpi-sub-desc">{{ $cash_flow['cash_out_count'] }} transaksi belanja/beban</div>
+    <!-- 4. IKHTISAR ARUS KAS (3 KPI BOXES FORMAL) -->
+    <div class="section-heading">2. Ikhtisar Arus Kas Periode {{ $period['label'] ?? 'Bulan Ini' }}</div>
+    <table class="kpi-table">
+        <tr>
+            <td style="width: 33.33%;">
+                <div class="kpi-card income">
+                    <div class="kpi-title">Total Kas Masuk</div>
+                    <div class="kpi-amount income">{{ $cash_flow['formatted_cash_in'] ?? 'Rp 0' }}</div>
+                    <div class="kpi-desc">{{ $cash_flow['cash_in_count'] ?? 0 }} Transaksi Penjualan / Pemasukan</div>
+                </div>
             </td>
-
-            <!-- Arus Kas Bersih -->
-            <td class="kpi-cell kpi-net">
-                <div class="kpi-tag-label" style="color: #0F172A;">ARUS KAS BERSIH</div>
-                <div class="kpi-num-large" style="color: #0F172A;">{{ $cash_flow['formatted_net'] }}</div>
-                <div>
-                    <span class="{{ $cash_flow['is_negative'] ? 'status-badge-red' : 'status-badge-green' }}">
-                        {{ $cash_flow['status_label'] }}
+            <td style="width: 33.33%;">
+                <div class="kpi-card expense">
+                    <div class="kpi-title">Total Kas Keluar</div>
+                    <div class="kpi-amount expense">{{ $cash_flow['formatted_cash_out'] ?? 'Rp 0' }}</div>
+                    <div class="kpi-desc">{{ $cash_flow['cash_out_count'] ?? 0 }} Transaksi Belanja &amp; Operasional</div>
+                </div>
+            </td>
+            <td style="width: 33.33%;">
+                <div class="kpi-card net">
+                    <div class="kpi-title">Arus Kas Bersih</div>
+                    <div class="kpi-amount net">{{ $cash_flow['formatted_net'] ?? 'Rp 0' }}</div>
+                    <span class="kpi-badge {{ ($cash_flow['is_negative'] ?? false) ? 'deficit' : 'surplus' }}">
+                        {{ $cash_flow['status_label'] ?? 'Surplus Arus Kas Bersih' }}
                     </span>
                 </div>
             </td>
         </tr>
     </table>
 
-    <!-- 4. RINCIAN KATEGORI PEMASUKAN & PENGELUARAN (DUA PANEL BERDAMPINGAN) -->
-    <table class="breakdown-two-col">
+    <!-- 5. RINCIAN PER KATEGORI (2 TABEL BERDAMPINGAN) -->
+    <div class="section-heading">3. Rincian Pemasukan &amp; Pengeluaran per Kategori</div>
+    <table class="layout-table" style="margin-bottom: 8px;">
         <tr>
-            <!-- Panel Pemasukan -->
-            <td class="panel-col">
-                <div class="table-panel">
-                    <div class="table-panel-header-in">Rincian Pemasukan</div>
-                    <table class="data-grid">
-                        <thead>
-                            <tr>
-                                <th class="text-left" style="width: 50%;">Kategori</th>
-                                <th class="text-right" style="width: 32%;">Total</th>
-                                <th class="text-right" style="width: 18%;">Porsi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($categories['cash_in'] as $inCat)
-                                <tr>
-                                    <td>{{ $inCat['label'] }}</td>
-                                    <td class="text-right font-bold" style="color: #15803D;">{{ $inCat['formatted_total'] }}</td>
-                                    <td class="text-right" style="color: #64748B;">{{ $inCat['percentage'] }}%</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3" class="empty-notice-container">
-                                        <div class="empty-notice-title">Belum ada data kas masuk pada periode ini.</div>
-                                        <div class="empty-notice-sub">Pencatatan omzet penjualan akan otomatis direkapitulasi di sini.</div>
-                                    </td>
-                                </tr>
-                            @endforelse
-                            @if (!empty($categories['cash_in']))
-                                <tr class="total-bar">
-                                    <td>Total Pemasukan</td>
-                                    <td class="text-right" style="color: #15803D;">{{ $cash_flow['formatted_cash_in'] }}</td>
-                                    <td class="text-right">100%</td>
-                                </tr>
-                            @endif
-                        </tbody>
-                    </table>
+            <!-- Tabel Pemasukan -->
+            <td style="width: 49%; vertical-align: top;">
+                <div style="font-size: 7.2pt; font-weight: 700; color: #047857; text-transform: uppercase; margin-bottom: 3px;">
+                    Rincian Kas Masuk (Penerimaan)
                 </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th class="text-left" style="width: 50%;">Kategori</th>
+                            <th class="text-right" style="width: 30%;">Total</th>
+                            <th class="text-right" style="width: 20%;">Porsi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($categories['cash_in'] as $cat)
+                            <tr>
+                                <td class="text-left">{{ $cat['label'] }}</td>
+                                <td class="text-right font-bold">{{ $cat['formatted_total'] }}</td>
+                                <td class="text-right">{{ $cat['percentage'] }}%</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="text-center" style="color: #94A3B8; padding: 10px 0;">
+                                    Belum ada data kas masuk pada periode ini.
+                                </td>
+                            </tr>
+                        @endforelse
+                        <tr class="total-row">
+                            <td class="text-left">TOTAL PENERIMAAN</td>
+                            <td class="text-right font-bold">{{ $cash_flow['formatted_cash_in'] ?? 'Rp 0' }}</td>
+                            <td class="text-right font-bold">{{ count($categories['cash_in']) > 0 ? '100%' : '0%' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </td>
 
-            <!-- Panel Pengeluaran -->
-            <td class="panel-col">
-                <div class="table-panel">
-                    <div class="table-panel-header-out">Rincian Pengeluaran</div>
-                    <table class="data-grid">
-                        <thead>
-                            <tr>
-                                <th class="text-left" style="width: 50%;">Kategori</th>
-                                <th class="text-right" style="width: 32%;">Total</th>
-                                <th class="text-right" style="width: 18%;">Porsi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($categories['cash_out'] as $outCat)
-                                <tr>
-                                    <td>{{ $outCat['label'] }}</td>
-                                    <td class="text-right font-bold" style="color: #BE123C;">{{ $outCat['formatted_total'] }}</td>
-                                    <td class="text-right" style="color: #64748B;">{{ $outCat['percentage'] }}%</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3" class="empty-notice-container">
-                                        <div class="empty-notice-title">Belum ada data kas keluar pada periode ini.</div>
-                                        <div class="empty-notice-sub">Pencatatan belanja & beban usaha akan otomatis direkapitulasi di sini.</div>
-                                    </td>
-                                </tr>
-                            @endforelse
-                            @if (!empty($categories['cash_out']))
-                                <tr class="total-bar">
-                                    <td>Total Pengeluaran</td>
-                                    <td class="text-right" style="color: #BE123C;">{{ $cash_flow['formatted_cash_out'] }}</td>
-                                    <td class="text-right">100%</td>
-                                </tr>
-                            @endif
-                        </tbody>
-                    </table>
+            <td style="width: 2%;"></td>
+
+            <!-- Tabel Pengeluaran -->
+            <td style="width: 49%; vertical-align: top;">
+                <div style="font-size: 7.2pt; font-weight: 700; color: #B91C1C; text-transform: uppercase; margin-bottom: 3px;">
+                    Rincian Kas Keluar (Pengeluaran)
                 </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th class="text-left" style="width: 50%;">Kategori</th>
+                            <th class="text-right" style="width: 30%;">Total</th>
+                            <th class="text-right" style="width: 20%;">Porsi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($categories['cash_out'] as $cat)
+                            <tr>
+                                <td class="text-left">{{ $cat['label'] }}</td>
+                                <td class="text-right font-bold">{{ $cat['formatted_total'] }}</td>
+                                <td class="text-right">{{ $cat['percentage'] }}%</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="text-center" style="color: #94A3B8; padding: 10px 0;">
+                                    Belum ada data kas keluar pada periode ini.
+                                </td>
+                            </tr>
+                        @endforelse
+                        <tr class="total-row">
+                            <td class="text-left">TOTAL PENGELUARAN</td>
+                            <td class="text-right font-bold">{{ $cash_flow['formatted_cash_out'] ?? 'Rp 0' }}</td>
+                            <td class="text-right font-bold">{{ count($categories['cash_out']) > 0 ? '100%' : '0%' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </td>
         </tr>
     </table>
 
-    <!-- 5. RINGKASAN NARASI EKSEKUTIF CERDAS AI -->
-    @if (!empty($ai_narrative))
-        <div class="ai-intelligence-box">
-            <div class="ai-pill-label">✦ Ringkasan Narasi Cerdas KasiVo</div>
-            <div class="ai-title-bold">{{ $ai_narrative['headline'] ?? 'Ikhtisar Operasional KasiVo' }}</div>
-            <div class="ai-body-text">{{ $ai_narrative['narrative'] ?? $ai_narrative['content'] ?? '' }}</div>
+    <!-- 6. IKHTISAR OPERASIONAL (AI NARRATIVE BRIEF) -->
+    <div class="narrative-box">
+        <div class="narrative-title">
+            {{ $ai_narrative['headline'] ?? 'Ikhtisar Aktivitas Usaha' }}
         </div>
-    @endif
+        <div class="narrative-text">
+            {{ $ai_narrative['narrative'] ?? 'Belum ada ringkasan aktivitas transaksi pada periode ini.' }}
+        </div>
+    </div>
 
-    <!-- 6. PERNYATAAN KEPATUHAN & LEMBAR INTEGRITAS DATA (DoD Wajib KV-050) -->
-    <table class="legal-seal-row">
+    <!-- 7. PERNYATAAN KEPATUHAN & BATASAN DOKUMEN (DISCLAIMER MANDAT KV-050) -->
+    <div class="disclaimer-box">
+        <div class="disclaimer-title">Pernyataan Kepatuhan & Batasan Dokumen (Disclaimer)</div>
+        <div class="disclaimer-text">
+            {{ $disclaimer ?? 'Dokumen ini merupakan profil ringkasan operasional dan catatan arus kas internal usaha berdasarkan pencatatan transaksi mandiri oleh pemilik usaha. Dokumen ini BUKAN merupakan surat jaminan, rekomendasi pinjaman, atau bukti kelayakan kredit perbankan/lembaga pembiayaan.' }}
+        </div>
+    </div>
+
+    <!-- 8. PENGESAHAN / TANDA TANGAN DOKUMEN -->
+    <table class="sign-table">
         <tr>
-            <td class="col-disclaimer">
-                <div class="disclaimer-panel">
-                    <div class="disclaimer-panel-title">Pernyataan Kepatuhan & Batasan Dokumen (Disclaimer)</div>
-                    <div class="disclaimer-panel-text">
-                        {{ $disclaimer }}
-                    </div>
+            <td style="width: 60%; vertical-align: bottom;">
+                <div style="font-size: 7pt; color: #64748B; line-height: 1.4;">
+                    Dokumen ini dihasilkan secara otomatis oleh sistem KasiVo Smart Business POS.<br>
+                    Integritas data diverifikasi berdasarkan catatan pembukuan mandiri pengguna.
                 </div>
             </td>
-            <td class="col-stamp">
-                <div class="digital-seal-panel">
-                    <span class="seal-pill">Integritas Data Digital</span>
-                    <div class="seal-name">{{ $business['owner_name'] }}</div>
-                    <div class="seal-firm">{{ $business['name'] }}</div>
-                    <div class="seal-date">
-                        Tercatat pada Sistem KasiVo POS<br>
-                        {{ $document['formatted_generated_at'] }}
-                    </div>
+            <td style="width: 40%; text-align: right; vertical-align: bottom;">
+                <div style="font-size: 7.5pt; color: #334155; margin-bottom: 2px;">
+                    Pemilik Usaha / Penanggung Jawab,
+                </div>
+                <div class="signature-line" style="margin-left: auto;"></div>
+                <div style="font-size: 8pt; font-weight: 700; color: #0F172A;">
+                    {{ $business['owner_name'] ?? 'Pemilik Usaha' }}
+                </div>
+                <div style="font-size: 7pt; color: #64748B;">
+                    {{ $business['name'] ?? '-' }}
                 </div>
             </td>
         </tr>
     </table>
 
-    <!-- 7. FOOTER BAR -->
-    <table class="layout-table page-footer-note">
-        <tr>
-            <td style="width: 60%;">
-                Dokumen resmi profil usaha mandiri ini digenerate secara digital oleh Sistem KasiVo Smart POS & Kasir Online.
-            </td>
-            <td style="width: 40%; text-align: right;">
-                Halaman 1 dari 1 • Validasi Digital Mandiri
-            </td>
-        </tr>
-    </table>
+    <!-- 9. FOOTER RESMI -->
+    <div class="footer-note">
+        Dokumen Resmi Profil Usaha &amp; Ikhtisar Arus Kas &bull; Dicetak melalui KasiVo POS pada {{ $document['formatted_generated_at'] ?? now()->translatedFormat('d F Y, H:i') . ' WIB' }} &bull; Halaman 1 dari 1
+    </div>
 
 </body>
 </html>
