@@ -3,12 +3,18 @@
 namespace App\Livewire;
 
 use App\Models\Business;
+use App\Services\Ai\GeminiService;
+use App\Services\Ai\GroqService;
+use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 #[Layout('layouts.app')]
 class CreateIncomeTransaction extends Component
 {
+    use WithFileUploads;
+
     public $amount = '';
     public string $category = 'penjualan_tunai';
     public string $transaction_date = '';
@@ -18,6 +24,133 @@ class CreateIncomeTransaction extends Component
     public function mount(): void
     {
         $this->transaction_date = now()->toDateString();
+    }
+
+    /**
+     * Ekstraksi foto nota penjualan menggunakan Gemini Vision dengan fallback ke Groq.
+     *
+     * @return array<string, mixed>
+     */
+    public function extractPhotoAi(string $base64Image, GeminiService $geminiService, GroqService $groqService): array
+    {
+        $business = auth()->user()?->businesses()->first();
+        $mimeType = 'image/jpeg';
+
+        if (str_starts_with($base64Image, 'data:image/')) {
+            $end = strpos($base64Image, ';');
+            if ($end !== false) {
+                $mimeType = substr($base64Image, 5, $end - 5);
+            }
+        }
+
+        $context = "Pencatatan pemasukan/penjualan kas masuk untuk usaha: " . ($business?->name ?? 'UMKM F&B');
+        $extracted = null;
+
+        if ($geminiService->isConfigured()) {
+            try {
+                $extracted = $geminiService->extractFromImage(
+                    base64Image: $base64Image,
+                    mimeType: $mimeType,
+                    additionalContext: $context,
+                    businessType: $business?->business_type,
+                    businessId: $business?->id,
+                    userId: auth()->id()
+                );
+            } catch (\Throwable $e) {
+                Log::warning('Gemini vision income extraction failed: ' . $e->getMessage());
+            }
+        }
+
+        if ($extracted === null) {
+            try {
+                $extracted = $groqService->extractFromImage(
+                    base64Image: $base64Image,
+                    mimeType: $mimeType,
+                    additionalContext: $context,
+                    businessType: $business?->business_type,
+                    businessId: $business?->id,
+                    userId: auth()->id()
+                );
+            } catch (\Throwable $e) {
+                Log::warning('Groq vision income extraction failed: ' . $e->getMessage());
+            }
+        }
+
+        $amount = (float) ($extracted['total_amount'] ?? 0);
+        $merchant = trim((string) ($extracted['merchant_name'] ?? ''));
+        $notes = !empty($extracted['notes']) ? $extracted['notes'] : ($merchant ? "Penjualan di {$merchant}" : 'Penjualan Nota Struk');
+        $category = 'penjualan_tunai';
+        if (!empty($extracted['category']) && in_array($extracted['category'], ['penjualan_tunai', 'penjualan_qris', 'penjualan'])) {
+            $category = $extracted['category'];
+        }
+
+        $this->amount = $amount > 0 ? $amount : '';
+        $this->notes = $notes;
+        $this->category = $category;
+        $this->transaction_date = $extracted['transaction_date'] ?? now()->toDateString();
+        $this->source_type = 'photo';
+
+        return [
+            'amount' => $amount,
+            'notes' => $notes,
+            'category' => $category,
+            'date' => $this->transaction_date,
+            'items' => $extracted['items'] ?? [],
+        ];
+    }
+
+    /**
+     * Ekstraksi teks bebas penjualan menggunakan Groq / Gemini NLP.
+     *
+     * @return array<string, mixed>
+     */
+    public function extractTextAi(string $text, GroqService $groqService, GeminiService $geminiService): array
+    {
+        $business = auth()->user()?->businesses()->first();
+        $extracted = null;
+
+        try {
+            $extracted = $groqService->extractFromText(
+                text: $text,
+                businessType: $business?->business_type,
+                businessId: $business?->id,
+                userId: auth()->id()
+            );
+        } catch (\Throwable $e) {
+            if ($geminiService->isConfigured()) {
+                try {
+                    $extracted = $geminiService->extractFromText(
+                        text: $text,
+                        businessType: $business?->business_type,
+                        businessId: $business?->id,
+                        userId: auth()->id()
+                    );
+                } catch (\Throwable $ge) {
+                    Log::warning('Gemini text income extraction failed: ' . $ge->getMessage());
+                }
+            }
+        }
+
+        $amount = (float) ($extracted['total_amount'] ?? 0);
+        $notes = !empty($extracted['notes']) ? $extracted['notes'] : $text;
+        $category = 'penjualan_tunai';
+        if (!empty($extracted['category']) && in_array($extracted['category'], ['penjualan_tunai', 'penjualan_qris', 'penjualan'])) {
+            $category = $extracted['category'];
+        }
+
+        $this->amount = $amount > 0 ? $amount : '';
+        $this->notes = $notes;
+        $this->category = $category;
+        $this->transaction_date = $extracted['transaction_date'] ?? now()->toDateString();
+        $this->source_type = 'text';
+
+        return [
+            'amount' => $amount,
+            'notes' => $notes,
+            'category' => $category,
+            'date' => $this->transaction_date,
+            'items' => $extracted['items'] ?? [],
+        ];
     }
 
     /**
@@ -95,4 +228,5 @@ class CreateIncomeTransaction extends Component
         ]);
     }
 }
+
 

@@ -1131,7 +1131,7 @@
             // ========================================================
             // ENGINE EKSTRAKSI HASIL AI & PEMETAAN FORM KONFIRMASI
             // ========================================================
-            extractFromText() {
+            async extractFromText() {
                 const raw = (this.textInput || '').trim();
                 if (!raw) {
                     this.errorMessage = 'Tuliskan catatan atau deskripsi penjualan terlebih dahulu sebelum memproses.';
@@ -1139,83 +1139,101 @@
                 }
 
                 this.isProcessing = true;
-                this.processingMessage = 'AI sedang menganalisis kalimat penjualan bebas...';
+                this.processingMessage = 'AI sedang menganalisis kalimat penjualan...';
                 this.errorMessage = null;
 
-                setTimeout(() => {
-                    try {
-                        const parsed = this.parseSalesSentence(raw);
-                        this.applyExtractedData(parsed, 'Teks Bebas');
-                        this.isProcessing = false;
-                        this.currentStep = 'review';
-                        window.dispatchEvent(new CustomEvent('income-step-changed', { detail: 'review' }));
-                        this.scrollToTop();
-                    } catch (e) {
-                        this.errorMessage = 'Gagal menganalisis catatan penjualan: ' + e.message;
-                        this.isProcessing = false;
+                try {
+                    let parsed = null;
+                    const caller = this.wire || (window.Livewire ? this.$wire : null);
+                    if (caller && typeof caller.extractTextAi === 'function') {
+                        parsed = await caller.extractTextAi(raw);
                     }
-                }, 350);
+
+                    if (parsed && parsed.amount > 0) {
+                        this.applyExtractedData(parsed, 'AI NLP');
+                    } else {
+                        parsed = this.parseSalesSentence(raw);
+                        this.applyExtractedData(parsed, 'Teks Bebas');
+                    }
+                } catch (e) {
+                    console.warn('Backend NLP fallback to regex:', e);
+                    const parsed = this.parseSalesSentence(raw);
+                    this.applyExtractedData(parsed, 'Teks Bebas');
+                } finally {
+                    this.isProcessing = false;
+                }
             },
 
-            extractFromVoice() {
+            async extractFromVoice() {
                 if (this.voiceState !== 'recorded' && !this.voiceAudioUrl) {
                     this.errorMessage = 'Rekam suara atau unggah berkas audio kasir terlebih dahulu.';
                     return;
                 }
 
                 this.isProcessing = true;
-                this.processingMessage = 'AI sedang mentranskripsi & mengekstrak data rekaman suara...';
+                this.processingMessage = 'AI sedang memproses hasil transkripsi suara...';
                 this.errorMessage = null;
 
-                setTimeout(() => {
-                    try {
-                        // Gunakan transkrip aktual suara atau kalimat rekaman terdeteksi
-                        const sentence = this.voiceTranscription || 'Hasil penjualan hari ini ada satu juta lima ratus ribu.';
-                        const parsed = this.parseSalesSentence(sentence);
-                        this.applyExtractedData(parsed, 'Suara Kasir');
-                        this.isProcessing = false;
-                        this.currentStep = 'review';
-                        window.dispatchEvent(new CustomEvent('income-step-changed', { detail: 'review' }));
-                        this.scrollToTop();
-                    } catch (e) {
-                        this.errorMessage = 'Gagal mengekstrak data dari rekaman suara: ' + e.message;
-                        this.isProcessing = false;
+                try {
+                    const sentence = this.voiceTranscription || 'Penjualan hari ini satu juta lima ratus ribu rupiah';
+                    let parsed = null;
+                    const caller = this.wire || (window.Livewire ? this.$wire : null);
+                    if (caller && typeof caller.extractTextAi === 'function') {
+                        parsed = await caller.extractTextAi(sentence);
                     }
-                }, 400);
+
+                    if (parsed && parsed.amount > 0) {
+                        this.applyExtractedData(parsed, 'Suara Kasir (AI)');
+                    } else {
+                        parsed = this.parseSalesSentence(sentence);
+                        this.applyExtractedData(parsed, 'Suara Kasir');
+                    }
+                } catch (e) {
+                    console.warn('Voice NLP fallback to regex:', e);
+                    const sentence = this.voiceTranscription || 'Hasil penjualan hari ini ada satu juta lima ratus ribu.';
+                    const parsed = this.parseSalesSentence(sentence);
+                    this.applyExtractedData(parsed, 'Suara Kasir');
+                } finally {
+                    this.isProcessing = false;
+                }
             },
 
-            extractFromNote() {
+            async extractFromNote() {
                 if (!this.photoPreview && !this.photoMeta) {
                     this.errorMessage = 'Pilih atau foto nota penjualan terlebih dahulu sebelum memproses.';
                     return;
                 }
 
                 this.isProcessing = true;
-                this.processingMessage = 'Vision AI sedang membaca data pada nota penjualan...';
+                this.processingMessage = 'Google Gemini Vision sedang memindai nota penjualan...';
                 this.errorMessage = null;
 
-                setTimeout(() => {
-                    try {
-                        const noteContext = `Struk Nota (${this.photoMeta ? this.photoMeta.name : 'Foto Bon'})`;
-                        const parsed = {
-                            amount: 150000,
-                            notes: noteContext,
-                            category: 'penjualan_tunai',
-                            date: new Date().toISOString().split('T')[0],
-                            items: [
-                                { item_name: 'Penjualan Nota Struk', quantity: 1, unit: 'struk', unit_price: 150000, subtotal: 150000 }
-                            ]
-                        };
-                        this.applyExtractedData(parsed, 'Input Nota');
-                        this.isProcessing = false;
-                        this.currentStep = 'review';
-                        window.dispatchEvent(new CustomEvent('income-step-changed', { detail: 'review' }));
-                        this.scrollToTop();
-                    } catch (e) {
-                        this.errorMessage = 'Gagal membaca nota penjualan: ' + e.message;
-                        this.isProcessing = false;
+                try {
+                    let parsed = null;
+                    const caller = this.wire || (window.Livewire ? this.$wire : null);
+                    if (caller && this.photoPreview && typeof caller.extractPhotoAi === 'function') {
+                        parsed = await caller.extractPhotoAi(this.photoPreview);
                     }
-                }, 450);
+
+                    if (parsed && parsed.amount > 0) {
+                        this.applyExtractedData(parsed, 'Google Gemini Vision');
+                    } else {
+                        // Fallback jika Vision tidak membaca angka spesifik atau berupa CSV
+                        const noteContext = `Struk Nota (${this.photoMeta ? this.photoMeta.name : 'Foto Bon'})`;
+                        this.applyExtractedData({
+                            amount: parsed?.amount || 0,
+                            notes: parsed?.notes || noteContext,
+                            category: parsed?.category || 'penjualan_tunai',
+                            date: parsed?.date || new Date().toISOString().split('T')[0],
+                            items: parsed?.items || []
+                        }, 'Foto Nota');
+                    }
+                } catch (e) {
+                    console.error('Photo AI extraction failed:', e);
+                    this.errorMessage = 'Gagal memproses nota via AI: ' + (e.message || 'Silakan isi nominal secara manual di form konfirmasi.');
+                } finally {
+                    this.isProcessing = false;
+                }
             },
 
             parseSalesSentence(text) {
