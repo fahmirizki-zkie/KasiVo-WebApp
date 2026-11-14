@@ -126,4 +126,69 @@ class AiEmergencyFallbackTest extends TestCase
             'source_type' => 'voice',
         ]);
     }
+
+    public function test_photo_transaction_shows_friendly_sanitized_error_on_timeout(): void
+    {
+        Storage::fake('public');
+
+        $mockGroq = Mockery::mock(GroqService::class);
+        $mockGroq->shouldReceive('extractFromImage')
+            ->once()
+            ->andThrow(new \RuntimeException('cURL error 28: Operation timed out after 30000 milliseconds'));
+
+        $this->app->instance(GroqService::class, $mockGroq);
+
+        $fakePhoto = UploadedFile::fake()->image('nota_timeout.jpg', 600, 800);
+
+        Livewire::actingAs($this->user)
+            ->test(CreateExpensePhotoTransaction::class)
+            ->set('photo', $fakePhoto)
+            ->call('processPhoto')
+            ->assertSet('errorType', 'error')
+            ->assertSee('Koneksi internet atau layanan AI sedang mengalami gangguan')
+            ->assertDontSee('cURL error 28')
+            ->assertSee('Coba Ulang')
+            ->assertSee('Lanjut Catat Manual (Koreksi Nominal Langsung)');
+    }
+
+    public function test_text_transaction_shows_friendly_sanitized_error_on_network_failure(): void
+    {
+        $mockGroq = Mockery::mock(GroqService::class);
+        $mockGroq->shouldReceive('extractFromText')
+            ->once()
+            ->andThrow(new \RuntimeException('cURL error 6: Could not resolve host: api.groq.com'));
+
+        $this->app->instance(GroqService::class, $mockGroq);
+
+        Livewire::actingAs($this->user)
+            ->test(CreateExpenseTextTransaction::class)
+            ->set('rawText', 'Beli beras 10kg 150rb')
+            ->call('processText')
+            ->assertSet('errorType', 'error')
+            ->assertSee('Koneksi internet atau layanan AI sedang mengalami gangguan')
+            ->assertDontSee('cURL error 6')
+            ->assertSee('Coba Ulang')
+            ->assertSee('Lanjut Catat Manual (Koreksi Nominal Langsung)');
+    }
+
+    public function test_voice_transaction_shows_friendly_sanitized_error_on_unparseable_audio(): void
+    {
+        $mockGroq = Mockery::mock(GroqService::class);
+        $mockGroq->shouldReceive('transcribeAudio')
+            ->once()
+            ->andThrow(new \RuntimeException('Groq Whisper STT failed [500]: internal audio processing glitch'));
+
+        $this->app->instance(GroqService::class, $mockGroq);
+
+        $tmpAudio = UploadedFile::fake()->create('suara.wav', 100, 'audio/wav');
+
+        Livewire::actingAs($this->user)
+            ->test(CreateExpenseVoiceTransaction::class)
+            ->set('audioFile', $tmpAudio)
+            ->call('processVoice')
+            ->assertSet('errorType', 'error')
+            ->assertSee('Rekaman suara belum dapat diproses dengan baik')
+            ->assertDontSee('internal audio processing glitch')
+            ->assertSee('Coba Ulang');
+    }
 }

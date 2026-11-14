@@ -95,11 +95,22 @@
 
                                 <button type="button"
                                         wire:click="retryProcess"
-                                        class="min-h-[48px] px-4 py-2.5 bg-white hover:bg-gray-50 active:bg-gray-100 border border-[#EEEEEE] hover:border-[#E87559]/30 text-[#252525] font-semibold rounded-xl text-xs sm:text-sm transition shadow-2xs flex items-center justify-center gap-2">
-                                    <svg class="w-4 h-4 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                                    </svg>
-                                    <span>Coba Lagi Nanti</span>
+                                        wire:loading.attr="disabled"
+                                        wire:target="retryProcess"
+                                        class="min-h-[48px] px-4 py-2.5 bg-white hover:bg-gray-50 active:bg-gray-100 border border-[#EEEEEE] hover:border-[#E87559]/30 text-[#252525] font-semibold rounded-xl text-xs sm:text-sm transition shadow-2xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <span wire:loading.remove wire:target="retryProcess" class="flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                        </svg>
+                                        <span>Coba Ulang</span>
+                                    </span>
+                                    <span wire:loading wire:target="retryProcess" class="flex items-center gap-2">
+                                        <svg class="animate-spin w-4 h-4 text-[#E87559]" viewBox="0 0 24 24" fill="none">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                                        </svg>
+                                        <span>Mencoba Ulang...</span>
+                                    </span>
                                 </button>
                             </div>
                         </div>
