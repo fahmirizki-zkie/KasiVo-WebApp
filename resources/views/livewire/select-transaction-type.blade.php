@@ -1,5 +1,4 @@
-<div class="py-6 sm:py-10">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="w-full flex-1 flex flex-col justify-between space-y-4">
 
         <!-- Header Halaman -->
         <div class="text-center mb-8 sm:mb-10">
@@ -220,5 +219,4 @@
             </a>
         </div>
 
-    </div>
 </div>

@@ -1,8 +1,6 @@
-<div class="py-6 sm:py-10">
-    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        <!-- Card Container Utama -->
-        <div class="bg-white rounded-3xl shadow-sm border border-[#EEEEEE] p-6 sm:p-8">
+<div class="w-full flex-1 flex flex-col space-y-4">
+    <!-- Card Container Utama -->
+    <div class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-[#EEEEEE] p-5 sm:p-7 lg:p-8 flex-1 flex flex-col justify-between">
 
             <!-- 1. Header Halaman & Breadcrumb Kontekstual -->
             <div class="mb-6 sm:mb-8 pb-5 border-b border-[#EEEEEE]">
@@ -633,8 +631,6 @@
                 </div>
             </div>
         </div>
-
-    </div>
 
     {{-- Modal Peringatan Transaksi Kembar / Duplikasi --}}
     @include('livewire.partials.duplicate-warning-modal')

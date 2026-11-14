@@ -1,7 +1,5 @@
-<div class="py-6 sm:py-10">
-    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        <div class="bg-white rounded-2xl shadow-sm border border-[#EEEEEE] p-6 sm:p-8">
+<div class="w-full flex-1 flex flex-col">
+    <div class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-[#EEEEEE] p-5 sm:p-7 lg:p-8 w-full flex-1 flex flex-col justify-between">
 
             <!-- Header Form -->
             <div class="mb-6 sm:mb-8 pb-5 border-b border-[#EEEEEE]">
@@ -122,46 +120,49 @@
                     @enderror
                 </div>
 
-                <!-- 3. Tanggal Transaksi -->
-                <div>
-                    <label for="transaction_date" class="block text-xs sm:text-sm font-semibold text-[#252525] mb-1.5">
-                        Tanggal Penjualan <span class="text-[#E87559]">*</span>
-                    </label>
-                    <input
-                        type="date"
-                        id="transaction_date"
-                        wire:model="transaction_date"
-                        max="{{ date('Y-m-d') }}"
-                        class="block w-full py-2.5 px-3 text-xs sm:text-sm rounded-xl border {{ $errors->has('transaction_date') ? 'border-[#E87559] text-[#E87559] focus:ring-[#E87559]/20 focus:border-[#E87559]' : 'border-[#EEEEEE] text-[#252525] focus:ring-emerald-500/20 focus:border-emerald-500' }} bg-[#FBFBFC] transition"
-                    />
-                    <p class="mt-1.5 text-[11px] text-[#777777]">
-                        Otomatis terisi tanggal hari ini. Tidak dapat memilih tanggal di masa depan.
-                    </p>
-                    @error('transaction_date')
-                        <p class="mt-1.5 text-xs text-[#E87559] font-medium flex items-center gap-1.5">
-                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                            </svg>
-                            <span>{{ $message }}</span>
+                <!-- 3 & 4. Tanggal Penjualan & Catatan Ringkas (Grid 2 Kolom Responsif) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+                    <!-- 3. Tanggal Transaksi -->
+                    <div>
+                        <label for="transaction_date" class="block text-xs sm:text-sm font-semibold text-[#252525] mb-1.5">
+                            Tanggal Penjualan <span class="text-[#E87559]">*</span>
+                        </label>
+                        <input
+                            type="date"
+                            id="transaction_date"
+                            wire:model="transaction_date"
+                            max="{{ date('Y-m-d') }}"
+                            class="block w-full py-2.5 px-3 text-xs sm:text-sm rounded-xl border {{ $errors->has('transaction_date') ? 'border-[#E87559] text-[#E87559] focus:ring-[#E87559]/20 focus:border-[#E87559]' : 'border-[#EEEEEE] text-[#252525] focus:ring-emerald-500/20 focus:border-emerald-500' }} bg-[#FBFBFC] transition"
+                        />
+                        <p class="mt-1.5 text-[11px] text-[#777777]">
+                            Otomatis terisi tanggal hari ini. Tidak dapat memilih tanggal di masa depan.
                         </p>
-                    @enderror
-                </div>
+                        @error('transaction_date')
+                            <p class="mt-1.5 text-xs text-[#E87559] font-medium flex items-center gap-1.5">
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
+                                <span>{{ $message }}</span>
+                            </p>
+                        @enderror
+                    </div>
 
-                <!-- 4. Catatan Tambahan (Opsional) -->
-                <div>
-                    <label for="notes" class="block text-xs sm:text-sm font-semibold text-[#252525] mb-1.5">
-                        Catatan Ringkas <span class="text-xs text-[#777777] font-normal">(Opsional)</span>
-                    </label>
-                    <textarea
-                        id="notes"
-                        wire:model="notes"
-                        rows="2"
-                        placeholder="Contoh: Omzet ramai shift makan siang, pesanan nasi kotak 20 porsi..."
-                        class="block w-full py-2.5 px-3 text-xs sm:text-sm rounded-xl border border-[#EEEEEE] text-[#252525] placeholder:text-[#BBBBBB] focus:ring-emerald-500/20 focus:border-emerald-500 bg-[#FBFBFC] transition"
-                    ></textarea>
-                    @error('notes')
-                        <p class="mt-1 text-xs text-[#E87559]">{{ $message }}</p>
-                    @enderror
+                    <!-- 4. Catatan Tambahan (Opsional) -->
+                    <div>
+                        <label for="notes" class="block text-xs sm:text-sm font-semibold text-[#252525] mb-1.5">
+                            Catatan Ringkas <span class="text-xs text-[#777777] font-normal">(Opsional)</span>
+                        </label>
+                        <textarea
+                            id="notes"
+                            wire:model="notes"
+                            rows="2"
+                            placeholder="Contoh: Omzet ramai shift makan siang, pesanan nasi kotak 20 porsi..."
+                            class="block w-full py-2.5 px-3 text-xs sm:text-sm rounded-xl border border-[#EEEEEE] text-[#252525] placeholder:text-[#BBBBBB] focus:ring-emerald-500/20 focus:border-emerald-500 bg-[#FBFBFC] transition"
+                        ></textarea>
+                        @error('notes')
+                            <p class="mt-1 text-xs text-[#E87559]">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
                 <!-- 5. Tombol Aksi Submit -->
@@ -197,6 +198,4 @@
             </form>
 
         </div>
-
-    </div>
 </div>

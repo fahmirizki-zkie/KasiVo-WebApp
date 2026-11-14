@@ -1,8 +1,6 @@
-<div class="py-6 sm:py-10" x-data="window.audioRecorder ? window.audioRecorder() : audioRecorder()">
-    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        <!-- Card Container Utama -->
-        <div class="bg-white rounded-3xl shadow-sm border border-[#EEEEEE] p-6 sm:p-8">
+<div class="w-full flex-1 flex flex-col space-y-4" x-data="window.audioRecorder ? window.audioRecorder() : audioRecorder()">
+    <!-- Card Container Utama -->
+    <div class="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-[#EEEEEE] p-5 sm:p-7 lg:p-8 flex-1 flex flex-col justify-between">
 
             <!-- 1. Header Halaman & Breadcrumb Kontekstual -->
             <div class="mb-6 sm:mb-8 pb-5 border-b border-[#EEEEEE]">
@@ -417,7 +415,7 @@
             @else
 
                 <!-- 2. Tab Switcher: Rekam Mikrofon vs Unggah Berkas -->
-                <div class="flex p-1 bg-[#FBFBFC] rounded-2xl border border-[#EEEEEE] mb-6">
+                <div class="flex p-1 bg-[#FBFBFC] rounded-2xl border border-[#EEEEEE] mb-6 max-w-lg mx-auto w-full">
                     <button
                         type="button"
                         @click="switchTab('record')"
@@ -754,8 +752,6 @@
                 </div>
             </div>
         </div>
-
-    </div>
 
     <!-- Script Audio Recorder Mandiri (Memastikan fungsi selalu aktif tanpa dependensi dev-server) -->
     <script>
