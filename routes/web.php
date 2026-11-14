@@ -1,17 +1,21 @@
 <?php
 
+use App\Http\Controllers\BusinessProfilePdfController;
 use App\Livewire\BusinessOnboarding;
 use App\Livewire\CreateExpensePhotoTransaction;
 use App\Livewire\CreateExpenseTextTransaction;
 use App\Livewire\CreateExpenseVoiceTransaction;
 use App\Livewire\CreateIncomeTransaction;
+use App\Livewire\Dashboard;
+use App\Livewire\ImportDigitalSales;
+use App\Livewire\RestockSuggestion;
 use App\Livewire\SelectTransactionType;
 use App\Livewire\TransactionHistory;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome');
 
-Route::view('dashboard', 'dashboard')
+Route::get('dashboard', Dashboard::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
@@ -36,19 +40,22 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('transactions/create-penjualan', CreateIncomeTransaction::class)->name('transactions.income');
 
+    Route::get('transactions/import-digital', ImportDigitalSales::class)->name('transactions.import-digital');
+
     Route::get('transactions', TransactionHistory::class)->name('transactions.index');
 
-    Route::get('restock', function () {
-        return view('placeholder', [
-            'title' => 'Saran Restock Bahan',
-            'description' => 'Rekomendasi pembelian bahan baku berbasis pola belanja mingguan.'
-        ]);
-    })->name('restock');
+    // Halaman Saran Restock Berbasis Pola (Task KV-049)
+    Route::get('restock', RestockSuggestion::class)->name('restock');
+    Route::get('saran-restock', RestockSuggestion::class)->name('restock.index');
+
+    // Unduh & Pratinjau Laporan Profil Usaha PDF (Task KV-052)
+    Route::get('business-profile/pdf', [BusinessProfilePdfController::class, 'download'])->name('business-profile.pdf');
+    Route::get('business-profile/download', [BusinessProfilePdfController::class, 'download'])->name('business-profile.download');
 
     Route::get('business-profile', function () {
         return view('placeholder', [
             'title' => 'Profil Usaha & Ekspor PDF',
-            'description' => 'Ringkasan performa usaha dan ekspor laporan PDF untuk akses pembiayaan.'
+            'description' => 'Ringkasan performa usaha dan ekspor laporan PDF ikhtisar arus kas internal.'
         ]);
     })->name('business-profile');
 });

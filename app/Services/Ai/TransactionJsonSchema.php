@@ -86,6 +86,75 @@ PROMPT;
     }
 
     /**
+     * Generate system prompt specifically for Digital Sales & Settlement screens (GoFood, GrabFood, Shopee, QRIS, POS).
+     */
+    public static function getDigitalSalesPrompt(?string $platformHint = null, ?string $currentDate = null): string
+    {
+        $today = $currentDate ?? Carbon::now()->toDateString();
+        $hint = ($platformHint && $platformHint !== 'auto') 
+            ? "Petunjuk platform yang dipilih pengguna: {$platformHint}." 
+            : "Identifikasi platform secara otomatis dari logo, nama aplikasi, atau format tampilan struk/layar.";
+
+        return <<<PROMPT
+Anda adalah asisten AI akuntansi pintar untuk KasiVo, aplikasi pembukuan kas UMKM F&B di Indonesia.
+Tugas khusus Anda: Menganalisis tangkapan layar (screenshot) ringkasan penjualan harian atau mutasi dari aplikasi merchant (seperti GoBiz / GoFood, GrabMerchant / GrabFood, Shopee Partner / ShopeeFood, QRIS MPM/CPM, mutasi bank settlement, atau aplikasi kasir POS).
+
+{$hint}
+Tanggal hari ini sebagai referensi: {$today}.
+
+Tugas Anda: Ekstrak data penjualan digital ke dalam STRICT JSON persis sesuai skema di bawah. JANGAN menyertakan teks penjelasan apa pun di luar JSON.
+
+SKEMA JSON RESMI PENJUALAN DIGITAL:
+{
+  "platform": "gofood" | "grabfood" | "shopeefood" | "qris" | "pos" | "other",
+  "transaction_date": "YYYY-MM-DD",
+  "total_amount": 0,
+  "gross_amount": 0,
+  "fee_amount": 0,
+  "net_amount": 0,
+  "order_count": 0,
+  "merchant_name": "Nama Toko / Resto / Merchant di layar atau null",
+  "notes": "Ringkasan penjualan digital singkat (cth: 'Rekap Penjualan GoFood 13 Nov 2026 - 15 Pesanan')",
+  "confidence_score": 0.95,
+  "needs_review": false,
+  "unclear_fields": [],
+  "review_reason": null,
+  "items": [
+    {
+      "item_name": "Nama menu / pesanan jika tertera",
+      "quantity": 1.0,
+      "price_per_unit": 0,
+      "subtotal": 0
+    }
+  ]
+}
+
+ATURAN EKSTRAKSI PENTING:
+1. "platform":
+   - "gofood": jika tertera GoBiz, GoFood, GoPay, Super Indo / Mitra Gojek.
+   - "grabfood": jika tertera Grab, GrabMerchant, OVO Merchant, GrabFood.
+   - "shopeefood": jika tertera Shopee Partner, ShopeePay, ShopeeFood.
+   - "qris": jika tertera QRIS, settlement QRIS, QRIS MPM, BCA Merchant, Mandiri QRIS, dsb.
+   - "pos": jika berasal dari aplikasi kasir seperti Moka, Majoo, Pawoon, Olsera, Kasir Pintar.
+   - "other": jika tidak dikenali atau dari rekening bank umum / aplikasi lain.
+2. "total_amount" & "net_amount":
+   - Nilai uang bersih (net) yang diterima atau dicairkan ke rekening/saldo pedagang.
+   - Wajib bernilai numerik murni tanpa simbol 'Rp' atau titik/koma pemisah ribuan.
+3. "gross_amount" & "fee_amount":
+   - "gross_amount": Total omzet kotor pesanan sebelum dipotong komisi/biaya platform. Jika tidak tertera rincian potongan, samakan dengan "total_amount".
+   - "fee_amount": Potongan komisi platform, MDR QRIS, biaya layanan aplikasi, atau diskon merchant. Jika tidak tertera, isi 0.
+   - Pastikan jika gross dan fee tertera: total_amount = gross_amount - fee_amount.
+4. "transaction_date":
+   - Format wajib "YYYY-MM-DD".
+   - Gunakan tanggal laporan/rekap transaksi yang tertera di screenshot. Jika tertulis 'Hari Ini' gunakan {$today}.
+5. "order_count":
+   - Jumlah transaksi / pesanan selesai yang berhasil jika tertera di layar (misal '15 pesanan selesai' -> 15). Jika tidak ada isi 0.
+6. "confidence_score" & "needs_review":
+   - Jika gambar buram, terpotong, atau angka nominal ambigu, berikan confidence_score < 0.70 dan set needs_review = true, serta jelaskan di review_reason.
+PROMPT;
+    }
+
+    /**
      * Clean raw string returned by LLM to isolate JSON payload.
      */
     public static function cleanJsonString(string $rawContent): string
@@ -240,6 +309,133 @@ PROMPT;
             'transaction_date' => $date,
             'merchant_name' => $merchantName,
             'notes' => $notes ?: ($type === self::TYPE_CASH_IN ? 'Penerimaan Penjualan' : 'Pengeluaran Usaha'),
+            'confidence_score' => $confidenceScore,
+            'needs_review' => $needsReview,
+            'unclear_fields' => array_values(array_unique($unclearFields)),
+            'review_reason' => $reviewReason,
+            'items' => $normalizedItems,
+        ];
+    }
+
+    /**
+     * Validate and normalize parsed Digital Sales payload.
+     *
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    public static function validateAndNormalizeDigitalSales(array $data, ?string $currentDate = null): array
+    {
+        $today = $currentDate ?? Carbon::now()->toDateString();
+
+        // Platform normalization
+        $allowedPlatforms = ['gofood', 'grabfood', 'shopeefood', 'qris', 'pos', 'other'];
+        $rawPlatform = strtolower(trim((string) ($data['platform'] ?? 'other')));
+        $platform = in_array($rawPlatform, $allowedPlatforms, true) ? $rawPlatform : 'other';
+
+        // Transaction date
+        $date = trim((string) ($data['transaction_date'] ?? ''));
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            $date = $today;
+        }
+
+        // Amounts
+        $totalAmount = self::sanitizeNumeric($data['total_amount'] ?? 0);
+        $grossAmount = self::sanitizeNumeric($data['gross_amount'] ?? 0);
+        $feeAmount = self::sanitizeNumeric($data['fee_amount'] ?? 0);
+        $netAmount = self::sanitizeNumeric($data['net_amount'] ?? 0);
+
+        // Harmonize amounts
+        if ($totalAmount <= 0 && $netAmount > 0) {
+            $totalAmount = $netAmount;
+        } elseif ($totalAmount <= 0 && $grossAmount > 0) {
+            $totalAmount = max(0.0, $grossAmount - $feeAmount);
+        }
+
+        if ($grossAmount <= 0 && $totalAmount > 0) {
+            $grossAmount = $totalAmount + $feeAmount;
+        }
+
+        if ($netAmount <= 0 && $totalAmount > 0) {
+            $netAmount = $totalAmount;
+        }
+
+        // Order count
+        $orderCount = (int) max(0, $data['order_count'] ?? 0);
+
+        // Merchant name
+        $merchantName = !empty($data['merchant_name']) ? trim((string) $data['merchant_name']) : null;
+
+        // Notes
+        $platformLabels = [
+            'gofood' => 'GoFood',
+            'grabfood' => 'GrabFood',
+            'shopeefood' => 'ShopeeFood',
+            'qris' => 'QRIS',
+            'pos' => 'Kasir POS',
+            'other' => 'Penjualan Digital',
+        ];
+        $platformLabel = $platformLabels[$platform] ?? 'Penjualan Digital';
+        $defaultNotes = "Rekap {$platformLabel} {$date}" . ($orderCount > 0 ? " ({$orderCount} pesanan)" : '');
+        $notes = !empty($data['notes']) ? trim((string) $data['notes']) : $defaultNotes;
+
+        // Confidence score and review flags
+        $confidenceScore = isset($data['confidence_score']) ? (float) $data['confidence_score'] : 0.95;
+        $confidenceScore = max(0.0, min(1.0, $confidenceScore));
+
+        $needsReview = (bool) ($data['needs_review'] ?? false);
+        $unclearFields = is_array($data['unclear_fields'] ?? null) ? $data['unclear_fields'] : [];
+        $reviewReason = !empty($data['review_reason']) ? trim((string) $data['review_reason']) : null;
+
+        if ($totalAmount <= 0) {
+            $needsReview = true;
+            $unclearFields[] = 'total_amount';
+            if (!$reviewReason) {
+                $reviewReason = 'Nominal total penjualan tidak terdeteksi atau bernilai 0.';
+            }
+        }
+
+        if ($confidenceScore < 0.70) {
+            $needsReview = true;
+            if (!$reviewReason) {
+                $reviewReason = 'Tingkat keyakinan AI rendah (' . round($confidenceScore * 100) . '%). Harap periksa ulang.';
+            }
+        }
+
+        // Items breakdown
+        $items = is_array($data['items'] ?? null) ? $data['items'] : [];
+        $normalizedItems = [];
+        foreach ($items as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            $itemName = trim((string) ($item['item_name'] ?? ''));
+            if (!$itemName) {
+                continue;
+            }
+            $qty = (float) max(0.1, (float) ($item['quantity'] ?? 1.0));
+            $subtotal = self::sanitizeNumeric($item['subtotal'] ?? 0);
+            $pricePerUnit = self::sanitizeNumeric($item['price_per_unit'] ?? ($qty > 0 ? $subtotal / $qty : 0));
+            $normalizedItems[] = [
+                'item_name' => $itemName,
+                'quantity' => $qty,
+                'unit' => 'porsi',
+                'price_per_unit' => $pricePerUnit,
+                'subtotal' => $subtotal ?: ($qty * $pricePerUnit),
+            ];
+        }
+
+        return [
+            'type' => self::TYPE_CASH_IN,
+            'category' => self::CATEGORY_PENJUALAN,
+            'platform' => $platform,
+            'transaction_date' => $date,
+            'total_amount' => (float) $totalAmount,
+            'gross_amount' => (float) $grossAmount,
+            'fee_amount' => (float) $feeAmount,
+            'net_amount' => (float) $netAmount,
+            'order_count' => $orderCount,
+            'merchant_name' => $merchantName,
+            'notes' => $notes,
             'confidence_score' => $confidenceScore,
             'needs_review' => $needsReview,
             'unclear_fields' => array_values(array_unique($unclearFields)),
