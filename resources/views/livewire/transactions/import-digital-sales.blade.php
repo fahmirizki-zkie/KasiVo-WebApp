@@ -4,14 +4,14 @@
         <!-- Tombol Kembali & Breadcrumb Navigasi -->
         <div class="mb-6 flex items-center justify-between">
             <a
-                href="{{ route('transactions.create') }}"
+                href="{{ route('transactions.income') }}"
                 wire:navigate
                 class="inline-flex items-center gap-2 min-h-[44px] px-3 py-2 -ml-3 rounded-xl text-xs sm:text-sm font-medium text-[#777777] hover:text-[#252525] hover:bg-slate-100/70 transition-colors"
             >
                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
                 </svg>
-                <span>Kembali ke Pilih Jalur</span>
+                <span>Kembali ke Catat Penjualan</span>
             </a>
 
             <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#DDF1EC] text-[#43A58A] border border-[#43A58A]/30 shadow-xs">

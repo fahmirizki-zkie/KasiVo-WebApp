@@ -829,7 +829,7 @@
                 <!-- Tombol Aksi Halaman Konfirmasi (Simpan Penjualan & Batal) -->
                 <div class="pt-6 border-t border-[#EEEEEE] flex items-center justify-between gap-3">
                     <a
-                        href="{{ route('transactions.create') }}"
+                        href="{{ route('transactions.income') }}"
                         wire:navigate
                         class="px-4 py-2.5 text-xs sm:text-sm font-semibold text-[#777777] hover:text-[#252525] rounded-xl transition"
                     >

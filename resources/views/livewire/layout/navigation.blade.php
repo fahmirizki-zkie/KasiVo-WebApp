@@ -59,12 +59,12 @@ new class extends Component
         ],
         'transactions.photo' => [
             ['label' => 'Transaksi', 'url' => route('transactions.index')],
-            ['label' => 'Pilih Jenis', 'url' => route('transactions.create')],
+            ['label' => 'Catat Pengeluaran', 'url' => route('transactions.expense')],
             ['label' => 'Foto Nota', 'url' => null],
         ],
         'transactions.text' => [
             ['label' => 'Transaksi', 'url' => route('transactions.index')],
-            ['label' => 'Pilih Jenis', 'url' => route('transactions.create')],
+            ['label' => 'Catat Pengeluaran', 'url' => route('transactions.expense')],
             ['label' => 'Teks Bebas', 'url' => null],
         ],
         'restock' => [
