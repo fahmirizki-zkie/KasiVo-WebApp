@@ -39,13 +39,24 @@
                 {{-- Kotak Perbandingan --}}
                 <div class="grid grid-cols-2 gap-3 text-xs">
                     <div class="bg-gray-50 border border-gray-200 rounded-xl p-3">
-                        <div class="text-gray-500 font-medium mb-1">🕒 Transaksi Sebelumnya</div>
+                        <div class="text-gray-500 font-medium mb-1 flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/>
+                            </svg>
+                            <span>Transaksi Sebelumnya</span>
+                        </div>
                         <div class="text-base font-bold text-gray-900">{{ $duplicateInfo['formatted_amount'] }}</div>
                         <div class="text-gray-600 mt-0.5 capitalize">{{ str_replace('_', ' ', $duplicateInfo['category'] ?? '') }}</div>
                         <div class="text-[11px] text-gray-400 mt-1 truncate">{{ $duplicateInfo['time_ago'] }}</div>
                     </div>
                     <div class="bg-orange-50/70 border border-orange-200 rounded-xl p-3">
-                        <div class="text-orange-700 font-medium mb-1">📝 Mau Dicatat Sekarang</div>
+                        <div class="text-orange-700 font-medium mb-1 flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                            <span>Mau Dicatat Sekarang</span>
+                        </div>
                         <div class="text-base font-bold text-orange-900">Rp {{ number_format((float) ($draft['amount'] ?? 0), 0, ',', '.') }}</div>
                         <div class="text-orange-700 mt-0.5 capitalize">{{ str_replace('_', ' ', $draft['category'] ?? '') }}</div>
                         <div class="text-[11px] text-orange-600 mt-1">Draf Baru</div>
@@ -57,9 +68,11 @@
                     {{-- Opsi 1: Batal Simpan (Lupa / Salah Dobel) --}}
                     <button type="button" 
                             wire:click="dismissDuplicateModal" 
-                            class="w-full flex flex-col items-center justify-center px-4 py-3 bg-white border-2 border-red-300 hover:bg-red-50 hover:border-red-400 text-red-700 rounded-xl font-medium transition shadow-sm">
+                            class="w-full flex flex-col items-center justify-center px-4 py-3 bg-white border-2 border-red-300 hover:bg-red-50 hover:border-red-400 text-red-700 rounded-xl font-medium transition shadow-xs">
                         <span class="text-sm font-bold flex items-center space-x-1.5">
-                            <span>❌</span>
+                            <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
                             <span>Batalkan, Tadi Saya Lupa Sudah Catat</span>
                         </span>
                         <span class="text-[11px] text-red-500 font-normal mt-0.5">
@@ -70,9 +83,11 @@
                     {{-- Opsi 2: Tetap Simpan (Benar Transaksi Baru) --}}
                     <button type="button" 
                             wire:click="confirmDuplicateAndSave" 
-                            class="w-full flex flex-col items-center justify-center px-4 py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl font-medium transition shadow-md">
+                            class="w-full flex flex-col items-center justify-center px-4 py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl font-medium transition shadow-xs">
                         <span class="text-sm font-bold flex items-center space-x-1.5">
-                            <span>✅</span>
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                            </svg>
                             <span>Ya, Ini Beneran Pengeluaran Baru</span>
                         </span>
                         <span class="text-[11px] text-emerald-100 font-normal mt-0.5">

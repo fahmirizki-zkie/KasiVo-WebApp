@@ -18,6 +18,7 @@ class GroqService
     protected string $textModel;
     protected string $textFailoverModel;
     protected string $visionModel;
+    protected string $visionFailoverModel;
     protected string $whisperModel;
     protected int $timeout;
     protected int $retryAttempts;
@@ -30,13 +31,15 @@ class GroqService
         ?string $whisperModel = null,
         ?int $timeout = null,
         ?int $retryAttempts = null,
-        ?string $textFailoverModel = null
+        ?string $textFailoverModel = null,
+        ?string $visionFailoverModel = null
     ) {
         $this->apiKey = $apiKey ?? (string) config('services.groq.api_key', '');
         $this->baseUrl = rtrim($baseUrl ?? (string) config('services.groq.base_url', 'https://api.groq.com/openai/v1'), '/');
         $this->textModel = $textModel ?? (string) config('services.groq.text_model', 'qwen/qwen3.8-27b');
         $this->textFailoverModel = $textFailoverModel ?? (string) config('services.groq.text_failover_model', 'llama-3.3-70b-versatile');
         $this->visionModel = $visionModel ?? (string) config('services.groq.vision_model', 'qwen/qwen3.8-27b');
+        $this->visionFailoverModel = $visionFailoverModel ?? (string) config('services.groq.vision_failover_model', '');
         $this->whisperModel = $whisperModel ?? (string) config('services.groq.whisper_model', 'whisper-large-v3-turbo');
         $this->timeout = $timeout ?? (int) config('services.groq.timeout', 30);
         $this->retryAttempts = $retryAttempts ?? (int) config('services.groq.retry_attempts', 2);
@@ -245,7 +248,21 @@ class GroqService
                 ],
             ];
 
-            $rawParsed = $this->chat($messages, $model, jsonMode: true);
+            try {
+                $rawParsed = $this->chat($messages, $model, jsonMode: true);
+            } catch (AiQuotaExceededException $e) {
+                throw $e;
+            } catch (\Throwable $e) {
+                if (!empty($this->visionFailoverModel) && $this->visionFailoverModel !== $model) {
+                    Log::warning("Groq primary vision model {$model} failed. Retrying with failover model {$this->visionFailoverModel}...", [
+                        'error' => $e->getMessage(),
+                    ]);
+                    $model = $this->visionFailoverModel;
+                    $rawParsed = $this->chat($messages, $model, jsonMode: true);
+                } else {
+                    throw $e;
+                }
+            }
             $normalized = TransactionJsonSchema::validateAndNormalize($rawParsed);
 
             if (!empty($normalized['needs_review'])) {

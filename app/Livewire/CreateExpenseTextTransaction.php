@@ -170,10 +170,36 @@ class CreateExpenseTextTransaction extends Component
                 'text' => $this->rawText,
             ]);
             $this->errorType = 'error';
-            $this->errorMessage = 'Gagal memproses catatan dengan AI: ' . $e->getMessage();
+            $this->errorMessage = $this->sanitizeAiErrorMessage($e, 'text');
         } finally {
             $this->isProcessing = false;
         }
+    }
+
+    /**
+     * Sanitasi pesan error teknis menjadi pesan ramah pengguna UMKM.
+     */
+    protected function sanitizeAiErrorMessage(\Throwable $e, string $mode = 'text'): string
+    {
+        $raw = strtolower($e->getMessage());
+
+        if (str_contains($raw, 'api key') || str_contains($raw, 'groq_api_key')) {
+            return 'Layanan AI belum tersedia saat ini (Konfigurasi GROQ_API_KEY belum tersedia di sistem). Anda tetap dapat mencatat transaksi secara manual.';
+        }
+
+        if (
+            str_contains($raw, 'curl error') ||
+            str_contains($raw, 'timed out') ||
+            str_contains($raw, 'timeout') ||
+            str_contains($raw, 'could not resolve host') ||
+            str_contains($raw, 'failed to connect') ||
+            str_contains($raw, 'connection refused') ||
+            str_contains($raw, 'network')
+        ) {
+            return 'Koneksi internet atau layanan AI sedang mengalami gangguan. Silakan coba kembali atau lanjutkan pencatatan secara manual.';
+        }
+
+        return 'Catatan teks belum dapat diproses dengan baik. Anda dapat mencoba kembali atau memasukkan nominal transaksi secara manual.';
     }
 
     /**
