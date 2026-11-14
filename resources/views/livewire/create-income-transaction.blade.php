@@ -536,7 +536,7 @@
             </div>
 
             <!-- 3. Form Konfirmasi Terintegrasi ke Backend Livewire -->
-            <form wire:submit="save" class="space-y-6">
+            <form wire:submit="save" novalidate class="space-y-6">
 
                 <!-- BAGIAN A: TOTAL NOMINAL PENJUALAN (HASIL EKSTRAKSI WAJIB MASUK KE SINI) -->
                 <div class="p-5 rounded-2xl bg-[#FCEDEA]/30 border border-[#E87559]/30 space-y-3">
@@ -558,8 +558,8 @@
                             id="amount"
                             wire:model="amount"
                             placeholder="0"
-                            step="1000"
-                            min="1000"
+                            step="any"
+                            min="0"
                             class="block w-full pl-14 sm:pl-16 pr-4 py-3.5 text-2xl sm:text-3xl font-extrabold rounded-xl border {{ $errors->has('amount') ? 'border-[#DC6464] text-[#DC6464] focus:ring-[#DC6464]/20 focus:border-[#DC6464]' : 'border-[#E87559]/40 text-[#252525] focus:ring-[#E87559]/20 focus:border-[#E87559]' }} bg-white placeholder:text-[#BBBBBB] transition"
                         />
                     </div>
@@ -667,7 +667,7 @@
                                                         type="number"
                                                         x-model.number="item.unit_price"
                                                         @input="updateItemSubtotal(index)"
-                                                        step="500"
+                                                        step="any"
                                                         min="0"
                                                         class="w-full py-1.5 px-2 text-right text-xs rounded-lg border border-[#EEEEEE] focus:ring-[#E87559]/20 focus:border-[#E87559] bg-white text-[#252525] font-semibold"
                                                     />
@@ -1440,6 +1440,14 @@
                     unit_price: Number(it.unit_price) || 0,
                     subtotal: Number(it.subtotal) || (Number(it.quantity || 1) * Number(it.unit_price || 0))
                 }));
+
+                // Jika amount masih 0 tapi rincian menu/item ada, jumlahkan otomatis subtotalnya
+                if ((!data.amount || data.amount <= 0) && this.items.length > 0) {
+                    const sum = this.items.reduce((s, it) => s + (Number(it.subtotal) || 0), 0);
+                    if (sum > 0) {
+                        data.amount = sum;
+                    }
+                }
 
                 // 1. Pindah tahapan ke review agar form terlihat
                 this.currentStep = 'review';

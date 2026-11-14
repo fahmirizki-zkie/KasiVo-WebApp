@@ -77,6 +77,18 @@ class CreateIncomeTransaction extends Component
         }
 
         $amount = (float) ($extracted['total_amount'] ?? 0);
+        $items = $extracted['items'] ?? [];
+
+        // Jika total_amount 0 tapi ada subtotal item, hitung otomatis jumlah subtotalnya
+        if ($amount <= 0 && !empty($items)) {
+            $sum = 0;
+            foreach ($items as $it) {
+                $sum += (float) ($it['subtotal'] ?? 0);
+            }
+            if ($sum > 0) {
+                $amount = $sum;
+            }
+        }
         $merchant = trim((string) ($extracted['merchant_name'] ?? ''));
         $notes = !empty($extracted['notes']) ? $extracted['notes'] : ($merchant ? "Penjualan di {$merchant}" : 'Penjualan Nota Struk');
         $category = 'penjualan_tunai';
@@ -132,6 +144,18 @@ class CreateIncomeTransaction extends Component
         }
 
         $amount = (float) ($extracted['total_amount'] ?? 0);
+        $items = $extracted['items'] ?? [];
+
+        // Jika total_amount 0 tapi ada subtotal item, hitung otomatis jumlah subtotalnya
+        if ($amount <= 0 && !empty($items)) {
+            $sum = 0;
+            foreach ($items as $it) {
+                $sum += (float) ($it['subtotal'] ?? 0);
+            }
+            if ($sum > 0) {
+                $amount = $sum;
+            }
+        }
         $notes = !empty($extracted['notes']) ? $extracted['notes'] : $text;
         $category = 'penjualan_tunai';
         if (!empty($extracted['category']) && in_array($extracted['category'], ['penjualan_tunai', 'penjualan_qris', 'penjualan'])) {
