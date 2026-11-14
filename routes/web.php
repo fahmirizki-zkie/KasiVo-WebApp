@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BusinessProfilePdfController;
 use App\Livewire\BusinessOnboarding;
+use App\Livewire\BusinessProfile;
 use App\Livewire\CreateExpensePhotoTransaction;
 use App\Livewire\CreateExpenseTextTransaction;
 use App\Livewire\CreateExpenseVoiceTransaction;
@@ -52,12 +53,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('business-profile/pdf', [BusinessProfilePdfController::class, 'download'])->name('business-profile.pdf');
     Route::get('business-profile/download', [BusinessProfilePdfController::class, 'download'])->name('business-profile.download');
 
-    Route::get('business-profile', function () {
-        return view('placeholder', [
-            'title' => 'Profil Usaha & Ekspor PDF',
-            'description' => 'Ringkasan performa usaha dan ekspor laporan PDF ikhtisar arus kas internal.'
-        ]);
-    })->name('business-profile');
+    // Halaman Profil Usaha & Ekspor Finansial PDF (Task KV-050)
+    Route::get('business-profile', BusinessProfile::class)->name('business-profile');
 });
 
 require __DIR__.'/auth.php';
