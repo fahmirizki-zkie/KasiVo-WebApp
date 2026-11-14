@@ -1,4 +1,5 @@
 <div class="w-full flex-1 flex flex-col justify-between space-y-4">
+    <div class="max-w-5xl mx-auto w-full">
 
         <!-- Header Halaman -->
         <div class="text-center mb-8 sm:mb-10">
@@ -218,5 +219,7 @@
                 <span>Lihat Riwayat Transaksi Tersimpan</span>
             </a>
         </div>
+
+    </div>
 
 </div>

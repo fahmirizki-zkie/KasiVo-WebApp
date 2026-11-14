@@ -33,7 +33,7 @@
                     $isApiKeyMissing = str_contains(strtolower($errorMessage), 'api key') || str_contains(strtolower($errorMessage), 'groq_api_key');
                 @endphp
 
-                <div class="relative w-full mb-6 p-5 sm:p-6 rounded-2xl border transition-all shadow-xs {{ $isQuota ? 'bg-amber-50 border-amber-200' : 'bg-[#FCEDEA]/80 border-[#E87559]/30' }}"
+                <div class="relative w-full max-w-3xl mx-auto mb-6 p-5 sm:p-6 rounded-2xl border transition-all shadow-xs {{ $isQuota ? 'bg-amber-50 border-amber-200' : 'bg-[#FCEDEA]/80 border-[#E87559]/30' }}"
                      role="alert">
 
                     <!-- Tombol Tutup di Kanan Atas -->
@@ -149,7 +149,7 @@
             <!-- TAMPILAN 2: KONFIRMASI DRAFT HASIL AI (REVIEW SCREEN)     -->
             <!-- ======================================================== -->
             @elseif($step === 'review')
-                <div class="space-y-6">
+                <div class="space-y-6 max-w-3xl mx-auto w-full">
 
                     <!-- Audio Transcription Bubble -->
                     @if($transcriptionText)
@@ -473,7 +473,7 @@
                 </template>
 
                 <!-- TAB 1: REKAM MIKROFON -->
-                <div x-show="activeTab === 'record'" x-cloak class="space-y-6">
+                <div x-show="activeTab === 'record'" x-cloak class="space-y-6 max-w-xl mx-auto w-full">
 
                     <!-- STATE A: IDLE (Siap Merekam) -->
                     <div x-show="state === 'idle'" class="text-center py-6 sm:py-8 space-y-5">
@@ -637,7 +637,7 @@
                 </div>
 
                 <!-- TAB 2: UNGGAH FILE AUDIO ALTERNATIF -->
-                <div x-show="activeTab === 'upload'" x-cloak class="space-y-6">
+                <div x-show="activeTab === 'upload'" x-cloak class="space-y-6 max-w-xl mx-auto w-full">
 
                     <!-- Hidden Native File Input -->
                     <input

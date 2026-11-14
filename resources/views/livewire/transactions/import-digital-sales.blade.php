@@ -1,4 +1,5 @@
 <div class="w-full flex-1 flex flex-col space-y-4">
+    <div class="max-w-4xl mx-auto w-full space-y-6">
 
         <!-- Tombol Kembali & Breadcrumb Navigasi -->
         <div class="mb-6 flex items-center justify-between">
@@ -540,6 +541,8 @@
 
             </div>
         @endif
+
+    </div>
 
         <!-- MODAL PERINGATAN TRANSAKSI DUPLIKAT (PENCEGAHAN IMPOR GANDA - DoD KV-037) -->
         @include('livewire.partials.duplicate-warning-modal')
