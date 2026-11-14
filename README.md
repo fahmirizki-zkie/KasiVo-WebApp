@@ -16,11 +16,11 @@
 **Nama Tim:** Niskala Team  
 **Perguruan Tinggi:** Universitas Airlangga  
 
-| No | Nama Anggota | Peran & Tanggung Jawab Utama | Kontak / Email |
-| :---: | :--- | :--- | :--- |
-| 1 | **Fahmi Rizki** | **Lead Backend, AI Integration & Database Architect**<br>Merancang arsitektur sistem, mesin orkestrasi AI (*multimodal parsing*), aturan arus kas, algoritma saran restock, ekspor PDF, serta pengujian otomatis (*automated testing*). | fahmi@kasivo.id |
-| 2 | **Putri** | **Frontend Engineer & UI/UX Designer**<br>Merancang *design system*, riset antarmuka pengguna UMKM ramah ponsel, tata letak visual komponen Blade, dan perapian visual antarmuka. | putri@kasivo.id |
-| 3 | **Angel** | **Frontend Engineer & UI/UX Designer**<br>Merancang interaktivitas reaktif Livewire, komponen formulir *Human-in-the-Loop*, visualisasi grafis arus kas, dan tata letak dokumen cetak PDF. | angel@kasivo.id |
+| No | Nama Anggota | Peran & Tanggung Jawab Utama |
+| :---: | :--- | :--- |
+| 1 | **Fahmi Rizki** | **Lead Backend, AI Integration & Database Architect**<br>Merancang arsitektur sistem, mesin orkestrasi AI (*multimodal parsing*), aturan arus kas, algoritma saran restock, ekspor PDF, serta pengujian otomatis (*automated testing*). |
+| 2 | **Putri** | **Frontend Engineer & UI/UX Designer**<br>Merancang *design system*, riset antarmuka pengguna UMKM ramah ponsel, tata letak visual komponen Blade, dan perapian visual antarmuka. |
+| 3 | **Angel** | **Frontend Engineer & UI/UX Designer**<br>Merancang interaktivitas reaktif Livewire, komponen formulir *Human-in-the-Loop*, visualisasi grafis arus kas, dan tata letak dokumen cetak PDF. |
 
 ---
 
@@ -89,51 +89,35 @@ KasiVo dibangun melalui pendekatan modular berbasis *Software Product Specificat
 ### A. Diagram Arsitektur Sistem (High-Level Architecture)
 
 ```mermaid
-flowchart TD
-    subgraph ClientLayer ["Client Layer (Responsive Browser)"]
+graph TD
+    subgraph Client ["1. Client Layer: Responsive Web"]
         UI["Web UI: Mobile & Desktop (Tailwind CSS 4)"]
-        LivewireClient["Alpine.js & Livewire Runtime"]
+        Livewire["Alpine.js & Livewire 3 Runtime"]
     end
 
-    subgraph AppLayer ["Application Layer (Laravel 13)"]
+    subgraph App ["2. Application Layer: Laravel 13"]
         Router["HTTP Routing & Auth Middleware"]
-        Controllers["Controllers & Livewire Components"]
-        
-        subgraph CoreServices ["KasiVo Core Domain Services"]
-            CFService["CashFlowService (Kalkulasi Arus Kas)"]
-            RService["RestockService (Pola Restock & 7-Day Rule)"]
-            BReportService["BusinessReportService (Laporan & DomPDF)"]
-            ImportService["DigitalSalesImportService (CSV Parser)"]
-        end
-
-        subgraph AiOrchestration ["AI Orchestration Layer"]
-            GroqClient["GroqService (Llama 3.3 70B & Whisper v3)"]
-            GeminiClient["GeminiVisionService (Gemini 2.5 Flash)"]
-            GuardrailEngine["Compliance & Anti-Hallucination Sanitizer"]
-            FallbackEngine["Deterministic Rule-Engine Fallback"]
-        end
+        Controllers["Livewire Components & Controllers"]
+        Services["Core Domain Services: CashFlow, Restock, Report"]
+        AiOrchestrator["AI Orchestrator & Fallback Sanitizer"]
     end
 
-    subgraph DataLayer ["Data & External Service Layer"]
-        PostgresDB[("PostgreSQL 18.4 Database")]
-        GroqCloud["Groq Cloud API (LPU Inference Engine)"]
-        GoogleCloud["Google Cloud / Gemini API"]
-        PDFEngine["DomPDF Engine (A4 Portrait Renderer)"]
+    subgraph External ["3. External Services & Storage"]
+        Groq["Groq Cloud API: Llama 3.3 70B & Whisper v3"]
+        Gemini["Google Gemini API: Vision Multimodal"]
+        PostgresDB["PostgreSQL 18.4 Database"]
+        DomPdf["DomPDF Engine: A4 Portrait"]
     end
 
-    UI <--> LivewireClient
-    LivewireClient <--> Router
-    Router <--> Controllers
-    Controllers <--> CoreServices
-    CoreServices <--> AiOrchestration
-    
-    AiOrchestration <--> GroqCloud
-    AiOrchestration <--> GoogleCloud
-    AiOrchestration --> GuardrailEngine
-    GuardrailEngine --> FallbackEngine
-    
-    CoreServices <--> PostgresDB
-    BReportService --> PDFEngine
+    UI --> Livewire
+    Livewire --> Router
+    Router --> Controllers
+    Controllers --> Services
+    Services --> AiOrchestrator
+    AiOrchestrator --> Groq
+    AiOrchestrator --> Gemini
+    Services --> PostgresDB
+    Services --> DomPdf
 ```
 
 ### B. Diagram Alur Data Multimodal (Multimodal Data Flow)
@@ -141,24 +125,24 @@ flowchart TD
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Owner as Pemilik Usaha (UMKM)
+    actor Owner as Pemilik Usaha UMKM
     participant UI as KasiVo Livewire UI
-    participant Server as KasiVo Controller / Service
-    participant AI as AI Engine (Groq / Gemini)
-    participant DB as PostgreSQL Database
+    participant Server as KasiVo Controller & Service
+    participant AI as AI Engine: Groq & Gemini
+    participant DB as Database PostgreSQL
 
     Owner->>UI: Unggah Foto Nota / Rekam Suara / Teks
     UI->>Server: Kirim Payload Multimodal
     Server->>AI: Ekstraksi OCR / ASR / NLP via Prompt Terstruktur
     
     alt API AI Sukses
-        AI-->>Server: JSON Terstruktur (Tipe, Kategori, Nominal, Item)
+        AI-->>Server: JSON Terstruktur: Tipe, Kategori, Nominal, Item
         Server->>Server: Verifikasi & Sanitasi Anti-Halusinasi
-    else Kuota Penuh / Jaringan Putus
-        Server->>Server: Aktifkan Fallback Deterministik (Zero Crash)
+    else Kuota Penuh atau Jaringan Putus
+        Server->>Server: Aktifkan Fallback Deterministik: Zero Crash
     end
 
-    Server-->>UI: Buka Layar Pratinjau (Human-in-the-Loop)
+    Server-->>UI: Buka Layar Pratinjau: Human-in-the-Loop
     Owner->>UI: Periksa & Koreksi Nominal (Konfirmasi Simpan)
     UI->>Server: Kirim Persetujuan Simpan Transaksi
     Server->>DB: Simpan Transaksi, Items & Audit Log
@@ -299,13 +283,13 @@ KasiVo menerapkan prinsip **Pemanfaatan AI yang Bertanggung Jawab (*Responsible 
 ### B. Prinsip Etika & *Guardrails* Keamanan AI
 
 ```mermaid
-flowchart LR
-    A["Input Mentah (Foto/Suara/Teks)"] --> B["Ekstraksi AI"]
-    B --> C{"Guardrails Anti-Halusinasi"}
-    C -- "Lolos" --> D["Layar Konfirmasi (Human-in-the-Loop)"]
-    C -- "Mencurigakan / Error" --> E["Fallback Deterministik"]
+graph LR
+    A["Input Mentah: Foto, Suara, atau Teks"] --> B["Ekstraksi AI"]
+    B --> C{"Validasi Guardrails"}
+    C -->|Lolos| D["Layar Konfirmasi: Human in the Loop"]
+    C -->|Gagal atau Error| E["Fallback Deterministik: Zero Crash"]
     D --> F["Persetujuan Pemilik Usaha"]
-    F --> G[("Penyimpanan Database")]
+    F --> G["Penyimpanan Database"]
 ```
 
 1. **Prinsip *Human-in-the-Loop* (Persetujuan Manusia):**
