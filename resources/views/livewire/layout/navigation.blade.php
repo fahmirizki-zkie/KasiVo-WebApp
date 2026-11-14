@@ -184,11 +184,6 @@ new class extends Component
                      x-transition:enter-start="opacity-0 -translate-y-1"
                      x-transition:enter-end="opacity-100 translate-y-0"
                      class="pl-9 pr-2 space-y-1 pt-1 pb-1">
-                    <a href="{{ route('transactions.index') }}" 
-                       wire:navigate
-                       class="block px-3 py-1.5 rounded-lg text-xs transition-colors {{ request()->routeIs('transactions.index') ? 'text-[#E87559] font-bold bg-[#FCEDEA]/50' : 'text-[#777777] hover:text-[#252525] hover:bg-gray-50' }}">
-                        Riwayat Transaksi
-                    </a>
                     <!-- Catat Pengeluaran (Multi-Moda AI) -->
                     <a href="{{ route('transactions.expense') }}"
                        wire:navigate
@@ -201,6 +196,11 @@ new class extends Component
                        class="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs transition-colors {{ request()->routeIs('transactions.income') ? 'text-[#E87559] font-bold bg-[#FCEDEA]/50' : 'text-[#777777] hover:text-[#252525] hover:bg-gray-50' }}">
                         <span>Catat Penjualan</span>
                         <span class="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-700">POS</span>
+                    </a>
+                    <a href="{{ route('transactions.index') }}" 
+                       wire:navigate
+                       class="block px-3 py-1.5 rounded-lg text-xs transition-colors {{ request()->routeIs('transactions.index') ? 'text-[#E87559] font-bold bg-[#FCEDEA]/50' : 'text-[#777777] hover:text-[#252525] hover:bg-gray-50' }}">
+                        Riwayat Transaksi
                     </a>
                 </div>
             </div>
