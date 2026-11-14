@@ -1,6 +1,5 @@
-<div class="py-12">
-    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg p-6 sm:p-8">
+<div class="w-full flex-1 flex flex-col">
+    <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-2xl p-6 sm:p-8 w-full flex-1 flex flex-col justify-between">
             <div class="mb-6">
                 <div class="flex items-center gap-2.5 mb-2">
                     <span class="w-8 h-8 rounded-xl bg-[#FCEDEA] text-[#E87559] flex items-center justify-center shrink-0 shadow-xs">
@@ -89,5 +88,4 @@
                 </div>
             </form>
         </div>
-    </div>
 </div>

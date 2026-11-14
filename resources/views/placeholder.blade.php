@@ -1,7 +1,7 @@
 <x-app-layout>
-    <div class="py-4 sm:py-6">
+    <div class="w-full flex-1 flex flex-col items-center justify-center">
         <!-- Main Card Surface -->
-        <div class="bg-white rounded-3xl border border-[#EEEEEE] shadow-sm p-6 sm:p-12 text-center max-w-2xl mx-auto">
+        <div class="bg-white rounded-2xl sm:rounded-3xl border border-[#EEEEEE] shadow-sm p-8 sm:p-16 text-center w-full flex-1 flex flex-col items-center justify-center">
             
             <!-- Feature Icon Badge -->
             <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#FCEDEA] text-[#E87559] mb-5 shadow-sm">
@@ -55,5 +55,4 @@
             @endif
 
         </div>
-    </div>
 </x-app-layout>
