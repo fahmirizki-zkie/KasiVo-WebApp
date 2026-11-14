@@ -1,344 +1,344 @@
 <div class="w-full space-y-6">
     <!-- 1. Header & Quick Actions -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5">
-                    <span class="w-8 h-8 rounded-xl bg-[#FCEDEA] text-[#E87559] flex items-center justify-center shrink-0 shadow-xs">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-[#252525] flex items-center gap-2.5">
+                <span class="w-8 h-8 rounded-xl bg-[#FCEDEA] text-[#E87559] flex items-center justify-center shrink-0 shadow-xs">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z"/>
+                    </svg>
+                </span>
+                <span>Riwayat Transaksi</span>
+            </h1>
+            <p class="text-sm text-[#777777] mt-1">
+                Catatan seluruh arus kas masuk (penjualan) dan kas keluar (pengeluaran) usahamu.
+            </p>
+        </div>
+        <div class="flex items-center gap-2">
+            <a href="{{ route('transactions.income') }}" wire:navigate class="inline-flex items-center px-4 py-2 bg-[#43A58A] hover:bg-[#3B927A] text-white text-xs sm:text-sm font-semibold rounded-xl shadow-xs transition active:scale-95">
+                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                </svg>
+                <span>Catat Penjualan</span>
+            </a>
+            <a href="{{ route('transactions.expense') }}" wire:navigate class="inline-flex items-center px-4 py-2 bg-[#E87559] hover:bg-[#D66448] text-white text-xs sm:text-sm font-semibold rounded-xl shadow-xs transition active:scale-95">
+                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"></path>
+                </svg>
+                <span>Catat Pengeluaran</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Flash Message -->
+    @if (session()->has('message'))
+        <div class="p-4 rounded-xl bg-[#DDF1EC] border border-[#43A58A]/30 text-[#43A58A] text-sm flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-[#43A58A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span class="font-medium">{{ session('message') }}</span>
+            </div>
+        </div>
+    @endif
+
+    @if (!$hasBusiness)
+        <!-- State jika belum punya profil usaha -->
+        <div class="bg-[#FFF8E7] border border-[#E7A34A]/30 rounded-2xl p-6 text-center">
+            <p class="text-[#252525] font-semibold">Kamu belum mendaftarkan profil usaha.</p>
+            <p class="text-xs text-[#777777] mt-1">Lengkapi nama dan jenis usahamu terlebih dahulu untuk mulai mencatat transaksi.</p>
+            <a href="{{ route('onboarding') }}" class="mt-4 inline-block px-4 py-2 bg-[#E87559] hover:bg-[#D66448] text-white rounded-xl text-xs sm:text-sm font-bold shadow-xs transition">
+                Mulai Onboarding Usaha
+            </a>
+        </div>
+    @else
+
+        <!-- 2. Mini Summary Cards (Realtime Reactive) -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <!-- Total Kas Masuk -->
+            <div class="bg-white border border-[#EEEEEE] rounded-2xl p-5 shadow-xs">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-[#43A58A] uppercase tracking-wider">Kas Masuk (Penjualan)</span>
+                    <span class="p-2 rounded-xl bg-[#DDF1EC] text-[#43A58A]">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
                         </svg>
                     </span>
-                    <span>Riwayat Transaksi</span>
-                </h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    Catatan seluruh arus kas masuk (penjualan) dan kas keluar (pengeluaran) usahamu.
+                </div>
+                <p class="text-2xl font-extrabold text-[#252525] mt-2">
+                    +Rp {{ number_format($totalCashIn, 0, ',', '.') }}
                 </p>
+                <p class="text-xs text-[#777777] mt-0.5">Sesuai filter aktif</p>
             </div>
-            <div class="flex items-center gap-2">
-                <a href="{{ route('transactions.income') }}" wire:navigate class="inline-flex items-center px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-xs transition active:scale-95">
-                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    <span>Catat Penjualan</span>
-                </a>
-                <a href="{{ route('transactions.expense') }}" wire:navigate class="inline-flex items-center px-3.5 py-2 bg-[#E87559] hover:bg-[#D66448] text-white text-xs sm:text-sm font-semibold rounded-xl shadow-xs transition active:scale-95">
-                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"></path>
-                    </svg>
-                    <span>Catat Pengeluaran</span>
-                </a>
+
+            <!-- Total Kas Keluar -->
+            <div class="bg-white border border-[#EEEEEE] rounded-2xl p-5 shadow-xs">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-[#DC6464] uppercase tracking-wider">Kas Keluar (Beban)</span>
+                    <span class="p-2 rounded-xl bg-[#FCEDEA] text-[#DC6464]">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
+                        </svg>
+                    </span>
+                </div>
+                <p class="text-2xl font-extrabold text-[#252525] mt-2">
+                    -Rp {{ number_format($totalCashOut, 0, ',', '.') }}
+                </p>
+                <p class="text-xs text-[#777777] mt-0.5">Sesuai filter aktif</p>
+            </div>
+
+            <!-- Arus Kas Bersih -->
+            <div class="bg-white border border-[#EEEEEE] rounded-2xl p-5 shadow-xs">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold {{ $netCashFlow >= 0 ? 'text-[#43A58A]' : 'text-[#DC6464]' }} uppercase tracking-wider">
+                        Arus Kas Bersih
+                    </span>
+                    <span class="p-2 rounded-xl {{ $netCashFlow >= 0 ? 'bg-[#DDF1EC] text-[#43A58A]' : 'bg-[#FCEDEA] text-[#DC6464]' }}">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </span>
+                </div>
+                <p class="text-2xl font-extrabold {{ $netCashFlow >= 0 ? 'text-[#43A58A]' : 'text-[#DC6464]' }} mt-2">
+                    {{ $netCashFlow >= 0 ? '+' : '' }}Rp {{ number_format($netCashFlow, 0, ',', '.') }}
+                </p>
+                <p class="text-xs text-[#777777] mt-0.5">Selisih kas masuk & keluar</p>
             </div>
         </div>
 
-        <!-- Flash Message -->
-        @if (session()->has('message'))
-            <div class="p-4 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-sm flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    <span>{{ session('message') }}</span>
-                </div>
-            </div>
-        @endif
-
-        @if (!$hasBusiness)
-            <!-- State jika belum punya profil usaha -->
-            <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-6 text-center">
-                <p class="text-amber-800 dark:text-amber-200 font-medium">Kamu belum mendaftarkan profil usaha.</p>
-                <p class="text-sm text-amber-600 dark:text-amber-400 mt-1">Lengkapi nama dan jenis usahamu terlebih dahulu untuk mulai mencatat transaksi.</p>
-                <a href="{{ route('onboarding') }}" class="mt-4 inline-block px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition">
-                    Mulai Onboarding Usaha
-                </a>
-            </div>
-        @else
-
-            <!-- 2. Mini Summary Cards (Realtime Reactive) -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <!-- Total Kas Masuk -->
-                <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 shadow-sm">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Kas Masuk (Penjualan)</span>
-                        <span class="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
-                            </svg>
-                        </span>
+        <!-- 3. Toolbar Filter & Pencarian -->
+        <div class="bg-white border border-[#EEEEEE] rounded-2xl p-5 shadow-xs space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <!-- Search Input -->
+                <div class="md:col-span-2 relative">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                        <svg class="h-4 w-4 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
                     </div>
-                    <p class="text-xl font-bold text-gray-900 dark:text-white mt-2">
-                        +Rp {{ number_format($totalCashIn, 0, ',', '.') }}
-                    </p>
-                    <p class="text-xs text-gray-400 mt-0.5">Sesuai filter aktif</p>
+                    <input
+                        type="text"
+                        wire:model.live.debounce.300ms="search"
+                        placeholder="Cari transaksi atau nama bahan..."
+                        class="block w-full pl-10 pr-3.5 py-2.5 border border-[#EEEEEE] rounded-xl text-xs sm:text-sm bg-[#FBFBFC] text-[#252525] placeholder-[#777777] focus:border-[#E87559] focus:ring-[#E87559]/20"
+                    />
                 </div>
 
-                <!-- Total Kas Keluar -->
-                <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 shadow-sm">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold text-rose-600 dark:text-rose-400 uppercase tracking-wider">Kas Keluar (Beban)</span>
-                        <span class="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
-                            </svg>
-                        </span>
-                    </div>
-                    <p class="text-xl font-bold text-gray-900 dark:text-white mt-2">
-                        -Rp {{ number_format($totalCashOut, 0, ',', '.') }}
-                    </p>
-                    <p class="text-xs text-gray-400 mt-0.5">Sesuai filter aktif</p>
-                </div>
-
-                <!-- Arus Kas Bersih -->
-                <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 shadow-sm">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold {{ $netCashFlow >= 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-rose-600' }} uppercase tracking-wider">
-                            Arus Kas Bersih
-                        </span>
-                        <span class="p-1.5 rounded-lg {{ $netCashFlow >= 0 ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600' : 'bg-rose-50 text-rose-600' }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                            </svg>
-                        </span>
-                    </div>
-                    <p class="text-xl font-bold {{ $netCashFlow >= 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-rose-600' }} mt-2">
-                        {{ $netCashFlow >= 0 ? '+' : '' }}Rp {{ number_format($netCashFlow, 0, ',', '.') }}
-                    </p>
-                    <p class="text-xs text-gray-400 mt-0.5">Selisih kas masuk & keluar</p>
-                </div>
-            </div>
-
-            <!-- 3. Toolbar Filter & Pencarian -->
-            <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 shadow-sm space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                    <!-- Search Input -->
-                    <div class="md:col-span-2 relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                        </div>
-                        <input
-                            type="text"
-                            wire:model.live.debounce.300ms="search"
-                            placeholder="Cari transaksi atau nama bahan..."
-                            class="block w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-indigo-500 focus:border-indigo-500"
-                        />
-                    </div>
-
-                    <!-- Filter Rentang Tanggal -->
-                    <div>
-                        <select
-                            wire:model.live="dateRange"
-                            class="block w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-indigo-500 focus:border-indigo-500"
-                        >
-                            <option value="all">Semua Waktu</option>
-                            <option value="today">Hari Ini</option>
-                            <option value="last_7_days">7 Hari Terakhir</option>
-                            <option value="this_month">Bulan Ini</option>
-                        </select>
-                    </div>
-
-                    <!-- Filter Kategori -->
-                    <div>
-                        <select
-                            wire:model.live="category"
-                            class="block w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-indigo-500 focus:border-indigo-500"
-                        >
-                            <option value="all">Semua Kategori</option>
-                            <optgroup label="Pengeluaran">
-                                <option value="bahan_baku">Bahan Baku & Dapur</option>
-                                <option value="operasional">Biaya Operasional</option>
-                                <option value="gaji">Gaji / Upah Karyawan</option>
-                                <option value="sewa">Sewa Tempat</option>
-                            </optgroup>
-                            <optgroup label="Penjualan">
-                                <option value="penjualan_tunai">Penjualan Tunai</option>
-                                <option value="penjualan_qris">Penjualan QRIS / Transfer</option>
-                            </optgroup>
-                            <option value="lainnya">Lainnya</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Tipe Kas Tabs/Pills -->
-                <div class="flex items-center gap-2 pt-2 border-t border-gray-100 dark:border-gray-700">
-                    <span class="text-xs font-medium text-gray-500 mr-2">Tipe Kas:</span>
-                    <button
-                        type="button"
-                        wire:click="$set('type', 'all')"
-                        class="px-3 py-1 text-xs font-medium rounded-full transition {{ $type === 'all' ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200' }}"
+                <!-- Filter Rentang Tanggal -->
+                <div>
+                    <select
+                        wire:model.live="dateRange"
+                        class="block w-full py-2.5 px-3.5 border border-[#EEEEEE] rounded-xl text-xs sm:text-sm bg-[#FBFBFC] text-[#252525] focus:border-[#E87559] focus:ring-[#E87559]/20"
                     >
-                        Semua
-                    </button>
-                    <button
-                        type="button"
-                        wire:click="$set('type', 'cash_in')"
-                        class="px-3 py-1 text-xs font-medium rounded-full transition {{ $type === 'cash_in' ? 'bg-emerald-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200' }}"
+                        <option value="all">Semua Waktu</option>
+                        <option value="today">Hari Ini</option>
+                        <option value="last_7_days">7 Hari Terakhir</option>
+                        <option value="this_month">Bulan Ini</option>
+                    </select>
+                </div>
+
+                <!-- Filter Kategori -->
+                <div>
+                    <select
+                        wire:model.live="category"
+                        class="block w-full py-2.5 px-3.5 border border-[#EEEEEE] rounded-xl text-xs sm:text-sm bg-[#FBFBFC] text-[#252525] focus:border-[#E87559] focus:ring-[#E87559]/20"
                     >
-                        + Kas Masuk (Penjualan)
-                    </button>
-                    <button
-                        type="button"
-                        wire:click="$set('type', 'cash_out')"
-                        class="px-3 py-1 text-xs font-medium rounded-full transition {{ $type === 'cash_out' ? 'bg-rose-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200' }}"
-                    >
-                        - Kas Keluar (Pengeluaran)
-                    </button>
+                        <option value="all">Semua Kategori</option>
+                        <optgroup label="Pengeluaran">
+                            <option value="bahan_baku">Bahan Baku & Dapur</option>
+                            <option value="operasional">Biaya Operasional</option>
+                            <option value="gaji">Gaji / Upah Karyawan</option>
+                            <option value="sewa">Sewa Tempat</option>
+                        </optgroup>
+                        <optgroup label="Penjualan">
+                            <option value="penjualan_tunai">Penjualan Tunai</option>
+                            <option value="penjualan_qris">Penjualan QRIS / Transfer</option>
+                        </optgroup>
+                        <option value="lainnya">Lainnya</option>
+                    </select>
                 </div>
             </div>
 
-            <!-- 4. Daftar Transaksi (Tabel / Card) -->
-            <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm overflow-hidden">
-                @if ($transactions->isEmpty())
-                    <!-- Empty State -->
-                    <div class="p-12 text-center">
-                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-400 mb-3">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                            </svg>
-                        </div>
-                        <h3 class="text-base font-semibold text-gray-900 dark:text-white">Tidak ada transaksi ditemukan</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Coba ubah kata kunci pencarian atau sesuaikan rentang waktu filter.</p>
+            <!-- Tipe Kas Tabs/Pills -->
+            <div class="flex items-center gap-2 pt-3 border-t border-[#EEEEEE]">
+                <span class="text-xs font-semibold text-[#777777] mr-1">Tipe Kas:</span>
+                <button
+                    type="button"
+                    wire:click="$set('type', 'all')"
+                    class="px-3.5 py-1.5 text-xs font-bold rounded-xl transition {{ $type === 'all' ? 'bg-[#252525] text-white shadow-xs' : 'bg-[#FBFBFC] text-[#777777] border border-[#EEEEEE] hover:bg-gray-100 hover:text-[#252525]' }}"
+                >
+                    Semua
+                </button>
+                <button
+                    type="button"
+                    wire:click="$set('type', 'cash_in')"
+                    class="px-3.5 py-1.5 text-xs font-bold rounded-xl transition {{ $type === 'cash_in' ? 'bg-[#43A58A] text-white shadow-xs' : 'bg-[#FBFBFC] text-[#777777] border border-[#EEEEEE] hover:bg-emerald-50 hover:text-[#43A58A]' }}"
+                >
+                    + Kas Masuk (Penjualan)
+                </button>
+                <button
+                    type="button"
+                    wire:click="$set('type', 'cash_out')"
+                    class="px-3.5 py-1.5 text-xs font-bold rounded-xl transition {{ $type === 'cash_out' ? 'bg-[#DC6464] text-white shadow-xs' : 'bg-[#FBFBFC] text-[#777777] border border-[#EEEEEE] hover:bg-rose-50 hover:text-[#DC6464]' }}"
+                >
+                    - Kas Keluar (Pengeluaran)
+                </button>
+            </div>
+        </div>
+
+        <!-- 4. Daftar Transaksi (Tabel / Card) -->
+        <div class="bg-white border border-[#EEEEEE] rounded-2xl shadow-xs overflow-hidden">
+            @if ($transactions->isEmpty())
+                <!-- Empty State -->
+                <div class="p-12 text-center">
+                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-[#FBFBFC] border border-[#EEEEEE] text-[#777777] mb-3">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
                     </div>
-                @else
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-left text-sm">
-                            <thead class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 text-xs uppercase font-semibold">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3.5">Tanggal</th>
-                                    <th scope="col" class="px-6 py-3.5">Deskripsi & Rincian</th>
-                                    <th scope="col" class="px-6 py-3.5">Kategori</th>
-                                    <th scope="col" class="px-6 py-3.5">Metode</th>
-                                    <th scope="col" class="px-6 py-3.5 text-right">Nominal</th>
-                                    <th scope="col" class="px-6 py-3.5 text-center">Aksi</th>
+                    <h3 class="text-base font-bold text-[#252525]">Tidak ada transaksi ditemukan</h3>
+                    <p class="text-xs text-[#777777] mt-1">Coba ubah kata kunci pencarian atau sesuaikan rentang waktu filter.</p>
+                </div>
+            @else
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-[#EEEEEE] text-left text-xs sm:text-sm">
+                        <thead class="bg-[#FBFBFC] text-[#777777] text-xs uppercase font-bold tracking-wider">
+                            <tr>
+                                <th scope="col" class="px-6 py-4">Tanggal</th>
+                                <th scope="col" class="px-6 py-4">Deskripsi & Rincian</th>
+                                <th scope="col" class="px-6 py-4">Kategori</th>
+                                <th scope="col" class="px-6 py-4">Metode</th>
+                                <th scope="col" class="px-6 py-4 text-right">Nominal</th>
+                                <th scope="col" class="px-6 py-4 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-[#EEEEEE] text-[#252525] bg-white">
+                            @foreach ($transactions as $t)
+                                <tr class="hover:bg-[#FBFBFC]/70 transition-colors">
+                                    <!-- Tanggal -->
+                                    <td class="px-6 py-4 whitespace-nowrap text-xs text-[#777777]">
+                                        <div class="font-bold text-[#252525]">
+                                            {{ \Carbon\Carbon::parse($t->transaction_date)->translatedFormat('d M Y') }}
+                                        </div>
+                                        <div class="text-[11px] text-[#777777]">{{ $t->created_at->format('H:i') }} WIB</div>
+                                    </td>
+
+                                    <!-- Deskripsi & Item -->
+                                    <td class="px-6 py-4">
+                                        <div class="font-bold text-[#252525]">
+                                            {{ $t->description }}
+                                        </div>
+                                        @if ($t->items->isNotEmpty())
+                                            <div class="text-xs text-[#777777] mt-1 flex flex-wrap gap-1">
+                                                @foreach ($t->items as $item)
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-[#FBFBFC] border border-[#EEEEEE] text-[#777777] text-[11px]">
+                                                        {{ $item->item_name }} ({{ (float) $item->quantity }} {{ $item->unit }})
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </td>
+
+                                    <!-- Kategori & Tipe Badge -->
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @if ($t->type === 'cash_in')
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[#DDF1EC] text-[#43A58A] border border-[#43A58A]/30">
+                                                {{ ucfirst(str_replace('_', ' ', $t->category)) }}
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[#FCEDEA] text-[#DC6464] border border-[#DC6464]/30">
+                                                {{ ucfirst(str_replace('_', ' ', $t->category)) }}
+                                            </span>
+                                        @endif
+                                    </td>
+
+                                    <!-- Sumber Input (Multimodal) -->
+                                    <td class="px-6 py-4 whitespace-nowrap text-xs text-[#777777]">
+                                        @if ($t->source_type === 'photo')
+                                            <span class="inline-flex items-center gap-1.5 text-[#777777] font-medium" title="Dari Foto Nota">
+                                                <svg class="w-3.5 h-3.5 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                </svg>
+                                                <span>Foto</span>
+                                            </span>
+                                        @elseif ($t->source_type === 'voice')
+                                            <span class="inline-flex items-center gap-1.5 text-[#777777] font-medium" title="Dari Suara">
+                                                <svg class="w-3.5 h-3.5 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                                                </svg>
+                                                <span>Suara</span>
+                                            </span>
+                                        @elseif ($t->source_type === 'digital_import')
+                                            <span class="inline-flex items-center gap-1.5 text-[#777777] font-medium" title="Impor Digital">
+                                                <svg class="w-3.5 h-3.5 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                                </svg>
+                                                <span>Impor</span>
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1.5 text-[#777777] font-medium" title="Ketik Teks">
+                                                <svg class="w-3.5 h-3.5 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                </svg>
+                                                <span>Teks</span>
+                                            </span>
+                                        @endif
+                                    </td>
+
+                                    <!-- Nominal -->
+                                    <td class="px-6 py-4 whitespace-nowrap text-right font-bold text-sm">
+                                        @if ($t->type === 'cash_in')
+                                            <span class="text-[#43A58A]">
+                                                +Rp {{ number_format($t->amount, 0, ',', '.') }}
+                                            </span>
+                                        @else
+                                            <span class="text-[#DC6464]">
+                                                -Rp {{ number_format($t->amount, 0, ',', '.') }}
+                                            </span>
+                                        @endif
+                                    </td>
+
+                                    <!-- Tombol Aksi (Detail/Koreksi & Hapus) -->
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <div class="inline-flex items-center gap-1.5">
+                                            <button
+                                                type="button"
+                                                wire:click="showDetail({{ $t->id }})"
+                                                class="text-[#777777] hover:text-[#E87559] p-1.5 rounded-lg hover:bg-[#FCEDEA]/50 transition"
+                                                title="Lihat Detail & Koreksi"
+                                            >
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                </svg>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                wire:click="confirmDelete({{ $t->id }})"
+                                                class="text-[#777777] hover:text-[#DC6464] p-1.5 rounded-lg hover:bg-[#FCEDEA]/50 transition"
+                                                title="Hapus transaksi"
+                                            >
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100 dark:divide-gray-700 text-gray-700 dark:text-gray-300">
-                                @foreach ($transactions as $t)
-                                    <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition">
-                                        <!-- Tanggal -->
-                                        <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500 dark:text-gray-400">
-                                            <div class="font-medium text-gray-900 dark:text-white">
-                                                {{ \Carbon\Carbon::parse($t->transaction_date)->translatedFormat('d M Y') }}
-                                            </div>
-                                            <div>{{ $t->created_at->format('H:i') }} WIB</div>
-                                        </td>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
 
-                                        <!-- Deskripsi & Item -->
-                                        <td class="px-6 py-4">
-                                            <div class="font-medium text-gray-900 dark:text-white">
-                                                {{ $t->description }}
-                                            </div>
-                                            @if ($t->items->isNotEmpty())
-                                                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 flex flex-wrap gap-1">
-                                                    @foreach ($t->items as $item)
-                                                        <span class="inline-flex items-center px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-[11px]">
-                                                            {{ $item->item_name }} ({{ (float) $item->quantity }} {{ $item->unit }})
-                                                        </span>
-                                                    @endforeach
-                                                </div>
-                                            @endif
-                                        </td>
+                <!-- Pagination Links -->
+                <div class="px-6 py-4 border-t border-[#EEEEEE] bg-[#FBFBFC]">
+                    {{ $transactions->links() }}
+                </div>
+            @endif
+        </div>
 
-                                        <!-- Kategori & Tipe Badge -->
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            @if ($t->type === 'cash_in')
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
-                                                    {{ ucfirst(str_replace('_', ' ', $t->category)) }}
-                                                </span>
-                                            @else
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300">
-                                                    {{ ucfirst(str_replace('_', ' ', $t->category)) }}
-                                                </span>
-                                            @endif
-                                        </td>
-
-                                        <!-- Sumber Input (Multimodal) -->
-                                        <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
-                                            @if ($t->source_type === 'photo')
-                                                <span class="inline-flex items-center gap-1.5 text-gray-600 dark:text-gray-400 font-medium" title="Dari Foto Nota">
-                                                    <svg class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                    </svg>
-                                                    <span>Foto</span>
-                                                </span>
-                                            @elseif ($t->source_type === 'voice')
-                                                <span class="inline-flex items-center gap-1.5 text-gray-600 dark:text-gray-400 font-medium" title="Dari Suara">
-                                                    <svg class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
-                                                    </svg>
-                                                    <span>Suara</span>
-                                                </span>
-                                            @elseif ($t->source_type === 'digital_import')
-                                                <span class="inline-flex items-center gap-1.5 text-gray-600 dark:text-gray-400 font-medium" title="Impor Digital">
-                                                    <svg class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                                                    </svg>
-                                                    <span>Impor</span>
-                                                </span>
-                                            @else
-                                                <span class="inline-flex items-center gap-1.5 text-gray-600 dark:text-gray-400 font-medium" title="Ketik Teks">
-                                                    <svg class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                                    </svg>
-                                                    <span>Teks</span>
-                                                </span>
-                                            @endif
-                                        </td>
-
-                                        <!-- Nominal -->
-                                        <td class="px-6 py-4 whitespace-nowrap text-right font-semibold">
-                                            @if ($t->type === 'cash_in')
-                                                <span class="text-emerald-600 dark:text-emerald-400">
-                                                    +Rp {{ number_format($t->amount, 0, ',', '.') }}
-                                                </span>
-                                            @else
-                                                <span class="text-rose-600 dark:text-rose-400">
-                                                    -Rp {{ number_format($t->amount, 0, ',', '.') }}
-                                                </span>
-                                            @endif
-                                        </td>
-
-                                        <!-- Tombol Aksi (Detail/Koreksi & Hapus) -->
-                                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                                            <div class="inline-flex items-center gap-1.5">
-                                                <button
-                                                    type="button"
-                                                    wire:click="showDetail({{ $t->id }})"
-                                                    class="text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 p-1 rounded transition"
-                                                    title="Lihat Detail & Koreksi"
-                                                >
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                                    </svg>
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    wire:click="confirmDelete({{ $t->id }})"
-                                                    class="text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 p-1 rounded transition"
-                                                    title="Hapus transaksi"
-                                                >
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Pagination Links -->
-                    <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-700">
-                        {{ $transactions->links() }}
-                    </div>
-                @endif
-            </div>
-
-        @endif
+    @endif
 
     <!-- 5. Modal Konfirmasi Hapus Transaksi (KV-018) -->
     @if ($confirmingDeletionId && $transactionToDelete)
