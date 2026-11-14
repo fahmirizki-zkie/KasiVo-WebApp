@@ -101,8 +101,10 @@ new class extends Component
 
 <div x-data="{ 
         mobileDrawerOpen: false, 
-        transactionsExpanded: {{ request()->routeIs('transactions.*') ? 'true' : 'false' }} 
+        transactionsExpanded: {{ request()->routeIs('transactions.*') ? 'true' : 'false' }},
+        incomeStep: 'input'
      }" 
+     @income-step-changed.window="incomeStep = $event.detail"
      @keydown.escape.window="mobileDrawerOpen = false">
 
     <!-- ======================================================== -->
@@ -310,61 +312,141 @@ new class extends Component
                 <div class="flex items-center gap-2 lg:hidden min-w-0">
                     <div class="h-4 w-px bg-[#EEEEEE] shrink-0" aria-hidden="true"></div>
                     <nav aria-label="Breadcrumb Mobile" class="flex items-center text-xs font-medium min-w-0">
-                        <ol class="flex items-center gap-1 min-w-0">
-                            @foreach ($breadcrumbs as $crumb)
-                                @if (!$loop->first)
-                                    <li class="shrink-0 text-[#999999]" aria-hidden="true">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-                                        </svg>
-                                    </li>
-                                @endif
-                                <li class="min-w-0 {{ $loop->last ? 'text-[#E87559] font-semibold truncate max-w-[120px] sm:max-w-[200px]' : 'shrink-0 text-[#777777]' }}">
-                                    @if ($crumb['url'] && !$loop->last)
-                                        <a href="{{ $crumb['url'] }}" 
-                                           class="inline-block py-0.5 text-[#777777] hover:text-[#E87559] hover:underline transition-colors focus:outline-none">
-                                            {{ $crumb['label'] }}
-                                        </a>
-                                    @else
-                                        <span class="truncate" aria-current="{{ $loop->last ? 'page' : 'false' }}">
-                                            {{ $crumb['label'] }}
-                                        </span>
-                                    @endif
+                        @if ($currentRoute === 'transactions.income')
+                            <ol class="flex items-center gap-1 min-w-0">
+                                <li class="shrink-0 text-[#777777]">
+                                    <a href="{{ route('transactions.index') }}"
+                                       class="inline-block py-0.5 text-[#777777] hover:text-[#E87559] hover:underline transition-colors focus:outline-none">
+                                        Transaksi
+                                    </a>
                                 </li>
-                            @endforeach
-                        </ol>
+                                <li class="shrink-0 text-[#999999]" aria-hidden="true">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </li>
+                                <li class="min-w-0 shrink-0">
+                                    <button type="button"
+                                            x-show="incomeStep === 'review'"
+                                            x-cloak
+                                            @click="window.dispatchEvent(new CustomEvent('income-back-to-input'))"
+                                            class="inline-block py-0.5 text-[#777777] hover:text-[#E87559] hover:underline transition-colors focus:outline-none cursor-pointer">
+                                        Catat Penjualan
+                                    </button>
+                                    <span x-show="incomeStep !== 'review'" class="text-[#E87559] font-semibold truncate max-w-[120px] sm:max-w-[200px]" aria-current="page">
+                                        Catat Penjualan
+                                    </span>
+                                </li>
+                                <li x-show="incomeStep === 'review'" x-cloak class="shrink-0 text-[#999999]" aria-hidden="true">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </li>
+                                <li x-show="incomeStep === 'review'" x-cloak class="min-w-0 text-[#E87559] font-semibold truncate max-w-[120px] sm:max-w-[200px]">
+                                    <span class="truncate" aria-current="page">
+                                        Konfirmasi Penjualan
+                                    </span>
+                                </li>
+                            </ol>
+                        @else
+                            <ol class="flex items-center gap-1 min-w-0">
+                                @foreach ($breadcrumbs as $crumb)
+                                    @if (!$loop->first)
+                                        <li class="shrink-0 text-[#999999]" aria-hidden="true">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                                            </svg>
+                                        </li>
+                                    @endif
+                                    <li class="min-w-0 {{ $loop->last ? 'text-[#E87559] font-semibold truncate max-w-[120px] sm:max-w-[200px]' : 'shrink-0 text-[#777777]' }}">
+                                        @if ($crumb['url'] && !$loop->last)
+                                            <a href="{{ $crumb['url'] }}"
+                                               class="inline-block py-0.5 text-[#777777] hover:text-[#E87559] hover:underline transition-colors focus:outline-none">
+                                                {{ $crumb['label'] }}
+                                            </a>
+                                        @else
+                                            <span class="truncate" aria-current="{{ $loop->last ? 'page' : 'false' }}">
+                                                {{ $crumb['label'] }}
+                                            </span>
+                                        @endif
+                                    </li>
+                                @endforeach
+                            </ol>
+                        @endif
                     </nav>
                 </div>
 
                 <!-- Desktop Breadcrumb & Dynamic Title (Visible on lg+) -->
                 <div class="hidden lg:flex flex-col">
                     <nav aria-label="Breadcrumb" class="flex items-center text-xs font-medium text-[#777777]">
-                        <ol class="flex items-center gap-1.5">
-                            @foreach ($breadcrumbs as $crumb)
-                                @if (!$loop->first)
-                                    <li class="shrink-0 text-[#999999]" aria-hidden="true">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-                                        </svg>
-                                    </li>
-                                @endif
+                        @if ($currentRoute === 'transactions.income')
+                            <ol class="flex items-center gap-1.5">
                                 <li class="min-w-0">
-                                    @if ($crumb['url'] && !$loop->last)
-                                        <a href="{{ $crumb['url'] }}" 
-                                           class="inline-block py-0.5 text-[#777777] hover:text-[#E87559] hover:underline transition-colors focus:outline-none focus:text-[#E87559]">
-                                            {{ $crumb['label'] }}
-                                        </a>
-                                    @else
-                                        <span class="text-[#E87559] font-semibold truncate" aria-current="page">
-                                            {{ $crumb['label'] }}
-                                        </span>
-                                    @endif
+                                    <a href="{{ route('transactions.index') }}"
+                                       class="inline-block py-0.5 text-[#777777] hover:text-[#E87559] hover:underline transition-colors focus:outline-none focus:text-[#E87559]">
+                                        Transaksi
+                                    </a>
                                 </li>
-                            @endforeach
-                        </ol>
+                                <li class="shrink-0 text-[#999999]" aria-hidden="true">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </li>
+                                <li class="min-w-0">
+                                    <button type="button"
+                                            x-show="incomeStep === 'review'"
+                                            x-cloak
+                                            @click="window.dispatchEvent(new CustomEvent('income-back-to-input'))"
+                                            class="inline-block py-0.5 text-[#777777] hover:text-[#E87559] hover:underline transition-colors focus:outline-none focus:text-[#E87559] cursor-pointer">
+                                        Catat Penjualan
+                                    </button>
+                                    <span x-show="incomeStep !== 'review'" class="text-[#E87559] font-semibold truncate" aria-current="page">
+                                        Catat Penjualan
+                                    </span>
+                                </li>
+                                <li x-show="incomeStep === 'review'" x-cloak class="shrink-0 text-[#999999]" aria-hidden="true">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </li>
+                                <li x-show="incomeStep === 'review'" x-cloak class="min-w-0">
+                                    <span class="text-[#E87559] font-semibold truncate" aria-current="page">
+                                        Konfirmasi Penjualan
+                                    </span>
+                                </li>
+                            </ol>
+                        @else
+                            <ol class="flex items-center gap-1.5">
+                                @foreach ($breadcrumbs as $crumb)
+                                    @if (!$loop->first)
+                                        <li class="shrink-0 text-[#999999]" aria-hidden="true">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                                            </svg>
+                                        </li>
+                                    @endif
+                                    <li class="min-w-0">
+                                        @if ($crumb['url'] && !$loop->last)
+                                            <a href="{{ $crumb['url'] }}"
+                                               class="inline-block py-0.5 text-[#777777] hover:text-[#E87559] hover:underline transition-colors focus:outline-none focus:text-[#E87559]">
+                                                {{ $crumb['label'] }}
+                                            </a>
+                                        @else
+                                            <span class="text-[#E87559] font-semibold truncate" aria-current="page">
+                                                {{ $crumb['label'] }}
+                                            </span>
+                                        @endif
+                                    </li>
+                                @endforeach
+                            </ol>
+                        @endif
                     </nav>
                     <h1 class="text-base font-extrabold text-[#252525] tracking-tight">
-                        {{ $pageTitle }}
+                        @if ($currentRoute === 'transactions.income')
+                            <span x-text="incomeStep === 'review' ? 'Konfirmasi Penjualan' : 'Catat Penjualan'">Catat Penjualan</span>
+                        @else
+                            {{ $pageTitle }}
+                        @endif
                     </h1>
                 </div>
             </div>
@@ -511,32 +593,63 @@ new class extends Component
                         <span>Dashboard</span>
                     </a>
 
-                    <!-- Riwayat Transaksi -->
-                    <a href="{{ route('transactions.index') }}" 
-                       wire:navigate
-                       @click="mobileDrawerOpen = false"
-                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors {{ request()->routeIs('transactions.index') ? 'bg-[#FCEDEA] text-[#E87559]' : 'text-[#64748B] hover:text-[#252525] hover:bg-gray-50' }}">
-                        <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('transactions.index') ? 'text-[#E87559]' : 'text-[#777777]' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z"/></svg>
-                        <span>Riwayat Transaksi</span>
-                    </a>
+                    <!-- 2. Transaksi (Accordion / Sub-Bab Mobile) -->
+                    <div class="space-y-1">
+                        <div class="flex items-center justify-between rounded-xl transition-colors {{ request()->routeIs('transactions.*') ? 'bg-[#FCEDEA] text-[#E87559] font-bold' : 'text-[#64748B] hover:text-[#252525] hover:bg-gray-50 font-medium' }}">
+                            <a href="{{ route('transactions.index') }}"
+                               wire:navigate
+                               @click="mobileDrawerOpen = false"
+                               class="flex-1 flex items-center gap-3 px-3.5 py-2.5 text-sm">
+                                <div class="shrink-0 {{ request()->routeIs('transactions.*') ? 'text-[#E87559]' : 'text-[#777777]' }}">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z"/>
+                                    </svg>
+                                </div>
+                                <span>Transaksi</span>
+                            </a>
+                            <button type="button"
+                                    @click="transactionsExpanded = !transactionsExpanded"
+                                    aria-label="Toggle sub-transaksi"
+                                    class="px-3 py-2.5 text-inherit focus:outline-none">
+                                <svg class="w-3.5 h-3.5 transition-transform duration-200" :class="{ 'rotate-180': transactionsExpanded }" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+                        </div>
 
-                    <!-- Catat Pengeluaran -->
-                    <a href="{{ route('transactions.expense') }}"
-                       wire:navigate
-                       @click="mobileDrawerOpen = false"
-                       class="flex items-center justify-between pl-11 pr-3.5 py-2 rounded-xl text-xs font-medium transition-colors {{ request()->routeIs('transactions.expense', 'transactions.photo', 'transactions.text') ? 'text-[#E87559] font-bold bg-[#FCEDEA]/50' : 'text-[#777777] hover:text-[#252525] hover:bg-gray-50' }}">
-                        <span>Catat Pengeluaran</span>
-                        <span class="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-amber-100 text-amber-700">AI</span>
-                    </a>
+                        <!-- Sub-menu Transaksi Mobile -->
+                        <div x-show="transactionsExpanded"
+                             x-transition:enter="transition ease-out duration-150"
+                             x-transition:enter-start="opacity-0 -translate-y-1"
+                             x-transition:enter-end="opacity-100 translate-y-0"
+                             class="pl-9 pr-2 space-y-1 pt-1 pb-1">
+                            <!-- Catat Pengeluaran -->
+                            <a href="{{ route('transactions.expense') }}"
+                               wire:navigate
+                               @click="mobileDrawerOpen = false"
+                               class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors {{ request()->routeIs('transactions.expense', 'transactions.photo', 'transactions.text') ? 'text-[#E87559] font-bold bg-[#FCEDEA]/50' : 'text-[#777777] hover:text-[#252525] hover:bg-gray-50' }}">
+                                <span>Catat Pengeluaran</span>
+                                <span class="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-amber-100 text-amber-700">AI</span>
+                            </a>
 
-                    <!-- Catat Penjualan -->
-                    <a href="{{ route('transactions.income') }}" 
-                       wire:navigate
-                       @click="mobileDrawerOpen = false"
-                       class="flex items-center justify-between pl-11 pr-3.5 py-2 rounded-xl text-xs font-medium transition-colors {{ request()->routeIs('transactions.income') ? 'text-[#E87559] font-bold bg-[#FCEDEA]/50' : 'text-[#777777] hover:text-[#252525] hover:bg-gray-50' }}">
-                        <span>Catat Penjualan</span>
-                        <span class="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-700">POS</span>
-                    </a>
+                            <!-- Catat Penjualan -->
+                            <a href="{{ route('transactions.income') }}"
+                               wire:navigate
+                               @click="mobileDrawerOpen = false"
+                               class="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors {{ request()->routeIs('transactions.income') ? 'text-[#E87559] font-bold bg-[#FCEDEA]/50' : 'text-[#777777] hover:text-[#252525] hover:bg-gray-50' }}">
+                                <span>Catat Penjualan</span>
+                                <span class="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-700">POS</span>
+                            </a>
+
+                            <!-- Riwayat Transaksi -->
+                            <a href="{{ route('transactions.index') }}"
+                               wire:navigate
+                               @click="mobileDrawerOpen = false"
+                               class="block px-3 py-2 rounded-lg text-xs font-medium transition-colors {{ request()->routeIs('transactions.index') ? 'text-[#E87559] font-bold bg-[#FCEDEA]/50' : 'text-[#777777] hover:text-[#252525] hover:bg-gray-50' }}">
+                                <span>Riwayat Transaksi</span>
+                            </a>
+                        </div>
+                    </div>
 
                     <!-- Restock -->
                     <a href="{{ route('restock') }}" 

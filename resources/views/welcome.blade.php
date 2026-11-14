@@ -26,7 +26,7 @@
         }
         .bg-grid-pattern {
             background-size: 32px 32px;
-            background-image: 
+            background-image:
                 linear-gradient(to right, rgba(0, 0, 0, 0.02) 1px, transparent 1px),
                 linear-gradient(to bottom, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
         }
@@ -67,21 +67,21 @@
                 <!-- Auth / Action Buttons -->
                 <div class="hidden sm:flex items-center gap-3">
                     @auth
-                        <a href="{{ Route::has('dashboard') ? route('dashboard') : url('/dashboard') }}" 
+                        <a href="{{ Route::has('dashboard') ? route('dashboard') : url('/dashboard') }}"
                            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#E87559] hover:bg-[#D66448] text-white text-sm font-semibold shadow-sm shadow-[#E87559]/25 hover:shadow-md hover:shadow-[#E87559]/35 transition-all">
                             <span>Open Dashboard</span>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </a>
                     @else
                         @if (Route::has('login'))
-                            <a href="{{ route('login') }}" 
+                            <a href="{{ route('login') }}"
                                class="px-4 py-2 text-sm font-semibold text-[#252525] hover:text-[#E87559] rounded-xl transition-colors">
                                 Login
                             </a>
                         @endif
 
                         @if (Route::has('register'))
-                            <a href="{{ route('register') }}" 
+                            <a href="{{ route('register') }}"
                                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#E87559] hover:bg-[#D66448] text-white text-sm font-semibold shadow-sm shadow-[#E87559]/25 hover:shadow-md hover:shadow-[#E87559]/35 transition-all transform active:scale-95">
                                 <span>Get Started</span>
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
@@ -92,7 +92,7 @@
 
                 <!-- Mobile & Tablet Hamburger Button -->
                 <div class="flex lg:hidden">
-                    <button type="button" 
+                    <button type="button"
                             id="mobile-menu-btn"
                             aria-label="Toggle Navigation Menu"
                             class="p-2 rounded-xl text-[#252525] hover:bg-[#FCEDEA] transition-colors focus:outline-none">
@@ -113,7 +113,7 @@
                 <a href="#why-us" class="mobile-nav-link block px-3 py-2 text-base font-medium text-[#777777] hover:text-[#252525] rounded-lg hover:bg-[#FCEDEA]">Why KasiVo</a>
                 <a href="#how-it-works" class="mobile-nav-link block px-3 py-2 text-base font-medium text-[#777777] hover:text-[#252525] rounded-lg hover:bg-[#FCEDEA]">How It Works</a>
                 <a href="#testimonials" class="mobile-nav-link block px-3 py-2 text-base font-medium text-[#777777] hover:text-[#252525] rounded-lg hover:bg-[#FCEDEA]">Testimonials</a>
-                
+
                 <div class="pt-4 border-t border-[#EEEEEE] flex flex-col gap-2">
                     @auth
                         <a href="{{ Route::has('dashboard') ? route('dashboard') : url('/dashboard') }}" class="w-full text-center px-4 py-2.5 rounded-xl bg-[#E87559] text-white text-sm font-semibold">
@@ -167,7 +167,7 @@
                         <svg class="absolute -bottom-2 left-0 w-full h-3 text-[#E87559]/30" viewBox="0 0 200 8" fill="none" preserveAspectRatio="none">
                             <path d="M1 5.5C40 2 60 7 100 4.5C140 2 160 6.5 199 4" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
                         </svg>
-                    </span> 
+                    </span>
                     with KasiVo
                 </h1>
 
@@ -178,16 +178,40 @@
 
                 <!-- CTA Action Buttons -->
                 <div class="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto sm:max-w-none">
-                    <a href="{{ Route::has('register') ? route('register') : url('/register') }}" 
-                       class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-2xl bg-[#E87559] hover:bg-[#D66448] text-white font-semibold text-base shadow-lg shadow-[#E87559]/25 hover:shadow-xl hover:shadow-[#E87559]/35 transition-all transform active:scale-95">
-                        <span>Get Started Free</span>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                    </a>
-                    <a href="#features" 
-                       class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-white hover:bg-gray-50 text-[#252525] font-semibold text-base border border-[#EEEEEE] hover:border-[#E87559]/30 shadow-sm transition-all">
-                        <span>Explore Features</span>
-                        <svg class="w-4 h-4 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    </a>
+                    @auth
+                        <a href="{{ Route::has('dashboard') ? route('dashboard') : url('/dashboard') }}"
+                           class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-2xl bg-[#E87559] hover:bg-[#D66448] text-white font-semibold text-base shadow-lg shadow-[#E87559]/25 hover:shadow-xl hover:shadow-[#E87559]/35 transition-all transform active:scale-95">
+                            <span>Open Dashboard</span>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </a>
+                        <a href="#features"
+                           class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-white hover:bg-gray-50 text-[#252525] font-semibold text-base border border-[#EEEEEE] hover:border-[#E87559]/30 shadow-sm transition-all">
+                            <span>Explore Features</span>
+                            <svg class="w-4 h-4 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </a>
+                    @else
+                        <a href="{{ Route::has('register') ? route('register') : url('/register') }}"
+                           class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-2xl bg-[#E87559] hover:bg-[#D66448] text-white font-semibold text-base shadow-lg shadow-[#E87559]/25 hover:shadow-xl hover:shadow-[#E87559]/35 transition-all transform active:scale-95">
+                            <span>Get Started Free</span>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </a>
+
+                        <!-- Mobile CTA: Tombol Login Langsung (Memudahkan Pengguna Mobile) -->
+                        <a href="{{ Route::has('login') ? route('login') : url('/login') }}"
+                           class="sm:hidden w-full inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-white hover:bg-gray-50 text-[#252525] font-semibold text-base border border-[#EEEEEE] hover:border-[#E87559]/30 shadow-sm transition-all">
+                            <span>Login ke Akun</span>
+                            <svg class="w-4 h-4 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                            </svg>
+                        </a>
+
+                        <!-- Desktop CTA: Explore Features (karena tombol Login sudah ada di navbar atas) -->
+                        <a href="#features"
+                           class="hidden sm:inline-flex w-auto items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-white hover:bg-gray-50 text-[#252525] font-semibold text-base border border-[#EEEEEE] hover:border-[#E87559]/30 shadow-sm transition-all">
+                            <span>Explore Features</span>
+                            <svg class="w-4 h-4 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </a>
+                    @endauth
                 </div>
 
                 <!-- Target F&B Business Fit (Authentic & Modern SaaS Aesthetic) -->
@@ -227,7 +251,7 @@
 
                     <!-- Dashboard Window Surface -->
                     <div class="bg-white rounded-3xl border border-[#EEEEEE] shadow-2xl shadow-black/5 overflow-hidden text-left">
-                        
+
                         <!-- Top Window Header / App Bar -->
                         <div class="px-5 py-3.5 bg-gray-50/80 border-b border-[#EEEEEE] flex flex-wrap items-center justify-between gap-3">
                             <div class="flex items-center gap-2">
@@ -251,7 +275,7 @@
 
                         <!-- Dashboard Interior -->
                         <div class="p-4 sm:p-6 lg:p-8 space-y-6 bg-gradient-to-b from-white to-[#FCEDEA]/20">
-                            
+
                             <!-- 1. Top Metrics Summary Row -->
                             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                                 <!-- Card 1: Total Sales -->
@@ -314,7 +338,7 @@
 
                             <!-- 2. Middle Grid: Sales Velocity & Live Voice POS -->
                             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                                
+
                                 <!-- Left Column: Revenue Velocity & Peak Hours (8 cols) -->
                                 <div class="lg:col-span-8 bg-white p-5 sm:p-6 rounded-2xl border border-[#EEEEEE] shadow-sm space-y-4">
                                     <div class="flex flex-wrap items-center justify-between gap-2">
@@ -587,7 +611,7 @@
             </div>
 
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                
+
                 <!-- Section Header -->
                 <div class="text-center max-w-3xl mx-auto mb-16">
                     <span class="inline-block px-3.5 py-1 rounded-full bg-[#FCEDEA] text-[#E87559] text-xs font-bold tracking-wider uppercase mb-3">
@@ -603,7 +627,7 @@
 
                 <!-- 4 Feature Cards Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    
+
                     <!-- Card 1: Voice Transaction (Pastel Soft Blush) -->
                     <div class="bg-[#FCEDEA]/60 rounded-3xl p-8 lg:p-10 border border-[#E87559]/20 hover:border-[#E87559]/50 transition-all shadow-sm hover:shadow-card flex flex-col justify-between group">
                         <div>
@@ -725,15 +749,15 @@
         <!-- ======================================================== -->
         <section id="why-us" class="py-20 lg:py-28 bg-[#FCEDEA]/25 border-t border-[#EEEEEE] relative overflow-hidden">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                
+
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-                    
+
                     <!-- Left: Benefits Narrative & List (7 cols) -->
                     <div class="lg:col-span-7 space-y-6">
                         <span class="inline-block px-3.5 py-1 rounded-full bg-[#FCEDEA] text-[#E87559] text-xs font-bold tracking-wider uppercase">
                             Mengapa KasiVo?
                         </span>
-                        
+
                         <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#252525] tracking-tight leading-tight">
                             Why Businesses Choose KasiVo
                         </h2>
@@ -744,7 +768,7 @@
 
                         <!-- 4 Core Benefits -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
-                            
+
                             <!-- Benefit 1 -->
                             <div class="flex items-start gap-3.5">
                                 <div class="w-10 h-10 rounded-xl bg-white text-[#E87559] border border-[#E87559]/20 flex items-center justify-center flex-shrink-0 shadow-sm mt-0.5">
@@ -801,7 +825,7 @@
 
                         <!-- Mini CTA in section -->
                         <div class="pt-4">
-                            <a href="{{ Route::has('register') ? route('register') : url('/register') }}" 
+                            <a href="{{ Route::has('register') ? route('register') : url('/register') }}"
                                class="inline-flex items-center gap-2 text-sm font-bold text-[#E87559] hover:text-[#D66448] group">
                                 <span>Coba Gratis KasiVo Selama 14 Hari</span>
                                 <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
@@ -868,7 +892,7 @@
         <!-- ======================================================== -->
         <section id="how-it-works" class="py-20 lg:py-28 bg-white border-t border-[#EEEEEE] relative">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                
+
                 <!-- Section Header -->
                 <div class="text-center max-w-3xl mx-auto mb-16">
                     <span class="inline-block px-3.5 py-1 rounded-full bg-[#E1F0F7] text-[#252525] text-xs font-bold tracking-wider uppercase mb-3">
@@ -884,7 +908,7 @@
 
                 <!-- 3 Step Workflow Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-                    
+
                     <!-- Step 1 -->
                     <div class="bg-white rounded-3xl p-8 border border-[#EEEEEE] hover:border-[#E87559]/40 shadow-sm hover:shadow-card transition-all flex flex-col justify-between group">
                         <div>
@@ -949,7 +973,7 @@
         <!-- ======================================================== -->
         <section id="testimonials" class="py-20 lg:py-28 bg-[#FCEDEA]/20 border-t border-[#EEEEEE] relative">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                
+
                 <!-- Section Header -->
                 <div class="text-center max-w-3xl mx-auto mb-16">
                     <span class="inline-block px-3.5 py-1 rounded-full bg-[#FCEDEA] text-[#E87559] text-xs font-bold tracking-wider uppercase mb-3">
@@ -968,7 +992,7 @@
 
                 <!-- 3 Testimonial Cards Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    
+
                     <!-- Card 1 -->
                     <div class="bg-white rounded-3xl p-8 border border-[#EEEEEE] shadow-sm hover:shadow-card transition flex flex-col justify-between">
                         <div>
@@ -1054,10 +1078,10 @@
         <!-- ======================================================== -->
         <section class="py-20 lg:py-28 bg-white relative">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                
+
                 <!-- Card Container with Soft Pastel Gradient -->
                 <div class="bg-gradient-to-br from-[#FCEDEA] via-white to-[#E1F0F7] rounded-3xl border border-[#EEEEEE] p-8 sm:p-12 lg:p-16 text-center shadow-soft relative isolate overflow-hidden">
-                    
+
                     <!-- Subtle Coral Accent Glow -->
                     <div class="absolute -top-16 -right-16 w-[360px] h-[360px] rounded-full bg-coral-glow filter blur-[60px] pointer-events-none z-0 select-none"></div>
 
@@ -1088,12 +1112,12 @@
 
                         <!-- CTA Actions -->
                         <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-                            <a href="{{ Route::has('register') ? route('register') : url('/register') }}" 
+                            <a href="{{ Route::has('register') ? route('register') : url('/register') }}"
                                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-[#E87559] hover:bg-[#D66448] text-white font-semibold text-base shadow-lg shadow-[#E87559]/30 hover:shadow-xl hover:shadow-[#E87559]/40 transition-all transform active:scale-95">
                                 <span>Get Started Free</span>
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                             </a>
-                            <a href="#hero" 
+                            <a href="#hero"
                                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-white hover:bg-gray-50 text-[#252525] font-semibold text-base border border-[#EEEEEE] shadow-sm transition-all">
                                 <span>Lihat Demo Kasir</span>
                             </a>
@@ -1132,7 +1156,7 @@
     <footer class="bg-white border-t border-[#EEEEEE] pt-16 pb-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8 pb-12 border-b border-[#EEEEEE]">
-                
+
                 <!-- Col 1: Brand Info (2 cols on lg) -->
                 <div class="lg:col-span-2 space-y-4">
                     <x-kasivo-logo size="md" :showTagline="true" />
