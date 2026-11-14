@@ -369,18 +369,8 @@ new class extends Component
                 </div>
             </div>
 
-            <!-- Right Side: Status Badge, Quick Action, and User Account Dropdown -->
+            <!-- Right Side: User Account Dropdown -->
             <div class="flex items-center gap-3">
-                
-                <!-- Quick "+ Transaksi" Action Button (Desktop & Tablet) -->
-                <a href="{{ route('transactions.create') }}" 
-                   wire:navigate
-                   class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#E87559] hover:bg-[#D66448] text-white text-xs font-semibold shadow-sm shadow-[#E87559]/20 hover:shadow-md transition-all transform active:scale-95">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    <span>Catat Transaksi</span>
-                </a>
 
                 <!-- User Account Dropdown -->
                 <x-dropdown align="right" width="56">
