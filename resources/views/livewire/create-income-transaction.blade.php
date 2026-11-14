@@ -1,4 +1,4 @@
-<div class="w-full flex-1 flex flex-col space-y-4" x-data="incomeSalesManager()" @income-back-to-input.window="backToInput()">
+<div class="w-full flex-1 flex flex-col space-y-4" x-data="incomeSalesManager($wire)" @income-back-to-input.window="backToInput()">
 
     <!-- ======================================================== -->
     <!-- HALAMAN 1: INPUT PENJUALAN (NOTA / SUARA / TEKS BEBAS)  -->
@@ -828,18 +828,30 @@
 
                 <!-- Tombol Aksi Halaman Konfirmasi (Simpan Penjualan & Batal) -->
                 <div class="pt-6 border-t border-[#EEEEEE] flex items-center justify-between gap-3">
-                    <a
-                        href="{{ route('transactions.create') }}"
-                        wire:navigate
-                        class="px-4 py-2.5 text-xs sm:text-sm font-semibold text-[#777777] hover:text-[#252525] rounded-xl transition"
-                    >
-                        Batal
-                    </a>
-
                     <button
-                        type="submit"
+                        type="button"
+                        @click="backToInput()"
+                        class="px-4 py-2.5 text-xs sm:text-sm font-semibold text-[#777777] hover:text-[#252525] hover:bg-gray-100 rounded-xl transition cursor-pointer flex items-center gap-1.5"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                        <span>Ubah Input</span>
+                    </button>
+
+                    <div class="flex items-center gap-2">
+                        <a
+                            href="{{ route('transactions.index') }}"
+                            wire:navigate
+                            class="px-4 py-2.5 text-xs sm:text-sm font-semibold text-[#777777] hover:text-[#DC6464] rounded-xl transition"
+                        >
+                            Batalkan
+                        </a>
+
+                        <button
+                            type="submit"
                             wire:loading.attr="disabled"
-                            class="inline-flex items-center gap-2 px-7 py-2.5 text-xs sm:text-sm font-bold text-white bg-[#E87559] hover:bg-[#D66448] active:bg-[#C25338] rounded-xl shadow-xs hover:shadow-md transition active:scale-95 disabled:opacity-50 cursor-pointer"
+                            class="inline-flex items-center gap-2 px-7 py-2.5 text-xs sm:text-sm font-bold text-white bg-[#43A58A] hover:bg-[#388D76] active:bg-[#2F7764] rounded-xl shadow-xs hover:shadow-md transition active:scale-95 disabled:opacity-50 cursor-pointer"
                         >
                             <span wire:loading.remove class="inline-flex items-center gap-1.5">
                                 <span>Simpan Penjualan</span>
@@ -855,6 +867,7 @@
                                 <span>Menyimpan Kas Masuk...</span>
                             </span>
                         </button>
+                    </div>
                 </div>
 
             </form>
@@ -889,8 +902,9 @@
 </div>
 
 <script>
-    function incomeSalesManager() {
+    function incomeSalesManager(wire) {
         return {
+            wire: wire,
             // State Alur Tahapan Terpisah ('input' | 'review')
             currentStep: 'input',
 
@@ -1409,49 +1423,50 @@
                     subtotal: Number(it.subtotal) || (Number(it.quantity || 1) * Number(it.unit_price || 0))
                 }));
 
-                // Sinkronisasi data ke kontrak Livewire backend
-                if (window.Livewire) {
-                    // 1. Total Nominal Penjualan (Wajib Masuk ke Amount)
+                // 1. Pindah tahapan ke review agar form terlihat
+                this.currentStep = 'review';
+                window.dispatchEvent(new CustomEvent('income-step-changed', { detail: 'review' }));
+                this.scrollToTop();
+
+                // 2. Sinkronisasi data ke kontrak Livewire backend
+                const livewireCaller = this.wire || (window.Livewire ? this.$wire : null);
+                if (livewireCaller) {
                     if (data.amount > 0) {
-                        const amountEl = document.getElementById('amount');
-                        if (amountEl) {
-                            amountEl.value = data.amount;
-                            amountEl.dispatchEvent(new Event('input', { bubbles: true }));
-                            amountEl.dispatchEvent(new Event('change', { bubbles: true }));
-                        }
-                        if (this.$wire) {
-                            this.$wire.set('amount', data.amount);
-                        }
+                        livewireCaller.set('amount', data.amount);
+                    }
+                    if (data.notes) {
+                        livewireCaller.set('notes', data.notes);
+                    }
+                    if (data.date) {
+                        livewireCaller.set('transaction_date', data.date);
+                    }
+                    if (data.category) {
+                        livewireCaller.set('category', data.category);
+                    }
+                }
+
+                // 3. Update elemen DOM input
+                this.$nextTick(() => {
+                    const amountEl = document.getElementById('amount');
+                    if (amountEl && data.amount > 0) {
+                        amountEl.value = data.amount;
+                        amountEl.dispatchEvent(new Event('input', { bubbles: true }));
+                        amountEl.dispatchEvent(new Event('change', { bubbles: true }));
                     }
 
-                    // 2. Catatan Ringkas (Hanya Catatan, Bukan Nominal)
                     const notesEl = document.getElementById('notes');
-                    if (notesEl) {
-                        notesEl.value = data.notes || '';
+                    if (notesEl && data.notes) {
+                        notesEl.value = data.notes;
                         notesEl.dispatchEvent(new Event('input', { bubbles: true }));
                         notesEl.dispatchEvent(new Event('change', { bubbles: true }));
                     }
-                    if (this.$wire) {
-                        this.$wire.set('notes', data.notes || '');
-                    }
 
-                    // 3. Tanggal Penjualan
-                    if (data.date) {
-                        const dateEl = document.getElementById('transaction_date');
-                        if (dateEl) {
-                            dateEl.value = data.date;
-                            dateEl.dispatchEvent(new Event('input', { bubbles: true }));
-                        }
-                        if (this.$wire) {
-                            this.$wire.set('transaction_date', data.date);
-                        }
+                    const dateEl = document.getElementById('transaction_date');
+                    if (dateEl && data.date) {
+                        dateEl.value = data.date;
+                        dateEl.dispatchEvent(new Event('input', { bubbles: true }));
                     }
-
-                    // 4. Metode Penerimaan
-                    if (data.category && this.$wire) {
-                        this.$wire.set('category', data.category);
-                    }
-                }
+                });
             },
 
             addItem() {
@@ -1485,16 +1500,19 @@
 
             syncTotalWithItems() {
                 const total = this.calculateItemsSum();
-                if (total > 0 && window.Livewire) {
-                    const amountEl = document.getElementById('amount');
-                    if (amountEl) {
-                        amountEl.value = total;
-                        amountEl.dispatchEvent(new Event('input', { bubbles: true }));
-                        amountEl.dispatchEvent(new Event('change', { bubbles: true }));
+                if (total > 0) {
+                    const livewireCaller = this.wire || (window.Livewire ? this.$wire : null);
+                    if (livewireCaller) {
+                        livewireCaller.set('amount', total);
                     }
-                    if (this.$wire) {
-                        this.$wire.set('amount', total);
-                    }
+                    this.$nextTick(() => {
+                        const amountEl = document.getElementById('amount');
+                        if (amountEl) {
+                            amountEl.value = total;
+                            amountEl.dispatchEvent(new Event('input', { bubbles: true }));
+                            amountEl.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    });
                 }
             },
 

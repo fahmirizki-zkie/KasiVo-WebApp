@@ -83,7 +83,7 @@ class CreateIncomeTransaction extends Component
 
         session()->flash('message', 'Penjualan sebesar Rp ' . number_format((float) $this->amount, 0, ',', '.') . ' berhasil dicatat!');
 
-        return redirect()->route('transactions.index');
+        return $this->redirect(route('transactions.index'), navigate: true);
     }
 
     public function render()
