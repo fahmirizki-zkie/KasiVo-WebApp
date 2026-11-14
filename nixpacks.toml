@@ -1,4 +1,8 @@
 # Nixpacks Configuration for Laravel 13 on Railway
+[variables]
+NIXPACKS_PHP_VERSION = '8.4'
+COMPOSER_IGNORE_PLATFORM_REQS = '1'
+
 [phases.setup]
 nixPkgs = [
   'php84',
@@ -15,7 +19,7 @@ nixPkgs = [
 
 [phases.install]
 cmds = [
-  'composer install --no-dev --optimize-autoloader --no-interaction',
+  'composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs',
   'npm ci --ignore-scripts || npm install --ignore-scripts'
 ]
 
