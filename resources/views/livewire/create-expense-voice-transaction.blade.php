@@ -14,14 +14,7 @@
                         <span>Kas Keluar (Pengeluaran)</span>
                     </span>
 
-                    <a href="{{ route('transactions.create') }}" 
-                       wire:navigate
-                       class="text-xs text-[#777777] hover:text-[#E87559] flex items-center gap-1 transition-colors">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                        </svg>
-                        <span>Ganti Jalur</span>
-                    </a>
+                    @include('livewire.partials.expense-mode-switcher', ['currentMode' => 'voice'])
                 </div>
 
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-[#252525] tracking-tight">
@@ -32,60 +25,98 @@
                 </p>
             </div>
 
-            <!-- Pesan Error Backend / Livewire -->
+            <!-- Tab Pintas Navigasi 3 Moda Pengeluaran -->
+            @include('livewire.partials.expense-mode-tabs', ['currentMode' => 'voice'])
+
+            <!-- Pesan Error Backend / Livewire (Layout Responsif & Terstruktur) -->
             @if($errorMessage)
-                @if($errorType === 'quota_exceeded')
-                    <div class="mb-6 p-4 rounded-2xl bg-red-50 border-2 border-red-200 text-[#252525] text-xs sm:text-sm flex flex-col sm:flex-row items-start justify-between gap-4 shadow-sm">
-                        <div class="flex items-start gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-red-100 text-red-600 flex items-center justify-center shrink-0">
-                                <span class="text-base">⚠️</span>
-                            </div>
-                            <div class="flex-1">
-                                <p class="font-extrabold text-red-700 text-sm">Kuota AI Anda Sudah Penuh / Token AI Anda Sudah Habis</p>
-                                <p class="mt-1 text-red-900 leading-relaxed text-xs">
-                                    Layanan AI mencapai batas panggilan saat ini. Jangan khawatir, rekaman suara Anda tidak hilang! Klik tombol di samping untuk mencatat transaksi ini secara langsung.
-                                </p>
-                            </div>
+                @php
+                    $isQuota = $errorType === 'quota_exceeded';
+                    $isApiKeyMissing = str_contains(strtolower($errorMessage), 'api key') || str_contains(strtolower($errorMessage), 'groq_api_key');
+                @endphp
+
+                <div class="relative w-full mb-6 p-5 sm:p-6 rounded-2xl border transition-all shadow-xs {{ $isQuota ? 'bg-amber-50 border-amber-200' : 'bg-[#FCEDEA]/80 border-[#E87559]/30' }}"
+                     role="alert">
+
+                    <!-- Tombol Tutup di Kanan Atas -->
+                    <button type="button"
+                            wire:click="$set('errorMessage', null)"
+                            class="absolute top-4 right-4 p-2 rounded-xl text-[#777777] hover:text-[#252525] hover:bg-black/5 transition-colors focus:outline-none"
+                            title="Tutup pesan"
+                            aria-label="Tutup pesan">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+
+                    <!-- Konten Alert: Icon Kiri + Area Teks Utama -->
+                    <div class="flex items-start gap-3.5 sm:gap-4 pr-8">
+                        <!-- Icon Peringatan di Sebelah Kiri -->
+                        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center shrink-0 mt-0.5 shadow-2xs {{ $isQuota ? 'bg-amber-100 text-amber-700' : 'bg-white text-[#DC6464] border border-[#E87559]/20' }}">
+                            <svg class="w-5 h-5 sm:w-5.5 sm:h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
                         </div>
-                        <div class="flex items-center gap-2 w-full sm:w-auto shrink-0 pt-2 sm:pt-0">
-                            <button type="button" 
-                                    wire:click="proceedToEmergencyReview"
-                                    class="flex-1 sm:flex-none px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold rounded-xl text-xs transition shadow-xs flex items-center justify-center gap-1.5">
-                                <span>✍️</span>
-                                <span>Koreksi Nominal Langsung</span>
-                            </button>
-                            <button type="button" 
-                                    wire:click="retryProcess"
-                                    class="px-3 py-2.5 bg-white hover:bg-gray-50 border border-red-300 text-red-700 font-semibold rounded-xl text-xs transition">
-                                🔄 Coba Ulang
-                            </button>
+
+                        <!-- Area Konten Utama -->
+                        <div class="flex-1 min-w-0">
+                            <!-- Judul Alert -->
+                            <h4 class="text-sm sm:text-base font-extrabold {{ $isQuota ? 'text-amber-900' : 'text-[#252525]' }}">
+                                @if($isQuota)
+                                    Kuota AI Anda Sudah Penuh / Token AI Anda Sudah Habis
+                                @else
+                                    Perhatian
+                                @endif
+                            </h4>
+
+                            <!-- Deskripsi Pesan Error Ramah Pengguna -->
+                            <div class="mt-1 text-xs sm:text-sm text-[#555555] leading-relaxed space-y-1">
+                                @if($isQuota)
+                                    <p>Layanan AI mencapai batas panggilan saat ini. Jangan khawatir, rekaman suara Anda tidak hilang! Anda masih bisa mencatat transaksi ini secara langsung.</p>
+                                @elseif($isApiKeyMissing)
+                                    <p class="font-semibold text-[#252525]">AI Transkripsi belum dapat digunakan.</p>
+                                    <p class="text-xs text-[#777777]">Konfigurasi GROQ_API_KEY belum tersedia di sistem. Rekaman audio Anda tetap aman.</p>
+                                @else
+                                    <p class="font-semibold text-[#252525]">AI belum dapat memproses rekaman suara ini.</p>
+                                    <p class="text-xs text-[#777777]">{{ $errorMessage }}. Rekaman audio Anda tetap aman.</p>
+                                @endif
+                            </div>
+
+                            <!-- Tombol Aksi di Bawah Deskripsi (Tinggi Min 48px) -->
+                            <div class="mt-4 pt-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                                <button type="button"
+                                        wire:click="proceedToEmergencyReview"
+                                        class="min-h-[48px] px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold rounded-xl text-xs sm:text-sm transition shadow-xs flex items-center justify-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                    </svg>
+                                    <span>Lanjut Catat Manual (Koreksi Nominal Langsung)</span>
+                                </button>
+
+                                <button type="button"
+                                        wire:click="retryProcess"
+                                        wire:loading.attr="disabled"
+                                        wire:target="retryProcess"
+                                        class="min-h-[48px] px-4 py-2.5 bg-white hover:bg-gray-50 active:bg-gray-100 border border-[#EEEEEE] hover:border-[#E87559]/30 text-[#252525] font-semibold rounded-xl text-xs sm:text-sm transition shadow-2xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <span wire:loading.remove wire:target="retryProcess" class="flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-[#777777]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                        </svg>
+                                        <span>Coba Ulang</span>
+                                    </span>
+                                    <span wire:loading wire:target="retryProcess" class="flex items-center gap-2">
+                                        <svg class="animate-spin w-4 h-4 text-[#E87559]" viewBox="0 0 24 24" fill="none">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                                        </svg>
+                                        <span>Mencoba Ulang...</span>
+                                    </span>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                @else
-                    <div class="mb-6 p-4 rounded-2xl bg-[#FCEDEA] border border-[#E87559]/20 text-[#252525] text-xs sm:text-sm flex flex-col sm:flex-row items-start justify-between gap-4">
-                        <div class="flex items-start gap-3">
-                            <div class="w-8 h-8 rounded-xl bg-white text-[#DC6464] flex items-center justify-center shrink-0 shadow-xs">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                                </svg>
-                            </div>
-                            <div class="flex-1">
-                                <p class="font-bold text-[#DC6464]">Perhatian</p>
-                                <p class="mt-0.5 text-[#555555] leading-relaxed">{{ $errorMessage }}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
-                            <button type="button" 
-                                    wire:click="proceedToEmergencyReview"
-                                    class="flex-1 sm:flex-none px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition">
-                                ✍️ Koreksi Nominal Langsung
-                            </button>
-                            <button type="button" 
-                                    wire:click="$set('errorMessage', null)" 
-                                    class="px-3 py-2 text-xs text-[#777777] hover:underline font-semibold">Tutup</button>
-                        </div>
-                    </div>
-                @endif
+
+                </div>
             @endif
 
             <!-- ======================================================== -->
