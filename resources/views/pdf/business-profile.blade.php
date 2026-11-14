@@ -6,21 +6,21 @@
     <style>
         @page {
             size: a4 portrait;
-            margin: 12mm 15mm 12mm 15mm;
+            margin: 14mm 16mm 14mm 16mm;
         }
 
         * {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
         }
 
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: 8.5pt;
-            line-height: 1.45;
+            font-size: 7.5pt;
+            line-height: 1.35;
             color: #1E293B;
             background-color: #FFFFFF;
+            margin: 0;
+            padding: 0;
         }
 
         /* Utility */
@@ -44,23 +44,23 @@
 
         /* 1. LETTERHEAD FORMAL & BERSIH */
         .letterhead-box {
-            padding-bottom: 10px;
-            margin-bottom: 12px;
-            border-bottom: 2px solid #0F172A;
+            padding-bottom: 6px;
+            margin-bottom: 8px;
+            border-bottom: 1.5px solid #0F172A;
         }
 
         .header-subline {
-            font-size: 7pt;
+            font-size: 6.5pt;
             color: #64748B;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 3px;
+            letter-spacing: 0.8px;
+            margin-top: 2px;
             font-weight: 600;
         }
 
         .meta-table {
-            font-size: 7.5pt;
-            line-height: 1.5;
+            font-size: 6.8pt;
+            line-height: 1.35;
             color: #334155;
             margin-left: auto;
         }
@@ -87,36 +87,36 @@
         /* 2. DOKUMEN TITLE */
         .doc-header-box {
             text-align: center;
-            margin-bottom: 14px;
-            padding: 4px 0;
+            margin-bottom: 8px;
+            padding: 2px 0;
         }
 
         .doc-title {
-            font-size: 13pt;
+            font-size: 11.5pt;
             font-weight: 800;
             color: #0F172A;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
             text-transform: uppercase;
             line-height: 1.2;
         }
 
         .doc-subtitle {
-            font-size: 7.8pt;
+            font-size: 7pt;
             color: #64748B;
-            margin-top: 3px;
+            margin-top: 2px;
             font-weight: 500;
         }
 
         /* 3. SECTION HEADINGS */
         .section-heading {
-            font-size: 8.5pt;
+            font-size: 7.5pt;
             font-weight: 700;
             color: #0F172A;
             text-transform: uppercase;
-            letter-spacing: 0.4px;
-            padding-bottom: 3px;
-            margin-top: 10px;
-            margin-bottom: 6px;
+            letter-spacing: 0.3px;
+            padding-bottom: 2px;
+            margin-top: 6px;
+            margin-bottom: 4px;
             border-bottom: 1px solid #CBD5E1;
         }
 
@@ -124,13 +124,13 @@
         .info-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 8pt;
-            margin-bottom: 12px;
+            font-size: 7.2pt;
+            margin-bottom: 6px;
             border: 1px solid #E2E8F0;
         }
 
         .info-table td {
-            padding: 5px 8px;
+            padding: 3.5px 6px;
             vertical-align: top;
             border-bottom: 1px solid #F1F5F9;
         }
@@ -153,43 +153,43 @@
         .kpi-table {
             width: 100%;
             border-collapse: separate;
-            border-spacing: 8px 0;
-            margin-bottom: 12px;
+            border-spacing: 6px 0;
+            margin-bottom: 6px;
         }
 
         .kpi-card {
             background-color: #FFFFFF;
             border: 1px solid #E2E8F0;
-            border-radius: 6px;
-            padding: 8px 10px;
+            border-radius: 4px;
+            padding: 6px 8px;
             text-align: left;
         }
 
         .kpi-card.income {
-            border-top: 3px solid #10B981;
+            border-top: 2.5px solid #10B981;
         }
 
         .kpi-card.expense {
-            border-top: 3px solid #E87559;
+            border-top: 2.5px solid #E87559;
         }
 
         .kpi-card.net {
-            border-top: 3px solid #0F172A;
+            border-top: 2.5px solid #0F172A;
         }
 
         .kpi-title {
-            font-size: 6.8pt;
+            font-size: 6.2pt;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
             color: #64748B;
-            margin-bottom: 2px;
+            margin-bottom: 1px;
         }
 
         .kpi-amount {
-            font-size: 11pt;
+            font-size: 10pt;
             font-weight: 800;
-            line-height: 1.2;
+            line-height: 1.15;
         }
 
         .kpi-amount.income { color: #047857; }
@@ -197,18 +197,18 @@
         .kpi-amount.net { color: #0F172A; }
 
         .kpi-desc {
-            font-size: 6.8pt;
+            font-size: 6.2pt;
             color: #64748B;
-            margin-top: 2px;
+            margin-top: 1px;
         }
 
         .kpi-badge {
             display: inline-block;
-            font-size: 6.5pt;
+            font-size: 5.8pt;
             font-weight: 700;
-            padding: 1px 5px;
-            border-radius: 3px;
-            margin-top: 3px;
+            padding: 1px 4px;
+            border-radius: 2px;
+            margin-top: 2px;
         }
 
         .kpi-badge.surplus {
@@ -227,7 +227,7 @@
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 7.5pt;
+            font-size: 6.8pt;
         }
 
         .data-table th {
@@ -235,15 +235,15 @@
             color: #475569;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.4px;
-            padding: 5px 6px;
+            letter-spacing: 0.3px;
+            padding: 3.5px 5px;
             border-top: 1px solid #CBD5E1;
             border-bottom: 1px solid #CBD5E1;
-            font-size: 6.8pt;
+            font-size: 6.2pt;
         }
 
         .data-table td {
-            padding: 4px 6px;
+            padding: 3px 5px;
             border-bottom: 1px solid #E2E8F0;
             color: #1E293B;
         }
@@ -254,29 +254,30 @@
             border-top: 1px solid #CBD5E1;
             border-bottom: 1px solid #0F172A;
             color: #0F172A;
+            padding: 3.5px 5px;
         }
 
         /* 7. AI SMART BRIEF / NARASI */
         .narrative-box {
             background-color: #F8FAFC;
             border: 1px solid #E2E8F0;
-            border-left: 3px solid #E87559;
+            border-left: 2.5px solid #E87559;
             border-radius: 4px;
-            padding: 8px 10px;
-            margin-top: 10px;
-            margin-bottom: 10px;
+            padding: 5px 8px;
+            margin-top: 6px;
+            margin-bottom: 5px;
         }
 
         .narrative-title {
-            font-size: 7.5pt;
+            font-size: 7pt;
             font-weight: 700;
             color: #0F172A;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
 
         .narrative-text {
-            font-size: 7.5pt;
-            line-height: 1.45;
+            font-size: 6.8pt;
+            line-height: 1.35;
             color: #334155;
         }
 
@@ -285,23 +286,23 @@
             background-color: #FFFFFF;
             border: 1px dashed #CBD5E1;
             border-radius: 4px;
-            padding: 6px 9px;
-            margin-top: 10px;
-            margin-bottom: 12px;
+            padding: 4px 7px;
+            margin-top: 5px;
+            margin-bottom: 6px;
         }
 
         .disclaimer-title {
-            font-size: 6.5pt;
+            font-size: 6.2pt;
             font-weight: 800;
             color: #475569;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
+            letter-spacing: 0.4px;
+            margin-bottom: 1px;
         }
 
         .disclaimer-text {
-            font-size: 6.8pt;
-            line-height: 1.35;
+            font-size: 6.2pt;
+            line-height: 1.3;
             color: #64748B;
         }
 
@@ -309,8 +310,8 @@
         .sign-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 7.5pt;
-            margin-top: 8px;
+            font-size: 6.8pt;
+            margin-top: 5px;
         }
 
         .sign-table td {
@@ -319,19 +320,19 @@
         }
 
         .signature-line {
-            width: 160px;
+            width: 140px;
             border-bottom: 1px solid #0F172A;
-            margin-top: 36px;
-            margin-bottom: 3px;
+            margin-top: 22px;
+            margin-bottom: 2px;
         }
 
         /* 10. FOOTER */
         .footer-note {
-            font-size: 6.5pt;
+            font-size: 6pt;
             color: #94A3B8;
             border-top: 1px solid #E2E8F0;
-            padding-top: 6px;
-            margin-top: 12px;
+            padding-top: 4px;
+            margin-top: 6px;
             text-align: center;
         }
     </style>
@@ -339,7 +340,6 @@
 <body>
 
     @php
-        // Ambil logo asli KasiVo dari path fisik dan ubah ke format base64
         $logoPath = public_path('images/kasivo-logo.png');
         $logoBase64 = file_exists($logoPath)
             ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
@@ -352,9 +352,9 @@
             <tr>
                 <td style="width: 50%;">
                     @if ($logoBase64)
-                        <img src="{{ $logoBase64 }}" style="height: 34px; width: auto;" alt="KasiVo" />
+                        <img src="{{ $logoBase64 }}" style="height: 30px; width: auto;" alt="KasiVo" />
                     @else
-                        <div style="font-size: 18pt; font-weight: 800; color: #E87559; letter-spacing: -0.5px;">KasiVo</div>
+                        <div style="font-size: 16pt; font-weight: 800; color: #E87559; letter-spacing: -0.5px;">KasiVo</div>
                     @endif
                     <div class="header-subline">Sistem POS Cerdas &amp; Rekapitulasi Finansial UMKM</div>
                 </td>
@@ -419,14 +419,14 @@
                 <div class="kpi-card income">
                     <div class="kpi-title">Total Kas Masuk</div>
                     <div class="kpi-amount income">{{ $cash_flow['formatted_cash_in'] ?? 'Rp 0' }}</div>
-                    <div class="kpi-desc">{{ $cash_flow['cash_in_count'] ?? 0 }} Transaksi Penjualan / Pemasukan</div>
+                    <div class="kpi-desc">{{ $cash_flow['cash_in_count'] ?? 0 }} Transaksi Penjualan / Masuk</div>
                 </div>
             </td>
             <td style="width: 33.33%;">
                 <div class="kpi-card expense">
                     <div class="kpi-title">Total Kas Keluar</div>
                     <div class="kpi-amount expense">{{ $cash_flow['formatted_cash_out'] ?? 'Rp 0' }}</div>
-                    <div class="kpi-desc">{{ $cash_flow['cash_out_count'] ?? 0 }} Transaksi Belanja &amp; Operasional</div>
+                    <div class="kpi-desc">{{ $cash_flow['cash_out_count'] ?? 0 }} Transaksi Belanja &amp; Beban</div>
                 </div>
             </td>
             <td style="width: 33.33%;">
@@ -443,11 +443,11 @@
 
     <!-- 5. RINCIAN PER KATEGORI (2 TABEL BERDAMPINGAN) -->
     <div class="section-heading">3. Rincian Pemasukan &amp; Pengeluaran per Kategori</div>
-    <table class="layout-table" style="margin-bottom: 8px;">
+    <table class="layout-table" style="margin-bottom: 4px;">
         <tr>
             <!-- Tabel Pemasukan -->
             <td style="width: 49%; vertical-align: top;">
-                <div style="font-size: 7.2pt; font-weight: 700; color: #047857; text-transform: uppercase; margin-bottom: 3px;">
+                <div style="font-size: 6.8pt; font-weight: 700; color: #047857; text-transform: uppercase; margin-bottom: 2px;">
                     Rincian Kas Masuk (Penerimaan)
                 </div>
                 <table class="data-table">
@@ -467,7 +467,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="3" class="text-center" style="color: #94A3B8; padding: 10px 0;">
+                                <td colspan="3" class="text-center" style="color: #94A3B8; padding: 6px 0;">
                                     Belum ada data kas masuk pada periode ini.
                                 </td>
                             </tr>
@@ -485,7 +485,7 @@
 
             <!-- Tabel Pengeluaran -->
             <td style="width: 49%; vertical-align: top;">
-                <div style="font-size: 7.2pt; font-weight: 700; color: #B91C1C; text-transform: uppercase; margin-bottom: 3px;">
+                <div style="font-size: 6.8pt; font-weight: 700; color: #B91C1C; text-transform: uppercase; margin-bottom: 2px;">
                     Rincian Kas Keluar (Pengeluaran)
                 </div>
                 <table class="data-table">
@@ -505,7 +505,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="3" class="text-center" style="color: #94A3B8; padding: 10px 0;">
+                                <td colspan="3" class="text-center" style="color: #94A3B8; padding: 6px 0;">
                                     Belum ada data kas keluar pada periode ini.
                                 </td>
                             </tr>
@@ -543,20 +543,20 @@
     <table class="sign-table">
         <tr>
             <td style="width: 60%; vertical-align: bottom;">
-                <div style="font-size: 7pt; color: #64748B; line-height: 1.4;">
+                <div style="font-size: 6.5pt; color: #64748B; line-height: 1.35;">
                     Dokumen ini dihasilkan secara otomatis oleh sistem KasiVo Smart Business POS.<br>
                     Integritas data diverifikasi berdasarkan catatan pembukuan mandiri pengguna.
                 </div>
             </td>
             <td style="width: 40%; text-align: right; vertical-align: bottom;">
-                <div style="font-size: 7.5pt; color: #334155; margin-bottom: 2px;">
+                <div style="font-size: 6.8pt; color: #334155; margin-bottom: 1px;">
                     Pemilik Usaha / Penanggung Jawab,
                 </div>
                 <div class="signature-line" style="margin-left: auto;"></div>
-                <div style="font-size: 8pt; font-weight: 700; color: #0F172A;">
+                <div style="font-size: 7.2pt; font-weight: 700; color: #0F172A;">
                     {{ $business['owner_name'] ?? 'Pemilik Usaha' }}
                 </div>
-                <div style="font-size: 7pt; color: #64748B;">
+                <div style="font-size: 6.5pt; color: #64748B;">
                     {{ $business['name'] ?? '-' }}
                 </div>
             </td>
