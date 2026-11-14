@@ -73,6 +73,15 @@ class Dashboard extends Component
                 ],
                 'periodLabel' => 'Bulan Ini',
                 'period' => $this->period,
+                'chartYMaxLabel' => 'Rp 1 Jt',
+                'chartYHalfLabel' => 'Rp 500 Rb',
+                'avgDailyCashIn' => 'Rp 0',
+                'avgDailyCashOut' => 'Rp 0',
+                'peakInLabel' => '-',
+                'surplusDays' => 0,
+                'deficitDays' => 0,
+                'activeDays' => 0,
+                'totalDays' => 0,
             ]);
         }
 
@@ -98,6 +107,38 @@ class Dashboard extends Component
             $periodDates['end_date']
         );
 
+        $totalDays = count($dailySeries);
+        $activeDays = 0;
+        $surplusDays = 0;
+        $deficitDays = 0;
+        $peakInVal = 0.0;
+        $peakInLabel = '-';
+        $maxVal = 0.0;
+
+        foreach ($dailySeries as $t) {
+            $maxVal = max($maxVal, $t['cash_in'], $t['cash_out']);
+            if ($t['has_activity']) {
+                $activeDays++;
+            }
+            if ($t['cash_in'] > $t['cash_out']) {
+                $surplusDays++;
+            } elseif ($t['cash_out'] > $t['cash_in']) {
+                $deficitDays++;
+            }
+            if ($t['cash_in'] > $peakInVal) {
+                $peakInVal = $t['cash_in'];
+                $peakInLabel = $t['day_name'] . ', ' . $t['short_date'] . ' (' . $t['cash_in_compact'] . ')';
+            }
+        }
+
+        $yMax = $maxVal > 0 ? ceil($maxVal / 500000) * 500000 : 1000000;
+        if ($yMax < 500000) {
+            $yMax = 500000;
+        }
+
+        $avgDailyCashIn = $totalDays > 0 ? round($summary['total_cash_in'] / $totalDays, 2) : 0.0;
+        $avgDailyCashOut = $totalDays > 0 ? round($summary['total_cash_out'] / $totalDays, 2) : 0.0;
+
         return view('livewire.dashboard', [
             'hasBusiness' => true,
             'business' => $business,
@@ -107,6 +148,15 @@ class Dashboard extends Component
             'periodDates' => $periodDates,
             'periodLabel' => $periodDates['label'],
             'period' => $this->period,
+            'chartYMaxLabel' => $cashFlowService->formatCompactRupiah($yMax),
+            'chartYHalfLabel' => $cashFlowService->formatCompactRupiah($yMax / 2),
+            'avgDailyCashIn' => $cashFlowService->formatCompactRupiah($avgDailyCashIn),
+            'avgDailyCashOut' => $cashFlowService->formatCompactRupiah($avgDailyCashOut),
+            'peakInLabel' => $peakInLabel,
+            'surplusDays' => $surplusDays,
+            'deficitDays' => $deficitDays,
+            'activeDays' => $activeDays,
+            'totalDays' => $totalDays,
         ]);
     }
 }

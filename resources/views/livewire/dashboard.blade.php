@@ -196,6 +196,298 @@
                 </a>
             </div>
         </div>
+    @else
+        <!-- 4. Grafik Tren Kas Masuk & Kas Keluar Harian (KV-042 & KV-043) -->
+        <div x-data="{ 
+                selectedTrend: null,
+                init() {
+                    const trends = @js($dailySeries);
+                    if (Array.isArray(trends) && trends.length > 0) {
+                        const today = trends.find(t => t.is_today);
+                        this.selectedTrend = today || trends[trends.length - 1];
+                    }
+                }
+             }" 
+             class="p-6 sm:p-8 rounded-3xl bg-white border border-[#EEEEEE] shadow-sm space-y-6">
+            
+            <!-- Header Grafik & Legenda Ringkasan -->
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div>
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <h2 class="text-lg sm:text-xl font-bold text-[#252525]">
+                            Grafik Tren Arus Kas Harian
+                        </h2>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#FCEDEA] text-[#E87559] text-[10px] font-bold">
+                            Kas Riil &bull; Tanpa Laba
+                        </span>
+                    </div>
+                    <p class="text-xs text-[#777777] mt-1">
+                        Memantau pergerakan uang tunai riil: kapan omzet penjualan melonjak dan kapan belanja bahan baku dilakukan. <span class="font-semibold text-[#252525]">Tidak menampilkan angka laba</span> sesuai standar pencatatan kas riil.
+                    </p>
+                </div>
+
+                <!-- Legenda Ringkasan Periode (Kas Masuk vs Kas Keluar) -->
+                <div class="flex flex-wrap items-center gap-3 text-xs shrink-0">
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#DDF1EC]/60 border border-[#43A58A]/25">
+                        <span class="w-3 h-3 rounded-full bg-[#43A58A]"></span>
+                        <span class="font-bold text-[#252525]">Kas Masuk:</span>
+                        <span class="text-[#43A58A] font-extrabold">{{ $summary['formatted_cash_in'] }}</span>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FCEDEA]/60 border border-[#E87559]/25">
+                        <span class="w-3 h-3 rounded-full bg-[#E87559]"></span>
+                        <span class="font-bold text-[#252525]">Kas Keluar:</span>
+                        <span class="text-[#E87559] font-extrabold">{{ $summary['formatted_cash_out'] }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3 Kartu Insight Arus Kas Cepat (Rata-Rata & Puncak Penjualan) -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1">
+                
+                <!-- Insight 1: Rata-rata Masuk -->
+                <div class="p-3.5 rounded-2xl bg-[#DDF1EC]/35 border border-[#43A58A]/25 flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-[#43A58A] text-white flex items-center justify-center shrink-0 shadow-xs" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-graph-up" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07"/>
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="text-[11px] font-bold text-[#777777] uppercase tracking-wider">Rata-Rata Masuk</div>
+                        <div class="text-sm sm:text-base font-extrabold text-[#252525] truncate">
+                            {{ $avgDailyCashIn }}<span class="text-xs font-normal text-[#777777]">/hari</span>
+                        </div>
+                        <div class="text-[10px] text-[#43A58A] font-medium truncate mt-0.5">
+                            {{ $summary['cash_in_count'] }} transaksi omzet
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insight 2: Rata-rata Keluar -->
+                <div class="p-3.5 rounded-2xl bg-[#FCEDEA]/35 border border-[#E87559]/25 flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-[#E87559] text-white flex items-center justify-center shrink-0 shadow-xs" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-check" viewBox="0 0 16 16">
+                            <path d="M11.354 6.354a.5.5 0 0 0-.708-.708L8 8.293 6.854 7.146a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0z"/>
+                            <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1zm3.915 10L3.102 4h10.796l-1.313 7zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0m7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="text-[11px] font-bold text-[#777777] uppercase tracking-wider">Rata-Rata Keluar</div>
+                        <div class="text-sm sm:text-base font-extrabold text-[#252525] truncate">
+                            {{ $avgDailyCashOut }}<span class="text-xs font-normal text-[#777777]">/hari</span>
+                        </div>
+                        <div class="text-[10px] text-[#E87559] font-medium truncate mt-0.5">
+                            {{ $summary['cash_out_count'] }} belanja bahan &amp; modal
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insight 3: Puncak Penjualan -->
+                <div class="p-3.5 rounded-2xl bg-[#E1F0F7]/45 border border-[#252525]/10 flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-[#252525] text-white flex items-center justify-center shrink-0 shadow-xs" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star-fill text-[#E87559]" viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="text-[11px] font-bold text-[#777777] uppercase tracking-wider">Puncak Kas Masuk</div>
+                        <div class="text-sm sm:text-base font-extrabold text-[#252525] truncate">
+                            {{ $peakInLabel !== '-' ? $peakInLabel : 'Belum ada data' }}
+                        </div>
+                        <div class="text-[10px] text-[#777777] font-medium truncate mt-0.5">
+                            Omzet tertinggi periode ini
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Area Grafik Batang Visual dengan Sumbu Y & Grid Bantu (KV-042) -->
+            <div class="space-y-4 pt-2">
+                
+                <div class="flex">
+                    <!-- Sumbu Y Kiri: Label Skala Nominal -->
+                    <div class="w-14 sm:w-16 shrink-0 flex flex-col justify-between text-right pr-2 sm:pr-3 text-[10px] sm:text-[11px] font-bold text-[#777777] h-64 pb-10 select-none">
+                        <span>{{ $chartYMaxLabel }}</span>
+                        <span>{{ $chartYHalfLabel }}</span>
+                        <span>Rp 0</span>
+                    </div>
+
+                    <!-- Area Grafik & Kolom Scrollable -->
+                    <div class="flex-1 min-w-0 relative">
+                        <!-- 3 Garis Grid Horizontal Sumbu Y -->
+                        <div class="absolute inset-x-0 top-0 h-64 pb-10 pointer-events-none flex flex-col justify-between">
+                            <div class="w-full border-b border-dashed border-[#EEEEEE]"></div>
+                            <div class="w-full border-b border-dashed border-[#EEEEEE]"></div>
+                            <div class="w-full border-b border-solid border-[#EEEEEE]"></div>
+                        </div>
+
+                        <!-- Kontainer Scroll Kolom Tanggal -->
+                        <div class="overflow-x-auto pb-3 pt-6 -mt-6">
+                            <div class="inline-flex items-end gap-1.5 sm:gap-2 min-w-full px-1 sm:px-2 h-64 pb-10">
+                                @foreach ($dailySeries as $trend)
+                                    <div 
+                                        @click="selectedTrend = {{ json_encode($trend) }}"
+                                        @mouseenter="selectedTrend = {{ json_encode($trend) }}"
+                                        :class="selectedTrend && selectedTrend.date === '{{ $trend['date'] }}' ? 'bg-[#FCEDEA]/40 ring-2 ring-[#E87559]/60' : 'hover:bg-[#FCEDEA]/25'"
+                                        class="flex-1 min-w-[48px] sm:min-w-[56px] max-w-[72px] h-full flex flex-col items-center justify-end group cursor-pointer rounded-xl p-1 transition-all"
+                                    >
+                                        <!-- Mini Floating Badge: Puncak Omzet atau Hari Ini -->
+                                        <div class="h-4 flex items-center justify-center mb-1">
+                                            @if ($trend['is_peak_in'] ?? false)
+                                                <span class="text-[8px] font-extrabold text-[#43A58A] bg-[#DDF1EC] border border-[#43A58A]/30 px-1 py-0.2 rounded-full whitespace-nowrap shadow-2xs">
+                                                    ★ Puncak
+                                                </span>
+                                            @elseif ($trend['is_today'] ?? false)
+                                                <span class="text-[8px] font-extrabold text-[#E87559] bg-[#FCEDEA] border border-[#E87559]/30 px-1 py-0.2 rounded-full whitespace-nowrap shadow-2xs">
+                                                    Hari Ini
+                                                </span>
+                                            @endif
+                                        </div>
+
+                                        <!-- Pasangan Batang Harian (Kas Masuk vs Kas Keluar) -->
+                                        <div class="w-full flex items-end justify-center gap-1 sm:gap-1.5 h-full pb-0.5">
+                                            <!-- Batang Kas Masuk -->
+                                            <div 
+                                                style="height: {{ max($trend['cash_in_percent'] ?? 0, ($trend['cash_in'] > 0 ? 8 : 2)) }}%;" 
+                                                class="w-2.5 sm:w-3.5 rounded-t-md bg-[#43A58A] transition-all duration-300 {{ $trend['cash_in'] == 0 ? 'opacity-20 bg-[#EEEEEE]' : 'group-hover:brightness-95' }}"
+                                                title="Kas Masuk: {{ $trend['formatted_cash_in'] }} ({{ $trend['day_name'] }}, {{ $trend['short_date'] ?? $trend['label'] }})"
+                                            ></div>
+
+                                            <!-- Batang Kas Keluar -->
+                                            <div 
+                                                style="height: {{ max($trend['cash_out_percent'] ?? 0, ($trend['cash_out'] > 0 ? 8 : 2)) }}%;" 
+                                                class="w-2.5 sm:w-3.5 rounded-t-md bg-[#E87559] transition-all duration-300 {{ $trend['cash_out'] == 0 ? 'opacity-20 bg-[#EEEEEE]' : 'group-hover:brightness-95' }}"
+                                                title="Kas Keluar: {{ $trend['formatted_cash_out'] }} ({{ $trend['day_name'] }}, {{ $trend['short_date'] ?? $trend['label'] }})"
+                                            ></div>
+                                        </div>
+
+                                        <!-- Label Hari & Tanggal -->
+                                        <div class="mt-2 text-center select-none w-full">
+                                            <span class="block text-[10px] sm:text-[11px] font-bold leading-tight {{ ($trend['is_today'] ?? false) ? 'text-[#E87559]' : 'text-[#252525]' }}">
+                                                {{ $trend['day_name'] }}
+                                            </span>
+                                            <span class="block text-[9px] sm:text-[10px] font-medium text-[#777777] leading-tight mt-0.5">
+                                                {{ $trend['day_number'] ?? $trend['label'] }}
+                                            </span>
+                                            @if ($trend['is_today'] ?? false)
+                                                <span class="inline-block w-1.5 h-1.5 rounded-full bg-[#E87559] mt-0.5"></span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inspector Card: Detail Hari Interaktif & Komprehensif (Ramah Mobile/Touch & Tidak Terpotong) -->
+                <div class="p-4 sm:p-5 rounded-2xl bg-[#FCEDEA]/15 border border-[#EEEEEE] space-y-3">
+                    
+                    <!-- Baris Atas Inspector: Identitas Tanggal & Status -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#EEEEEE]">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded-lg bg-[#252525] text-white font-bold text-[10px] uppercase tracking-wider">
+                                Rincian Harian
+                            </span>
+                            <template x-if="selectedTrend">
+                                <span class="font-extrabold text-[#252525] text-sm sm:text-base">
+                                    <span x-text="selectedTrend.day_name"></span>, <span x-text="selectedTrend.short_date || selectedTrend.label"></span>
+                                    <template x-if="selectedTrend.is_today">
+                                        <span class="ml-1 px-2 py-0.5 rounded-md bg-[#FCEDEA] text-[#E87559] text-xs font-bold">(Hari Ini)</span>
+                                    </template>
+                                    <template x-if="selectedTrend.is_peak_in">
+                                        <span class="ml-1 px-2 py-0.5 rounded-md bg-[#DDF1EC] text-[#43A58A] text-xs font-bold">★ Puncak Kas Masuk</span>
+                                    </template>
+                                </span>
+                            </template>
+                            <template x-if="!selectedTrend">
+                                <span class="text-xs text-[#777777] italic">
+                                    Sentuh atau arahkan kursor ke kolom diagram untuk melihat detail hari tersebut
+                                </span>
+                            </template>
+                        </div>
+
+                        <template x-if="selectedTrend">
+                            <div class="text-xs text-[#777777] font-semibold flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#777777]"></span>
+                                <span>Aktivitas: <strong class="text-[#252525]" x-text="(selectedTrend.tx_count || 0) + ' transaksi tercatat'"></strong></span>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Baris Bawah Inspector: 3 Metrik Detail (Kas Masuk, Kas Keluar, Selisih Kas Harian) -->
+                    <template x-if="selectedTrend">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                            
+                            <!-- Detail 1: Kas Masuk Hari Itu -->
+                            <div class="p-3 rounded-xl bg-white border border-[#43A58A]/25 shadow-2xs">
+                                <div class="text-[10px] font-bold text-[#777777] uppercase tracking-wider flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-[#43A58A]"></span>
+                                    <span>Kas Masuk (Penjualan)</span>
+                                </div>
+                                <div class="mt-1 text-base sm:text-lg font-extrabold text-[#43A58A]" x-text="selectedTrend.formatted_cash_in"></div>
+                                <div class="text-[10px] text-[#777777] mt-0.5">Uang masuk dari omzet warung</div>
+                            </div>
+
+                            <!-- Detail 2: Kas Keluar Hari Itu -->
+                            <div class="p-3 rounded-xl bg-white border border-[#E87559]/25 shadow-2xs">
+                                <div class="text-[10px] font-bold text-[#777777] uppercase tracking-wider flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-[#E87559]"></span>
+                                    <span>Kas Keluar (Belanja)</span>
+                                </div>
+                                <div class="mt-1 text-base sm:text-lg font-extrabold text-[#E87559]" x-text="selectedTrend.formatted_cash_out"></div>
+                                <div class="text-[10px] text-[#777777] mt-0.5">Bahan baku &amp; operasional</div>
+                            </div>
+
+                            <!-- Detail 3: Selisih Kas Bersih Hari Itu -->
+                            <div class="p-3 rounded-xl bg-white border shadow-2xs" :class="selectedTrend.is_surplus ? 'border-[#43A58A]/35' : 'border-[#E87559]/35'">
+                                <div class="text-[10px] font-bold text-[#777777] uppercase tracking-wider flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full" :class="selectedTrend.is_surplus ? 'bg-[#43A58A]' : 'bg-[#E87559]'"></span>
+                                    <span>Selisih Kas Harian</span>
+                                </div>
+                                <div class="mt-1 text-base sm:text-lg font-extrabold" :class="selectedTrend.is_surplus ? 'text-[#43A58A]' : 'text-[#E87559]'" x-text="selectedTrend.formatted_net"></div>
+                                <div class="text-[10px] mt-0.5 font-semibold" :class="selectedTrend.is_surplus ? 'text-[#43A58A]' : 'text-[#E87559]'">
+                                    <span x-text="selectedTrend.is_surplus ? 'Kas Berjalan Surplus' : 'Belanja Stok Lebih Besar (Bukan Rugi)'"></span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </template>
+
+                </div>
+
+                <!-- Footer Informasi & Distribusi Hari Periode -->
+                <div class="pt-3 border-t border-[#EEEEEE] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-[#777777]">
+                    
+                    <!-- Distribusi Hari -->
+                    <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                        <span class="font-bold text-[#252525]">Distribusi Periode:</span>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#DDF1EC] text-[#43A58A] font-bold text-[11px]">
+                            <span class="w-1.5 h-1.5 rounded-full bg-[#43A58A]"></span>
+                            <span>{{ $surplusDays }} hari surplus</span>
+                        </span>
+                        @if ($deficitDays > 0)
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#FCEDEA] text-[#E87559] font-bold text-[11px]">
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#E87559]"></span>
+                                <span>{{ $deficitDays }} hari belanja stok</span>
+                            </span>
+                        @endif
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#EEEEEE] text-[#777777] font-semibold text-[11px]">
+                            <span>{{ $totalDays }} hari total ({{ $periodLabel }})</span>
+                        </span>
+                    </div>
+
+                    <!-- Petunjuk Interaksi & Edukasi Non-Laba -->
+                    <div class="flex items-center gap-1 text-[11px] text-[#777777]">
+                        <span class="sm:hidden text-[#E87559] font-semibold">Geser grafik ke samping untuk melihat seluruh tanggal &rarr;</span>
+                        <span class="hidden sm:inline italic">Klik kolom diagram untuk mengganti rincian harian</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
     @endif
 
     <!-- Middle Quick Navigation Cards Grid -->

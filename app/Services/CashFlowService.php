@@ -146,15 +146,18 @@ class CashFlowService
             ->selectRaw("
                 transaction_date,
                 type,
-                COALESCE(SUM(amount), 0) as total
+                COALESCE(SUM(amount), 0) as total,
+                COUNT(*) as count
             ")
             ->groupBy('transaction_date', 'type')
             ->get();
 
         $matrix = [];
+        $counts = [];
         foreach ($records as $record) {
             $dateStr = Carbon::parse($record->transaction_date)->toDateString();
             $matrix[$dateStr . '-' . $record->type] = (float) $record->total;
+            $counts[$dateStr] = ($counts[$dateStr] ?? 0) + (int) $record->count;
         }
 
         $series = [];
@@ -170,16 +173,54 @@ class CashFlowService
                 'date' => $dateKey,
                 'label' => $cursor->translatedFormat('d M'),
                 'day_name' => $cursor->translatedFormat('D'),
+                'day_number' => $cursor->format('d'),
+                'short_date' => $cursor->format('d/m'),
                 'cash_in' => (float) $cashIn,
                 'cash_out' => (float) $cashOut,
                 'net' => (float) $net,
+                'is_surplus' => $net >= 0,
+                'tx_count' => $counts[$dateKey] ?? 0,
+                'is_today' => $cursor->isToday(),
+                'has_activity' => ($cashIn > 0 || $cashOut > 0),
                 'formatted_cash_in' => $this->formatRupiah($cashIn),
                 'formatted_cash_out' => $this->formatRupiah($cashOut),
-                'formatted_net' => $this->formatRupiah($net, false),
+                'formatted_net' => $this->formatRupiah($net, true),
+                'cash_in_compact' => $this->formatCompactRupiah($cashIn),
+                'cash_out_compact' => $this->formatCompactRupiah($cashOut),
             ];
 
             $cursor->addDay();
         }
+
+        $maxVal = 0.0;
+        $maxInVal = 0.0;
+        $maxInIdx = null;
+
+        foreach ($series as $idx => $t) {
+            $maxVal = max($maxVal, $t['cash_in'], $t['cash_out']);
+            if ($t['cash_in'] > $maxInVal) {
+                $maxInVal = $t['cash_in'];
+                $maxInIdx = $idx;
+            }
+        }
+
+        $yMax = $maxVal > 0 ? ceil($maxVal / 500000) * 500000 : 1000000;
+        if ($yMax < 500000) {
+            $yMax = 500000;
+        }
+
+        foreach ($series as $idx => &$item) {
+            $item['cash_in_percent'] = $yMax > 0 && $item['cash_in'] > 0
+                ? max(6, min(100, (int) round(($item['cash_in'] / $yMax) * 100)))
+                : 0;
+
+            $item['cash_out_percent'] = $yMax > 0 && $item['cash_out'] > 0
+                ? max(6, min(100, (int) round(($item['cash_out'] / $yMax) * 100)))
+                : 0;
+
+            $item['is_peak_in'] = ($maxInIdx !== null && $maxInVal > 0 && $idx === $maxInIdx);
+        }
+        unset($item);
 
         return $series;
     }
@@ -286,6 +327,21 @@ class CashFlowService
     public function getCategoryLabel(string $category): string
     {
         return self::CATEGORY_LABELS[$category] ?? ucwords(str_replace('_', ' ', $category));
+    }
+
+    /**
+     * Format nilai angka ke mata uang Rupiah ringkas (contoh: "Rp 1,5 Jt" atau "Rp 500 Rb").
+     */
+    public function formatCompactRupiah(float $amount): string
+    {
+        if ($amount >= 1000000) {
+            $val = round($amount / 1000000, 1);
+            return 'Rp ' . (fmod($val, 1.0) === 0.0 ? (int) $val : number_format($val, 1, ',', '.')) . ' Jt';
+        }
+        if ($amount >= 1000) {
+            return 'Rp ' . number_format($amount / 1000, 0, ',', '.') . ' Rb';
+        }
+        return 'Rp ' . number_format($amount, 0, ',', '.');
     }
 }
 
